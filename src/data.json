@@ -1,0 +1,231 @@
+[
+  {
+    "id": 1,
+    "firstName": "Alice",
+    "lastName": "Johnson",
+    "address": "987 Pine St, Quahog",
+    "phone": "123-123-1234",
+    "email": "alice.johnson@example.com",
+    "lawnSize": "400 sq ft",
+    "visits": [
+      { "date": "Aug-02-24", "paid": true },
+      { "date": "Jul-15-24", "paid": false },
+      { "date": "Jul-01-24", "paid": true },
+      { "date": "Jun-15-24", "paid": false },
+      { "date": "Jun-01-24", "paid": true }
+    ],
+    "image": "https://cdn.sanity.io/images/32lej2m6/production/5ed93ff76ffbb70e392cd91e4a42dc76b5c0da70-1920x1080.jpg?auto=format",
+    "tags": [
+      { "day": "Tuesday", "occurrence": "Weekly" }
+    ]
+  },
+  {
+    "id": 2,
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "address": "456 Elm St, Shelbyville",
+    "phone": "987-654-3210",
+    "email": "jane.smith@example.com",
+    "lawnSize": "750 sq ft",
+    "visits": [
+      { "date": "jul-08-24", "paid": false },
+      { "date": "jul-15-24", "paid": true },
+      { "date": "Jul-22-24", "paid": true },
+      { "date": "jul-29-24", "paid": true },
+      { "date": "Aug-05-24", "paid": true }
+    ],
+    "image": "https://www.nichiha.com/uploads/blog/ProPhotos_2Q6A2757-Pano-1-Blog-Header.jpg?t=1628871925",
+    "tags": [
+      { "day": "Tuesday", "occurrence": "Weekly" }
+    ]
+  },
+  {
+    "id": 3,
+    "firstName": "Jim",
+    "lastName": "Beam",
+    "address": "789 Oak St, Ogdenville",
+    "phone": "555-555-5555",
+    "email": "jim.beam@example.com",
+    "lawnSize": "1000 sq ft",
+    "visits": [
+      { "date": "Jul-06-24", "paid": true },
+      { "date": "jul-13-24", "paid": true },
+      { "date": "jul-20-24", "paid": true },
+      { "date": "jul-27-24", "paid": false },
+      { "date": "Aug-03-24", "paid": true }
+    ],
+    "image": "https://i.redd.it/fmtl7p8ocb551.jpg",
+    "tags": [
+      { "day": "Tuesday", "occurrence": "Weekly" }
+    ]
+  },
+  {
+    "id": 4,
+    "firstName": "Sara",
+    "lastName": "Connor",
+    "address": "101 Maple St, Capital City",
+    "phone": "234-567-8901",
+    "email": "sara.connor@example.com",
+    "lawnSize": "600 sq ft",
+    "visits": [
+      { "date": "Aug-01-24", "paid": true },
+      { "date": "Jul-25-24", "paid": true },
+      { "date": "Jul-18-24", "paid": true },
+      { "date": "Jul-11-24", "paid": true },
+      { "date": "Jul-04-24", "paid": true }
+    ],
+    "image": "https://cdnb.artstation.com/p/assets/images/images/019/630/807/large/mazin-nasra-final.jpg?1564353880",
+    "tags": [
+      { "day": "Tuesday", "occurrence": "Weekly" }
+    ]
+  },
+  {
+    "id": 5,
+    "firstName": "Michael",
+    "lastName": "Johnson",
+    "address": "789 Birch St, Shelbyville",
+    "phone": "345-678-9012",
+    "email": "michael.johnson@example.com",
+    "lawnSize": "650 sq ft",
+    "visits": [
+      { "date": "Aug-01-24", "paid": true },
+      { "date": "Jul-25-24", "paid": false },
+      { "date": "Jul-18-24", "paid": true },
+      { "date": "Jul-11-24", "paid": true },
+      { "date": "Jul-04-24", "paid": false }
+    ],
+    "image": "https://yardzen.com/wp-content/uploads/2022/07/Schelly_9-Odell-Ave__4-Photo.jpg",
+    "tags": [
+      { "day": "Tuesday", "occurrence": "Weekly" }
+    ]
+  },
+  {
+    "id": 6,
+    "firstName": "Emily",
+    "lastName": "Davis",
+    "address": "456 Maple St, Springfield",
+    "phone": "456-789-0123",
+    "email": "emily.davis@example.com",
+    "lawnSize": "700 sq ft",
+    "visits": [
+      { "date": "Aug-01-24", "paid": true },
+      { "date": "Jul-25-24", "paid": true },
+      { "date": "Jul-18-24", "paid": false },
+      { "date": "Jul-11-24", "paid": true },
+      { "date": "Jul-04-24", "paid": false }
+    ],
+    "image": "https://yardzen.com/wp-content/uploads/2022/07/tapia_4043-martinshire-dr_1.jpeg",
+    "tags": [
+      { "day": "Monday", "occurrence": "Weekly" }
+    ]
+  },
+  {
+    "id": 7,
+    "firstName": "William",
+    "lastName": "Brown",
+    "address": "123 Pine St, Ogdenville",
+    "phone": "567-890-1234",
+    "email": "william.brown@example.com",
+    "lawnSize": "800 sq ft",
+    "visits": [
+      { "date": "Aug-01-24", "paid": true },
+      { "date": "Jul-25-24", "paid": false },
+      { "date": "Jul-18-24", "paid": true },
+      { "date": "Jul-11-24", "paid": false },
+      { "date": "Jul-04-24", "paid": true }
+    ],
+    "image": "https://www.whitehouselandscaping.com/wp-content/uploads/2018/12/Render-2.jpg",
+    "tags": []
+  },
+  {
+    "id": 8,
+    "firstName": "Sophia",
+    "lastName": "Wilson",
+    "address": "789 Cedar St, Brockway",
+    "phone": "678-901-2345",
+    "email": "sophia.wilson@example.com",
+    "lawnSize": "750 sq ft",
+    "visits": [
+      { "date": "Aug-01-24", "paid": true },
+      { "date": "Jul-31-24", "paid": true },
+      { "date": "Jul-11-24", "paid": false },
+      { "date": "Jul-01-24", "paid": true },
+      { "date": "Jul-21-24", "paid": true }
+    ],
+    "image": "https://cdn.sanity.io/images/32lej2m6/production/5ed93ff76ffbb70e392cd91e4a42dc76b5c0da70-1920x1080.jpg?auto=format",
+    "tags": []
+  },
+  {
+    "id": 9,
+    "firstName": "Clark",
+    "lastName": "Kent",
+    "address": "909 Krypton St, Metropolis",
+    "phone": "312-555-1234",
+    "email": "clark.kent@example.com",
+    "lawnSize": "1500 sq ft",
+    "visits": [
+      { "date": "Aug-06-24", "paid": false},
+      { "date": "Jul-30-24", "paid": true },
+      { "date": "Jul-23-24", "paid": false },
+      { "date": "Jul-16-24", "paid": true },
+      { "date": "Jul-09-24", "paid": false}
+    ],
+    "image": "https://cdn.sanity.io/images/32lej2m6/production/5ed93ff76ffbb70e392cd91e4a42dc76b5c0da70-1920x1080.jpg?auto=format",
+    "tags": []
+  },
+  {
+    "id": 10,
+    "firstName": "Bruce",
+    "lastName": "Wayne",
+    "address": "1007 Mountain Dr, Gotham",
+    "phone": "213-555-5678",
+    "email": "bruce.wayne@example.com",
+    "lawnSize": "2000 sq ft",
+    "visits": [
+      { "date": "Aug-01-24", "paid": true },
+      { "date": "Jul-25-24", "paid": false },
+      { "date": "Jul-18-24", "paid": true },
+      { "date": "Jul-11-24", "paid": false },
+      { "date": "Jul-04-24", "paid": true }
+    ],
+    "image": "https://yardzen.com/wp-content/uploads/2022/07/tapia_4043-martinshire-dr_1.jpeg",
+    "tags": []
+  },
+  {
+    "id": 11,
+    "firstName": "Diana",
+    "lastName": "Prince",
+    "address": "123 Amazon Ln, Themyscira",
+    "phone": "415-555-7890",
+    "email": "diana.prince@example.com",
+    "lawnSize": "1250 sq ft",
+    "visits": [
+      { "date": "Aug-01-24", "paid": true },
+      { "date": "Jul-25-24", "paid": true },
+      { "date": "Jul-18-24", "paid": true },
+      { "date": "Jul-11-24", "paid": true },
+      { "date": "Jul-04-24", "paid": false }
+    ],
+    "image": "https://www.whitehouselandscaping.com/wp-content/uploads/2018/12/Render-2.jpg",
+    "tags": []
+  },
+  {
+    "id": 12,
+    "firstName": "Barry",
+    "lastName": "Allen",
+    "address": "123 Speedster Ave, Central City",
+    "phone": "619-555-0123",
+    "email": "barry.allen@example.com",
+    "lawnSize": "1000 sq ft",
+    "visits": [
+      { "date": "Aug-01-24", "paid": true },
+      { "date": "Jul-25-24", "paid": true },
+      { "date": "Jul-18-24", "paid": true },
+      { "date": "Jul-11-24", "paid": false },
+      { "date": "Jul-04-24", "paid": true }
+    ],
+    "image": "https://cdn.sanity.io/images/32lej2m6/production/5ed93ff76ffbb70e392cd91e4a42dc76b5c0da70-1920x1080.jpg?auto=format",
+    "tags": []
+  }
+
+]

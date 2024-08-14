@@ -1,0 +1,325 @@
+body, html, #root {
+  margin: 0;
+  height: 100%;
+  overflow: hidden; /* Prevent scrollbar from appearing */
+}
+
+.app-container {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 100%; /* Increase width to create more space on the left */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Align the list to the right */
+  box-sizing: border-box;
+  padding: 10vh 0px 10vh 20vw;/* Increase left padding significantly */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden;
+  background-size: cover;
+  background-position: center;
+  transition: background-image 0.1s ease-in-out, opacity .5s ease-in-out; /* Adjust transition duration here */
+  scroll-behavior: smooth;
+  z-index: 1; /* Ensure this is above the background image */
+}
+
+.app-container::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
+}
+
+.back-ground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 520px;
+  background: rgba(40, 40, 43, 1);
+  clip-path: polygon(40% 30%, 50% 20%, 100% 20%, 100% 0, 0 0, 0 30%);
+  z-index: 5; /* Ensure this is below the top bar and sort dropdown */
+}
+
+.search-bar {
+  position: fixed;
+  top: 112px; /* Adjust the top position as needed */
+  width: 25%;
+  height: 4%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: opacity 0.5s, background-color 0.5s, box-shadow 0.5s;
+  opacity: 100;
+  z-index: 10;
+  pointer-events: none; /* Disable pointer events */
+  color: white;
+  background-color: rgba(47, 47, 48, 0.372); 
+}
+
+.right-aligned-list {
+  list-style: none;
+  padding: 0;
+  width: 100%; /* Ensure list takes full width */
+  padding-bottom: 80px; /* Add padding to the bottom to ensure items do not overlap with the menu */
+  z-index: 2; /* Ensure this is above the background image */
+  margin-top: 35px;
+}
+
+.right-aligned-list .list-item.focused {
+  transform: scale(1.03);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  animation: glow-blur 2s infinite ease-in-out;
+  z-index: 2;
+}
+
+
+.list-item {
+  font-family: Inter;
+  background: rgba(3, 3, 3, 0.212); /* Transparent white background */
+  backdrop-filter: blur(25px); /* Blur effect */
+  border: 3px solid rgba(255, 255, 255, 0.3); /* Light border */
+  border-width: 0px;
+  color: white;
+  padding: 10px 20px;
+  margin: 8px 0;
+  border-radius: 10px 0 0 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  text-shadow: rgb(255, 255, 255) 1px 0 10px;
+  box-sizing: border-box; /* Include padding in width calculation */
+  position: relative; /* Create a stacking context */
+  cursor: pointer;
+  z-index: 10;
+  min-width: 50%; /* Fixed width for list items */
+  max-width: 55%;
+  margin-left: auto; /* Align to the right with padding */
+  transform-origin: right center;
+  user-select: none; /* Prevent text selection */
+  
+}
+
+@keyframes glow-blur {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6), 0 0 20px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.6), 0 0 20px rgba(255, 0, 255, 0.6), 0 0 30px rgba(255, 0, 255, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6), 0 0 20px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.6);
+  }
+}
+
+.list-item.focused {
+  transform: scale(1.03);
+  animation: glow-blur 2s infinite ease-in-out;
+  z-index: 2;
+}
+
+.list-item:hover {
+  transform: scale(1.02);
+  z-index: 2;
+}
+
+.bottom-menu {
+  font-family: Inter;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  background: rgba(40, 40, 43, 1); /* Transparent white background */
+  backdrop-filter: blur(5px); /* Blur effect */
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  z-index: 10; /* Ensure the menu is above the list items */
+}
+
+/* Add this to your App.css */
+
+.top-bar {
+  font-family: Inter;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: rgba(40, 40, 43, 1);
+  backdrop-filter: blur(5px);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  box-sizing: border-box;
+  z-index: 10; /* Ensure the top bar is above the list items */
+}
+
+.sort-button-container {
+  position: absolute;
+  right: 20px; /* Adjust as needed for spacing */
+  top: 35px;  /* Set this value to move it to a specific position */
+  display: flex;
+  align-items: center;
+}
+
+.sort-button {
+  background-color: rgb(33, 33, 36);
+  border: none;
+  color: white;
+  padding: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  border-radius: 10px;
+  min-width: 100px; /* Set a fixed minimum width */
+  text-align: center;
+}
+.sort-button:hover{
+  transform: scale(1.03);
+}
+
+.sort-dropdown {
+  display: none;
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.194);
+  margin-top: -8px;
+  width: 150px;
+  box-shadow: 10px 10px 10px 0px rgba(0, 0, 0, 0.2);
+  z-index: 70; /* Ensure dropdown is above other elements */
+  top: 50px;
+  right: 0;
+  border-radius: 5px;
+}
+
+.sort-dropdown button {
+  background-color: rgba(82, 82, 82, 0.64);
+  color: rgb(197, 197, 197);
+  padding: 10px;
+  text-align: left;
+  border: none;
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.sort-button-container:hover .sort-dropdown {
+  display: block;
+}
+
+.client-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px; /* Reduce padding */
+  line-height: 1.4; /* Reduce line height */
+  font-size: 19px; /* Optionally, reduce font size */
+  text-shadow: rgb(255, 255, 255) 1px 0 2px;
+  margin-top: 90px; /* Adjust as needed */
+}
+
+.stars {
+  margin-top: 5px;
+}
+
+.star {
+  color: rgb(228, 213, 136);
+  margin-left: 2px;
+  text-shadow: 0 0 10px rgb(255, 157, 0);
+  font-size: 1.2em; 
+}
+
+.mode-button-container{
+  position: absolute;
+  left: 15%; /* Adjust as needed for spacing */
+  top: 15%;  /* Set this value to move it to a specific position */
+  display: flex;
+  align-items: center;
+}
+
+.add-client-button-container{
+  position: absolute;
+  left: 22%; /* Adjust as needed for spacing */
+  top: 15%;  /* Set this value to move it to a specific position */
+  display: flex;
+  align-items: center;
+}
+
+.add-client, .mode-button{
+  background-color: rgb(33, 33, 36);
+  border: none;
+  color: rgb(255, 255, 255);
+  padding: 30px;
+  font-size: 15px;
+  cursor: pointer;
+  border-radius: 10px;
+  min-width: 100px; /* Set a fixed minimum width */
+  text-align: center;
+  margin-left: 20px; /* Optional: Adjust margin as needed */
+}
+
+.mode-button:hover, .add-client:hover{
+  transform: scale(1.03);
+}
+
+.mode-button:active,  .add-client:active, .sort-button:active{
+  transform: scale(1.05);
+  background-color: rgba(0, 0, 0, 0); /* Change background color on button press */
+  color: rgb(254, 254, 254); /* Change text color on button press */
+  box-shadow: 0 0 5px rgba(247, 247, 247, 0.6); /* Add a box shadow on button press */
+}
+
+.list-item.date-header{
+  font-family: 'Arial Narrow';
+  font-size: x-large;
+}
+
+
+.list-item.complete {
+  background-color: rgba(0, 101, 253, 0.564);
+}
+
+.list-item.paid {
+  background-color: rgba(0, 255, 21, 0.427);
+}
+
+.list-item.complete::before {
+  content: '✔';
+  position: absolute;
+  top: -12px;
+  left: -1px;
+  color: white;
+  font-size: 14px;
+  background-color: rgba(0, 101, 253, 0.564);
+  padding: 2px 8px;
+  border-radius: 100px;
+
+}
+
+.list-item.paid::before {
+  content: '$';
+  position: absolute;
+  top: -12px;
+  left: -1px;
+  color: white;
+  font-size: 14px;
+  background-color: rgba(0, 255, 21, 0.427);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.left-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20vw; /* Adjust width as needed */
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 10; /* Ensure it's above other elements */
+}
