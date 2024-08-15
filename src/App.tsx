@@ -2,30 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import addresses from './data.json';
 import Calendar from './components/Calendar';
-
-interface Client {
-  id: number;
-  firstName: string;
-  lastName: string;
-  address: string;
-  phone: string;
-  email: string;
-  lawnSize: string;
-  visits: Visit[];
-  image: string; // Add image property
-  selected?: string; // Change the selected property to string
-  tags: { day: string, occurrence: string }[]; // Add tags property
-}
-
-/**
- * Represents a visit.
- * @property {string} date - The date of the visit.
- * @property {boolean} paid - Indicates if the visit has been paid.
- */
-interface Visit {
-  date: string;
-  paid: boolean;
-}
+import { Client } from './types/interfaces'; // Import interfaces
 
 // function that takes in square feet and returns a star value integer. 
 // the star value integer is used to render the number of stars on the client list.
