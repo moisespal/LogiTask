@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
 import addresses from './data.json';
 import Calendar from './components/Calendar';
+import TopBar from './components/TopBar';
 import { Client } from './types/interfaces'; // Import interfaces
+import './App.css';
+
 
 // function that takes in square feet and returns a star value integer. 
 // the star value integer is used to render the number of stars on the client list.
@@ -208,30 +210,12 @@ const App: React.FC = () => {
         onChange={handleChange}
         placeholder="Search: Type to search"
       />
-      <div className="top-bar">
-        <div className={`client-info ${focusedItemId !== null ? 'visible' : ''}`}>
-          {focusedItemId !== null && (
-            <>
-              <div>{selectedClient?.firstName} {selectedClient?.lastName}</div>
-              <div>{selectedClient?.address}</div>
-              <div>{selectedClient?.phone}</div>
-              <div>{selectedClient?.email}</div>
-              <div>{selectedClient?.lawnSize}</div>
-            </>
-          )}
-        </div>
-        <div className="sort-button-container" style={{ marginTop: '20px' }}>
-          Sort
-          <button className="sort-button">By {sortOption.charAt(0).toUpperCase() + sortOption.slice(1)}</button>
-          <div className="sort-dropdown">
-            <button onClick={() => handleSortChange('none')}>None</button>
-            <button onClick={() => handleSortChange('firstName')}>First Name</button>
-            <button onClick={() => handleSortChange('address')}>Address</button>
-            <button onClick={() => handleSortChange('phone')}>Phone Number</button>
-            <button onClick={() => handleSortChange('lawnSize')}>Lawn Size</button>
-          </div>
-        </div>
-      </div>
+      <TopBar
+        focusedItemId={focusedItemId}
+        selectedClient={selectedClient ?? null}
+        sortOption={sortOption}
+        handleSortChange={handleSortChange}
+      />
       <ul className="right-aligned-list">
         {modeType === 'Daily' && (
           <li className="list-item date-header">
