@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import addresses from './data.json';
-import Calendar from './Calendar';
+import Calendar from './components/Calendar';
 
 interface Client {
   id: number;
