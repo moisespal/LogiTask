@@ -116,7 +116,7 @@
     ],
     "image": "https://yardzen.com/wp-content/uploads/2022/07/tapia_4043-martinshire-dr_1.jpeg",
     "tags": [
-      { "day": "Monday", "occurrence": "Weekly" }
+      { "day": "Friday", "occurrence": "Weekly" }
     ]
   },
   {
@@ -128,14 +128,16 @@
     "email": "william.brown@example.com",
     "lawnSize": "800 sq ft",
     "visits": [
-      { "date": "Aug-01-24", "paid": true },
+      { "date": "Sep-06-24", "paid": true },
       { "date": "Jul-25-24", "paid": false },
       { "date": "Jul-18-24", "paid": true },
       { "date": "Jul-11-24", "paid": false },
       { "date": "Jul-04-24", "paid": true }
     ],
     "image": "https://www.whitehouselandscaping.com/wp-content/uploads/2018/12/Render-2.jpg",
-    "tags": []
+    "tags": [
+      { "day": "Friday", "occurrence": "Weekly" }
+    ]
   },
   {
     "id": 8,
@@ -146,7 +148,7 @@
     "email": "sophia.wilson@example.com",
     "lawnSize": "750 sq ft",
     "visits": [
-      { "date": "Aug-01-24", "paid": true },
+      { "date": "Sep-06-24", "paid": true },
       { "date": "Jul-31-24", "paid": true },
       { "date": "Jul-11-24", "paid": false },
       { "date": "Jul-01-24", "paid": true },
@@ -164,7 +166,7 @@
     "email": "clark.kent@example.com",
     "lawnSize": "1500 sq ft",
     "visits": [
-      { "date": "Aug-06-24", "paid": false},
+      { "date": "Sep-06-24", "paid": false},
       { "date": "Jul-30-24", "paid": true },
       { "date": "Jul-23-24", "paid": false },
       { "date": "Jul-16-24", "paid": true },
