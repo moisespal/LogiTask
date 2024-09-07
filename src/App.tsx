@@ -21,7 +21,6 @@ const getStars = (lawnSize: string): number => {
   return 7;
 };
 
-
 /**
  * Renders a specified number of stars as JSX elements.
  * 
@@ -186,6 +185,7 @@ const App: React.FC = () => {
   const selectedClient = focusedItemId !== null ? filteredAddresses.find(client => client.id === focusedItemId) : null;
 
   return (
+    
     <div className="app-container" style={{ backgroundImage: selectedClient ? `url(${selectedClient.image})` : `url(${'https://wallpapers.com/images/hd/windows-default-background-ihuecjk2mhalw3nq.jpg'})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
       {selectedClient && modeType === 'Client' && (
         <Calendar visits={selectedClient.visits} />
@@ -238,14 +238,18 @@ const App: React.FC = () => {
         ))}
       </ul>
       <div className="bottom-menu">
-        <div className="mode-button-container">
-          <button className="mode-button" onClick={handleModeClick}>{modeType}</button>
-        </div>
-        <div className="add-client-button-container">
-          <button className="add-client">+</button>
+        <div className="bottom-menu-button-container">
+            <button className="mode-button" onClick={handleModeClick}>{modeType}</button>
+            <button className="add-client">+</button>
         </div>
         <div className="company-profile-card">
-          Company Name
+          <div className="company-info">
+            <img id="company-image" src="https://art.pixilart.com/thumb/sr2e1188a7c216a.png" alt="Company Logo"/>
+            <div className="company-info-text">
+              <p className='company-name'>Company Name</p>
+              <p className='level'>Lvl 5</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
