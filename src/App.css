@@ -155,7 +155,6 @@ body, html, #root {
   position: relative;
   right: 25px; 
   top: 35px;  
-  display: flex;
   align-items: center;
 }
 
@@ -201,9 +200,6 @@ body, html, #root {
 }
 
 .client-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
   padding: 10px; /* Reduce padding */
   line-height: 1.4; /* Reduce line height */
   font-size: 19px; /* Optionally, reduce font size */
@@ -300,3 +296,4 @@ body, html, #root {
   padding: 2px 8px;
   border-radius: 100px;
 }
+
