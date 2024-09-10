@@ -33,7 +33,6 @@ const renderStars = (count: number): JSX.Element[] => {
   ));
 };
 
-
 // gets today as a string in the format of the day of the week
 const getTodayDayString = (): string => {
   return new Date().toLocaleDateString('en-US', { weekday: 'long' });
