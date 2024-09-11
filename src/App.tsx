@@ -2,42 +2,30 @@ import React, { useState, useEffect, useRef } from 'react';
 import addresses from './data.json';
 import Calendar from './components/Calendar';
 import TopBar from './components/TopBar';
-import { Client } from './types/interfaces'; // Import interfaces
+import { Client } from './types/interfaces';
 import './App.css';
 
-
-// function that takes in square feet and returns a star value integer. 
-// the star value integer is used to render the number of stars on the client list.
-// the star value is determined by the square footage of the lawn.
+// Utility functions
 const getStars = (lawnSize: string): number => {
   const size = parseInt(lawnSize.replace(/\D/g, ''), 10);
   if (isNaN(size)) return 0;
-  if (size < 350) return 1;
-  if (size < 600) return 2;
-  if (size < 700) return 3;
-  if (size < 800) return 4;
-  if (size < 900) return 5;
-  if (size < 1000) return 6;
-  return 7;
+  return Math.min(Math.floor((size - 350) / 100) + 1, 7);
 };
 
-/**
- * Renders a specified number of stars as JSX elements.
- * 
- * @param count - The number of stars to render.
- * @returns An array of JSX elements representing the stars.
- */
-const renderStars = (count: number): JSX.Element[] => {
-  return Array.from({ length: count }, (_, i) => (
-    <span key={i} className="star">★</span>
-  ));
+const renderStars = (count: number): JSX.Element[] => (
+  Array.from({ length: count }, (_, i) => <span key={i} className="star">★</span>)
+);
+
+const getTodayDayString = (): string =>
+  new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+const getOrdinalSuffix = (day: number): string => {
+  if (day > 3 && day < 21) return 'th';
+  const suffixes = ['th', 'st', 'nd', 'rd'];
+  return suffixes[(day % 10)] || 'th';
 };
 
-// gets today as a string in the format of the day of the week
-const getTodayDayString = (): string => {
-  return new Date().toLocaleDateString('en-US', { weekday: 'long' });
-};
-
+// Main Component
 const App: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [focusedItemId, setFocusedItemId] = useState<number | null>(null);
@@ -46,211 +34,183 @@ const App: React.FC = () => {
   const [clients, setClients] = useState<Client[]>(addresses);
   const listRefs = useRef<(HTMLLIElement | null)[]>([]);
 
-  const handleModeClick = () => {
-    if (modeType === 'Client') return setModeType('Daily');
-    return setModeType('Client');
-  };
+  // Event Handlers
+  const handleModeClick = () => setModeType(prev => (prev === 'Client' ? 'Daily' : 'Client'));
 
-  const sortAddresses = (clients: Client[]): Client[] => {
-    return [...clients].sort((a, b) => {
-      switch (sortOption) {
-        case 'firstName':
-          return a.firstName.localeCompare(b.firstName);
-        case 'address':
-          return a.address.localeCompare(b.address);
-        case 'phone':
-          return a.phone.localeCompare(b.phone);
-        case 'lawnSize':
-          return parseInt(a.lawnSize) - parseInt(b.lawnSize);
-        default:
-          return 0;
-      }
-    });
-  };
-
-  const todayDayString = getTodayDayString();
-
-  const filterByModeType = (clients: Client[]): Client[] => {
-    if (modeType === 'Client') return clients;
-    if (modeType === 'Daily') return clients.filter(item => item.tags.some(tag => tag.day === todayDayString));
-    return [];
-  };
-
-  const filterBySearchTerm = (clients: Client[]): Client[] => {
-    return clients.filter(item =>
-      [item.firstName, item.lastName, item.address, item.phone, item.email, item.lawnSize, item.selected]
-        .some(field => field && field.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  };
-
-  const filteredAddresses = sortAddresses(filterBySearchTerm(filterByModeType(clients)));
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
 
   const handleItemClick = (id: number) => {
-    if (modeType === "Daily") {
-      setClients(prevClients => prevClients.map(client => {
-        if (client.id === id) {
-          let newStatus;
-          if (client.id === focusedItemId) {
-            if (client.selected === "Complete") {
-              newStatus = "Paid";
-            } else if (client.selected === "Paid") {
-              newStatus = "None";
-            } else {
-              newStatus = "Complete";
-            }
-          } else {
-            newStatus = client.selected;
-          }
-          return { ...client, selected: newStatus };
-        }
-        return client;
-      }));
+    if (modeType === 'Daily') {
+      setClients(prevClients => 
+        prevClients.map(client =>
+          client.id === id
+            ? { ...client, selected: getNextStatus(client) }
+            : client
+        )
+      );
     }
     setFocusedItemId(id);
   };
 
-  const handleSortChange = (option: string) => {
-    setSortOption(option);
+  const handleSortChange = (option: string) => setSortOption(option);
+
+  const getNextStatus = (client: Client) => {
+    if (client.id !== focusedItemId) return client.selected;
+    if (client.selected === 'Complete') return 'Paid';
+    if (client.selected === 'Paid') return 'None';
+    return 'Complete';
   };
 
-  const getOrdinalSuffix = (day: number): string => {
-    if (day > 3 && day < 21) return 'th';
-    switch (day % 10) {
-      case 1: return 'st';
-      case 2: return 'nd';
-      case 3: return 'rd';
-      default: return 'th';
+  // Filtering and Sorting
+  const filterClientsByMode = (clients: Client[]): Client[] => {
+    if (modeType === 'Daily') {
+      const todayDayString = getTodayDayString();
+      return clients.filter(client => client.tags.some(tag => tag.day === todayDayString));
     }
+    return clients;
   };
 
-  const today = new Date();
-  const day = today.getDate();
-  const formattedDate = `${today.toLocaleDateString('en-US', { weekday: 'long' })}, ${today.toLocaleDateString('en-US', { month: 'long' })} ${day}${getOrdinalSuffix(day)}`;
+  const filterClientsBySearch = (clients: Client[]): Client[] => 
+    clients.filter(client =>
+      [client.firstName, client.lastName, client.address, client.phone, client.email, client.lawnSize]
+        .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
 
-  useEffect(() => {
-    if (filteredAddresses.length === 1) {
-      setFocusedItemId(filteredAddresses[0].id);
-    } else if (filteredAddresses.length > 1) {
-      const focusedItem = filteredAddresses.find(client => client.id === focusedItemId);
-      if (!focusedItem) {
-        setFocusedItemId(null);
+  const sortClients = (clients: Client[]): Client[] =>
+    [...clients].sort((a, b) => {
+      switch (sortOption) {
+        case 'firstName': return a.firstName.localeCompare(b.firstName);
+        case 'address': return a.address.localeCompare(b.address);
+        case 'phone': return a.phone.localeCompare(b.phone);
+        case 'lawnSize': return parseInt(a.lawnSize) - parseInt(b.lawnSize);
+        default: return 0;
       }
-    }
-  }, [filteredAddresses, focusedItemId]);
+    });
 
+  const filteredClients = sortClients(filterClientsBySearch(filterClientsByMode(clients)));
+
+  // Keyboard Navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const allowedKeys = /^[a-zA-Z0-9,.\s]$/;
-      if (e.key === 'Backspace') {
-        setSearchTerm((prev) => prev.slice(0, -1));
-      } else if (allowedKeys.test(e.key)) {
-        setSearchTerm((prev) => prev + e.key);
-      } else if (e.key === 'ArrowRight') {
-        setFocusedItemId((prevId) => {
-          const currentIndex = filteredAddresses.findIndex(client => client.id === prevId);
-          const newIndex = Math.min(currentIndex + 1, filteredAddresses.length - 1);
-          const newFocusedItemId = filteredAddresses[newIndex]?.id ?? null;
-          if (newFocusedItemId !== null) {
-            const newItemIndex = filteredAddresses.findIndex(client => client.id === newFocusedItemId);
-            listRefs.current[newItemIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-          return newFocusedItemId;
-        });
-      } else if (e.key === 'ArrowLeft') {
-        setFocusedItemId((prevId) => {
-          const currentIndex = filteredAddresses.findIndex(client => client.id === prevId);
-          const newIndex = Math.max(currentIndex - 1, 0);
-          const newFocusedItemId = filteredAddresses[newIndex]?.id ?? null;
-          if (newFocusedItemId !== null) {
-            const newItemIndex = filteredAddresses.findIndex(client => client.id === newFocusedItemId);
-            listRefs.current[newItemIndex]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-          return newFocusedItemId;
-        });
-      }
+      if (e.key === 'Backspace') setSearchTerm(prev => prev.slice(0, -1));
+      else if (/^[a-zA-Z0-9,.\s]$/.test(e.key)) setSearchTerm(prev => prev + e.key);
+      else if (e.key === 'ArrowRight') navigateFocusedItem(1);
+      else if (e.key === 'ArrowLeft') navigateFocusedItem(-1);
     };
 
     window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [filteredClients]);
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [filteredAddresses.length, filteredAddresses]);
+  const navigateFocusedItem = (direction: number) => {
+    setFocusedItemId(prevId => {
+      const currentIndex = filteredClients.findIndex(client => client.id === prevId);
+      const newIndex = Math.min(Math.max(currentIndex + direction, 0), filteredClients.length - 1);
+      const newFocusedItemId = filteredClients[newIndex]?.id ?? null;
+  
+      if (newFocusedItemId !== null) {
+        const newItemIndex = filteredClients.findIndex(client => client.id === newFocusedItemId);
+        listRefs.current[newItemIndex]?.scrollIntoView({
+          behavior: 'auto',
+          block: 'center'
+        });
+      }
+  
+      return newFocusedItemId;
+    });
+  };
 
-  const selectedClient = focusedItemId !== null ? filteredAddresses.find(client => client.id === focusedItemId) : null;
+  // Automatically focus the first or reset focus when needed
+  useEffect(() => {
+    if (filteredClients.length === 1) setFocusedItemId(filteredClients[0].id);
+    else if (filteredClients.length > 1 && !filteredClients.some(client => client.id === focusedItemId)) {
+      setFocusedItemId(null);
+    }
+  }, [filteredClients, focusedItemId]);
+
+  // Formatting Date
+  const today = new Date();
+  const formattedDate = `${today.toLocaleDateString('en-US', { weekday: 'long' })}, ${today.toLocaleDateString('en-US', { month: 'long' })} ${today.getDate()}${getOrdinalSuffix(today.getDate())}`;
+
+  const selectedClient = focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) : null;
 
   return (
-    
-    <div className="app-container" style={{ backgroundImage: selectedClient ? `url(${selectedClient.image})` : `url(${'https://wallpapers.com/images/hd/windows-default-background-ihuecjk2mhalw3nq.jpg'})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-      {selectedClient && modeType === 'Client' && (
+    <div 
+      className="app-container" 
+      style={{
+      backgroundImage: `url(${selectedClient?.image || 'https://wallpapers.com/images/hd/windows-default-background-ihuecjk2mhalw3nq.jpg'})`
+      }}
+    >
+      
+      {modeType === 'Client' && (
+      selectedClient ? (
         <Calendar visits={selectedClient.visits} />
+      ) : null
       )}
-      {!selectedClient && modeType === 'Client' && (
-        <div className="calendar-container">
-          <h2>Past 30 Days</h2>
-          <div className="calendar-grid">
-            {Array.from({ length: 30 }).map((_, i) => (
-              <div key={i} className="calendar-day">
-                <span className="date"></span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      <div className="back-ground"></div>
-      <input
-        type="text"
-        className={`search-bar ${searchTerm ? 'active' : ''}`}
-        value={searchTerm}
-        onChange={handleChange}
-        placeholder="Search: Type to search"
-      />
+    
       <TopBar
-        focusedItemId={focusedItemId}
-        selectedClient={selectedClient ?? null}
-        sortOption={sortOption}
-        handleSortChange={handleSortChange}
+      focusedItemId={focusedItemId}
+      selectedClient={selectedClient || null}
+      sortOption={sortOption}
+      handleSortChange={handleSortChange}
       />
+
+      <input
+      type="text"
+      className={`search-bar ${searchTerm ? 'active' : ''}`}
+      value={searchTerm}
+      onChange={handleChange}
+      placeholder="Search: Type to search"
+      />
+    
       <ul className="right-aligned-list">
-        {modeType === 'Daily' && (
-          <li className="list-item date-header">
-            {formattedDate}
-          </li>
-        )}
-        {filteredAddresses.map((item: Client, index) => (
-          <li
-            key={item.id}
-            className={`list-item 
-              ${item.id === focusedItemId ? 'focused' : ''} 
-              ${item.selected === 'Complete' ? 'complete' : ''} 
-              ${item.selected === 'Paid' ? 'paid' : ''}`}
-            ref={el => listRefs.current[index] = el}
-            onClick={() => handleItemClick(item.id)}
-          >
-            {item.address}
-            <div className="stars">{renderStars(getStars(item.lawnSize))}</div>
-          </li>
-        ))}
+      {modeType === 'Daily' && (
+        <li className="list-item date-header">
+        {formattedDate}
+        </li>
+      )}
+    
+      {filteredClients.map((item: Client, index) => (
+        <li
+          key={item.id}
+          className={`list-item 
+            ${item.id === focusedItemId ? 'focused' : ''} 
+            ${item.selected === 'Complete' ? 'complete' : ''} 
+            ${item.selected === 'Paid' ? 'paid' : ''}`}
+          ref={el => listRefs.current[index] = el}
+          onClick={() => handleItemClick(item.id)}
+        >
+          {item.address}
+          <div className="stars">{renderStars(getStars(item.lawnSize))}</div>
+        </li>
+      ))}
       </ul>
+    
       <div className="bottom-menu">
+      <div className="bottom-menu-container">
         <div className="bottom-menu-button-container">
-            <button className="mode-button" onClick={handleModeClick}>{modeType}</button>
-            <button className="add-client">+</button>
+        <button className="mode-button" onClick={handleModeClick}>
+          {modeType}
+        </button>
+        <button className="add-client">+</button>
         </div>
+        
         <div className="company-profile-card">
-          <div className="company-info">
-            <img id="company-image" src="https://art.pixilart.com/thumb/sr2e1188a7c216a.png" alt="Company Logo"/>
-            <div className="company-info-text">
-              <p className='company-name'>Company Name</p>
-              <p className='level'>Lvl 5</p>
-            </div>
+        <div className="company-info">
+          <img
+          id="company-image"
+          src="https://art.pixilart.com/thumb/sr2e1188a7c216a.png"
+          alt="Company Logo"
+          />
+          <div className="company-info-text">
+          <p className="company-name">Company Name</p>
+          <p className="level">Lvl 5</p>
           </div>
+        </div>
         </div>
       </div>
+      </div>
+    
     </div>
   );
 }
