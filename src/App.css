@@ -25,7 +25,7 @@ body, html, #root {
   display: none; /* For Chrome, Safari, and Opera */
 }
 
-.back-ground {
+.top-menu-shape {
   position: fixed;
   top: 0;
   left: 0;
@@ -33,7 +33,7 @@ body, html, #root {
   height: 520px;
   background: rgba(40, 40, 43, 1);
   clip-path: polygon(40% 30%, 50% 20%, 100% 20%, 100% 0, 0 0, 0 30%);
-  z-index: 5; /* Ensure this is below the top bar and sort dropdown */
+  z-index: -1; /* Ensure this is below the top bar and sort dropdown */
 }
 
 .search-bar {
@@ -91,22 +91,9 @@ body, html, #root {
   user-select: none; /* Prevent text selection */
 }
 
-@keyframes glow-blur {
-  0% {
-    box-shadow: inset 0 0 5px rgba(226, 226, 226, 0.6), inset 0 0 10px rgba(192, 192, 255, 0.6), inset 0 0 20px rgba(192, 192, 255, 0.6);
-  }
-  50% {
-    box-shadow: inset 0 0 5px rgba(192, 192, 255, 0.6), inset 0 0 10px rgba(192, 192, 255, 0.6), inset 0 0 20px rgba(192, 192, 255, 0.6);
-  }
-  100% {
-    box-shadow: inset 0 0 5px rgba(226, 226, 226, 0.6), inset 0 0 10px rgba(192, 192, 255, 0.6), inset 0 0 20px rgba(192, 192, 255, 0.6);
-  }
-}
-
 .list-item.focused {
   transform: scale(1.03);
   box-shadow: inset 0 0 5px rgba(226, 226, 226, 0.6), inset 0 0 10px rgba(192, 192, 255, 0.6), inset 0 0 20px rgba(192, 192, 255, 0.6);
-  animation: glow-blur 2s infinite ease-in-out;
   z-index: 2;
 }
 
@@ -115,10 +102,9 @@ body, html, #root {
   z-index: 2;
 }
 
-
-
 .bottom-menu {
   position: fixed;
+  padding: 0 20px;
   font-family: Inter;
   bottom: 0;
   left: 0;
@@ -134,13 +120,20 @@ body, html, #root {
   z-index: 10; /* Ensure the menu is above the list items */
 }
 
+.bottom-menu-container {
+  display: inline-flex;
+  justify-content: space-around;
+  
+}
+
 .bottom-menu-button-container{
   display: flex;
   position: relative;
-  left: -40px;
+  left: -100px;
 }
 
 .add-client, .mode-button{
+  position: relative;
   background-color: rgb(33, 33, 36);
   border: none;
   color: rgb(255, 255, 255);
@@ -165,31 +158,33 @@ body, html, #root {
 }
 
 .company-profile-card {
+  position: relative;
+  left: 35px;
   width: 300px;
   padding-top: 15px;
   padding-bottom: 15px;
   border-radius: 10px;
   border: 3px solid rgba(41, 41, 44, 0.788);;
   background-color: rgb(33, 33, 36);
-  position: relative;
-  left: -200px;
   user-select: none;
   box-sizing: border-box; /* Include padding in width and height */
+  flex-shrink: 0;
 }
 
 #company-image {
+  position: relative;
+  left: 20px;
   float: left;
   width: 60px;
   height: 60px;
   left: 5px;
   border-radius: 25%;
-  position: absolute;
   box-shadow:  -2px 5px 10px rgb(0, 0, 0);
 }
 
 .company-info-text{
   position: relative;
-  left: 70px;
+  left: 15px;
   font-size: 20px;
   color: #ffffff;
   font-family: 'Arial Narrow';

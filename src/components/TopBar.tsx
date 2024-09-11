@@ -11,6 +11,7 @@ interface TopBarProps {
 const TopBar: React.FC<TopBarProps> = ({ focusedItemId, selectedClient, sortOption, handleSortChange }) => {
   return (
     <div className="top-bar">
+      <div className="top-menu-shape"></div>
       <div className={`client-info ${focusedItemId !== null ? 'visible' : ''}`}>
         {focusedItemId !== null && (
           <>
