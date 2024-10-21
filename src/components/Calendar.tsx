@@ -1,87 +1,97 @@
-import React from 'react';
+// Calendar.tsx
+import React, { useRef, useState, useEffect } from 'react';
+import Draggable from 'react-draggable';
 import './Calendar.css';
 
-
-//creates the Visit object with date and paid properties
+// Interface for the Visit object
 interface Visit {
   date: string;
   paid: boolean;
 }
 
-//creates an object array that holds Visit objects in each element: ex:[{date, paid}, {date, paid}, {date, paid}]
-interface CalendarProps { 
+// Interface for the component props
+interface CalendarProps {
   visits: Visit[];
 }
 
-/// Creates a React functional component named Calendar that takes CalendarProps as props
-/// <CalendarProps> ensures the props passed to this component match the CalendarProps interface
-/// {visits} pulls the visits property from the props. able to use it directly in the component.
 const Calendar: React.FC<CalendarProps> = ({ visits }) => {
+  const today = new Date();
 
-  const today = new Date(); // grabs todays date and stores it in the today constant. 
+  // Ref to access the calendar container
+  const calendarRef = useRef<HTMLDivElement>(null);
 
-  const last30Days = Array.from({ length: 30 }, (_, i) => { /// creates an array of 30 with indexes filling each one with the previous 30 days from today
-    const date = new Date(); // gets todays date 
-    date.setDate(today.getDate()-i); // sets the date to today minus the index, 
-    return date; /// returns the date element to the last30Days array
-  }).reverse(); /// reverses order so days go from oldest to today
+  // Ref to track if the user has moved the calendar
+  const hasMoved = useRef(false);
+
+  // Handler for when dragging starts
+  const handleDragStart = () => {
+    hasMoved.current = true;
+  };
 
 
-  /// function to assign classNames to the 30 days from today, expects to pass a date when using the function
+  // Generate the last 30 days, oldest to today
+  const last30Days = Array.from({ length: 30 }, (_, i) => {
+    const date = new Date();
+    date.setDate(today.getDate() - (29 - i)); // Adjusted to get the correct dates
+    return date;
+  });
+
+  // Function to assign classNames to days
   const getDayClassName = (date: Date) => {
+    const visit = visits.find(visit => {
+      const [year, month, day] = visit.date.split('-').map(Number);
+      const visitDate = new Date(year, month - 1, day);
+      return visitDate.toDateString() === date.toDateString();
+    });
 
-    //if the date passed in the function is found in the props array of objects, it returns the the object that contains that date. so {date, paid.
-    const visit = visits.find(
-      visit => new Date(visit.date).toDateString() === date.toDateString()
-    );
-    
-    /// used to concatinate the className later
     let className = 'calendar-day';
 
-    /// if it found the object then its either 'calendar-day.paid' or 'calendar-day.not-paid' as its 'class-name', depending on what the objects paid boolean holds
+    // Mark today's date
+    if (date.toDateString() === today.toDateString()) {
+      className += ' today';
+    }
+
     if (visit) {
       className += visit.paid ? ' paid' : ' not-paid';
     }
 
-    // if the 30 days include days not part of todays month then you are part of 'calendar-day.previous-month
     if (date.getMonth() !== today.getMonth()) {
       className += ' previous-month';
     }
     return className;
   };
 
-  
-  const firstDay = last30Days[0].getDay(); // Gets the day of the week for the first day (oldest of the 30 days) sun = 0, mon = 1 ... sat = 6 
-  
+  // Get the day of the week for the first day
+  const firstDay = last30Days[0].getDay();
 
-// We create an array of blanks depending on the value of 'firstDay'
+  // Create an array of blanks for padding
   const paddedDays = Array(firstDay).fill(null).concat(last30Days);
 
   return (
+    <Draggable
+      onStart={handleDragStart}
+    >
+      <div className="calendar-container" ref={calendarRef}>
+        <h2>
+          {today.toLocaleDateString('default', { month: 'long' })} {today.getFullYear()}
+        </h2>
 
-    <div className="calendar-container">
-
-      {/* converts todays date to string form and converts it to its 'long' month name */}
-      <h2>{today.toLocaleDateString('default', { month: 'long' })} {today.getFullYear()}</h2>
-
-
-      <div className="calendar-grid">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
-          <div key={index} className="calendar-weekday">{day}</div>
-        ))}
-        {paddedDays.map((day, index) => (
-          day ? (
-            <div key={index} className={getDayClassName(day)}>
-
-              <span className="date">{day.getDate()}</span>
-            </div>
-          ) : (
-            <div key={index} className="calendar-day empty"></div>
-          )
-        ))}
+        <div className="calendar-grid">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+            <div key={index} className="calendar-weekday">{day}</div>
+          ))}
+          {paddedDays.map((day, index) =>
+            day ? (
+              <div key={index} className={getDayClassName(day)}>
+                <span className="date">{day.getDate()}</span>
+              </div>
+            ) : (
+              <div key={index} className="calendar-day empty" />
+            )
+          )}
+        </div>
       </div>
-
-    </div>
+    </Draggable>
   );
 };
 

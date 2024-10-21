@@ -175,8 +175,8 @@ const App: React.FC = () => {
           key={item.id}
           className={`list-item 
             ${item.id === focusedItemId ? 'focused' : ''} 
-            ${item.selected === 'Complete' ? 'complete' : ''} 
-            ${item.selected === 'Paid' ? 'paid' : ''}`}
+            ${modeType === 'Daily' && item.selected === 'Complete' ? 'complete' : ''} 
+            ${modeType === 'Daily' && item.selected === 'Paid' ? 'paid' : ''}`}
           ref={el => listRefs.current[index] = el}
           onClick={() => handleItemClick(item.id)}
         >

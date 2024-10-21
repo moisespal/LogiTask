@@ -1,90 +1,112 @@
 .calendar-container {
-    font-family: Inter;
-    position: fixed;
-    right: 100px;
-    left: 50px;
-    top: 180px; /* Adjust this value based on your layout */
-    width: 25vw;
-    padding: 10px;
-    box-sizing: border-box;
-    background-color: rgba(40, 40, 43, 0.374);
-    color: white;
-    border-radius: 10px;
-    transition: box-shadow 0.5s, background-color 0.5s;
-    z-index: 5;
-    min-width: 420px;
-    max-width: 600px;
-    min-height: 300px;
-    max-height: 600px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    pointer-events: none;
-    z-index: 0;
-    font-size: .8em; /* Default font-size for larger screens */
-    flex-shrink: 5;
-  }
+  font-family: 'Inter', sans-serif;
+  position: absolute;
+  top: 170px;
+  left: 100px;
+  width: 320px;
+  max-width: 90vw;
+  padding: 15px;
+  box-sizing: border-box;
+  background-color: rgba(40, 40, 43, 0.85); /* Adjusted color */
+  color: #f0f0f0; /* Light text for contrast */
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  cursor: grab;
+}
 
-  
-  .calendar-container h2 {
-    margin: 0;
-    padding: 5px ;
-    font-size: 1.5em;
-  }
-  
-  .calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 05px;
-    width: 100%; /* Ensures the grid fills the container's width */
-    height: auto; /* Lets the height adjust dynamically */
-  }
-  
-  .calendar-day {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: clamp(0.3em, 2vw, 1em); /* Font will be between 0.6em and 1em, scaling with the screen size */
-    background-color: rgba(178, 178, 178, 0.311);
-    backdrop-filter: blur(20px);
-    transition: transform 0.9s, box-shadow 0.5s; 
+/* Ensure minimum and maximum sizes */
+.calendar-container {
+  min-width: 280px;
+  min-height: 300px;
+  max-height: 90vh;
+}
 
-  }
-  .calendar-weekday {
-    font-weight: bold;
-    text-align: center;
-    padding: 10px;
-  }
+/* Calendar Header */
+.calendar-container h2 {
+  margin: 0 0 10px 0;
+  padding: 0;
+  font-size: 1.5em;
+  text-align: center;
+  color: #ffffff; /* White text for header */
+}
 
-  .calendar-day.paid {
-    background-color: rgba(50, 243, 50, 0.639);
-    box-shadow: 0px 0px 10px green;
-    transform: scale(1.1);
-  }
-  
-  .calendar-day.not-paid {
-    background-color: rgba(247, 28, 28, 0.584);
-    box-shadow: 0px 0px 10px red;
-    transform: scale(1.1);
-  }
-  
-  .calendar-day .date {
-    font-size: 1.5em;
-    
-  }
-  
-  .calendar-day.previous-month {
-    color: rgb(223, 223, 223);
-    font-weight: 200;
-    
-  }
+/* Calendar Grid */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  width: 100%;
+}
 
-  .calendar-day.empty {
-    background-color: rgba(178, 178, 178, 0);
-    backdrop-filter: blur(0px);
-  }
+/* Weekday Headers */
+.calendar-weekday {
+  font-weight: bold;
+  text-align: center;
+  padding: 5px 0;
+  color: #c0c0c0; /* Lighter shade for weekdays */
+  font-size: 0.9em;
+  border-bottom: 1px solid #555555;
+}
 
-  
+/* Calendar Days */
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.9em;
+  background-color: #2b2b2e; /* Dark background for days */
+  color: #e0e0e0;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+/* Today's Date Highlight */
+.calendar-day.today {
+  background-color: #606060; /* Slightly lighter background for today */
+  color: #ffffff;
+  font-weight: bold;
+  transform: scale(1.05);
+}
+
+/* Paid Days */
+.calendar-day.paid {
+  background-color: #28a745; /* Green background for paid days */
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* Not Paid Days */
+.calendar-day.not-paid {
+  background-color: #dc3545; /* Red background for not paid days */
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* Hover Effect */
+.calendar-day:hover {
+  background-color: #38383b; /* Slightly lighter on hover */
+  cursor: pointer;
+}
+
+/* Previous Month Days */
+.calendar-day.previous-month {
+  color: #888888; /* Lighter shade for previous month's days */
+  background-color: #1f1f21;
+}
+
+/* Empty Days (Padding at the Start) */
+.calendar-day.empty {
+  background-color: transparent;
+  pointer-events: none;
+}
+
+/* Date Number */
+.calendar-day .date {
+  font-size: 1.2em;
+}
