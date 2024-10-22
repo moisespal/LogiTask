@@ -9,34 +9,39 @@
     "lawnSize": "500 sq ft",
     "visits": [
       {
-        "date": "2023-09-01",
+        "date": "2024-09-27",
         "paid": true,
-        "payment": {
-          "amount": 50,
-          "paid": true,
-          "method": "Cash"
-        }
+        "complete": true,
+        "charge": 50
       },
       {
-        "date": "2023-09-08",
+        "date": "2024-10-04",
         "paid": true,
-        "payment": {
-          "amount": 50,
-          "paid": true,
-          "method": "Online",
-          "platform": "PayPal"
-        }
+        "complete": true,
+        "charge": 50
+      },
+      {
+        "date": "2024-10-11",
+        "paid": false,
+        "complete": true,
+        "charge": 50
+      },
+      {
+        "date": "2024-10-18",
+        "paid": false,
+        "complete": true,
+        "charge": 50
       }
     ],
     "image": "https://external-preview.redd.it/tx0Q2hNTR3yZ0p12bZ_DB2_3D6pY35y5YNw9WBSk8wM.jpg?auto=webp&s=8629b34ac54a53dd21d5bad51baf755f33e4105c",
-    "selected": "Paid",
+    "selected": "Complete",
     "tags": [
       { "day": "Friday", "occurrence": "Weekly" }
     ],
     "schedule": {
       "frequency": "Weekly",
-      "nextServiceDate": "2023-09-15",
-      "lastServiceDate": "2023-09-08"
+      "nextServiceDate": "2024-10-25",
+      "lastServiceDate": "2024-10-18"
     }
   },
   {
@@ -49,22 +54,22 @@
     "lawnSize": "750 sq ft",
     "visits": [
       {
-        "date": "2024-10-21",
+        "date": "2024-09-23",
         "paid": false,
-        "payment": {
-          "amount": 65,
-          "paid": false,
-          "method": "Check"
-        }
+        "complete": true,
+        "charge": 65
       },
       {
-        "date": "2023-09-04",
+        "date": "2024-10-07",
         "paid": false,
-        "payment": {
-          "amount": 65,
-          "paid": false,
-          "method": "Check"
-        }
+        "complete": true,
+        "charge": 65
+      },
+      {
+        "date": "2024-10-21",
+        "paid": false,
+        "complete": false,
+        "charge": 65
       }
     ],
     "image": "https://yardzen.com/wp-content/uploads/2022/07/Dibella_Tropical_option-B.jpg",
@@ -74,8 +79,8 @@
     ],
     "schedule": {
       "frequency": "Biweekly",
-      "nextServiceDate": "2023-09-18",
-      "lastServiceDate": "2023-09-04"
+      "nextServiceDate": "2024-11-04",
+      "lastServiceDate": "2024-10-21"
     }
   },
   {
@@ -88,24 +93,27 @@
     "lawnSize": "600 sq ft",
     "visits": [
       {
-        "date": "2023-09-02",
+        "date": "2024-09-28",
         "paid": true,
-        "payment": {
-          "amount": 55,
-          "paid": true,
-          "method": "Card"
-        }
+        "complete": true,
+        "charge": 55
+      },
+      {
+        "date": "2024-10-19",
+        "paid": false,
+        "complete": true,
+        "charge": 55
       }
     ],
     "image": "https://cdn.sanity.io/images/32lej2m6/production/05a009a115b87748801a8cc9efdd149f6254d01b-1920x1080.jpg?auto=format",
-    "selected": "Paid",
+    "selected": "Complete",
     "tags": [
-      { "day": "Saturday", "occurrence": "Monthly" }
+      { "day": "Saturday", "occurrence": "Biweekly" }
     ],
     "schedule": {
-      "frequency": "Monthly",
-      "nextServiceDate": "2023-10-02",
-      "lastServiceDate": "2023-09-02"
+      "frequency": "Biweekly",
+      "nextServiceDate": "2024-11-02",
+      "lastServiceDate": "2024-10-19"
     }
   },
   {
@@ -118,24 +126,28 @@
     "lawnSize": "850 sq ft",
     "visits": [
       {
-        "date": "2023-09-05",
+        "date": "2024-09-24",
         "paid": true,
-        "payment": {
-          "amount": 70,
-          "paid": true,
-          "method": "Online",
-          "platform": "Stripe"
-        }
+        "complete": true,
+        "charge": 70
       },
       {
-        "date": "2023-09-12",
+        "date": "2024-10-01",
+        "paid": true,
+        "complete": true,
+        "charge": 70
+      },
+      {
+        "date": "2024-10-08",
         "paid": false,
-        "payment": {
-          "amount": 70,
-          "paid": false,
-          "method": "Online",
-          "platform": "Stripe"
-        }
+        "complete": true,
+        "charge": 70
+      },
+      {
+        "date": "2024-10-15",
+        "paid": false,
+        "complete": true,
+        "charge": 70
       }
     ],
     "image": "https://yardzen.com/wp-content/uploads/2022/07/Anissimov_3-Willow-Springs-Ct_5.jpg",
@@ -145,8 +157,8 @@
     ],
     "schedule": {
       "frequency": "Weekly",
-      "nextServiceDate": "2023-09-19",
-      "lastServiceDate": "2023-09-12"
+      "nextServiceDate": "2024-10-22",
+      "lastServiceDate": "2024-10-15"
     }
   },
   {
@@ -157,15 +169,23 @@
     "phone": "555-666-7777",
     "email": "charlie.brown@example.com",
     "lawnSize": "400 sq ft",
-    "visits": [],
+    "visits": [
+      {
+        "date": "2024-10-09",
+        "paid": false,
+        "complete": true,
+        "charge": 40
+      }
+    ],
     "image": "https://yardzen.com/wp-content/uploads/2022/07/Perrin_1730-Los-Altos-Way_null_V3-2.jpg",
-    "selected": "None",
+    "selected": "Complete",
     "tags": [
       { "day": "Wednesday", "occurrence": "One-time" }
     ],
     "schedule": {
       "frequency": "One-time",
-      "nextServiceDate": "2023-09-20"
+      "nextServiceDate": null,
+      "lastServiceDate": "2024-10-09"
     }
   },
   {
@@ -178,33 +198,39 @@
     "lawnSize": "950 sq ft",
     "visits": [
       {
-        "date": "2023-09-03",
+        "date": "2024-09-29",
         "paid": true,
-        "payment": {
-          "amount": 80,
-          "paid": true,
-          "method": "Cash"
-        }
+        "complete": true,
+        "charge": 80
       },
       {
-        "date": "2023-09-10",
+        "date": "2024-10-06",
         "paid": true,
-        "payment": {
-          "amount": 80,
-          "paid": true,
-          "method": "Cash"
-        }
+        "complete": true,
+        "charge": 80
+      },
+      {
+        "date": "2024-10-13",
+        "paid": false,
+        "complete": true,
+        "charge": 80
+      },
+      {
+        "date": "2024-10-20",
+        "paid": false,
+        "complete": false,
+        "charge": 80
       }
     ],
     "image": "https://blog.remax.ca/wp-content/uploads/sites/8/2024/07/Copy-of-REMAX-Canada-New-Blog-Images.jpg",
-    "selected": "Paid",
+    "selected": "Complete",
     "tags": [
       { "day": "Sunday", "occurrence": "Weekly" }
     ],
     "schedule": {
       "frequency": "Weekly",
-      "nextServiceDate": "2023-09-17",
-      "lastServiceDate": "2023-09-10"
+      "nextServiceDate": "2024-10-27",
+      "lastServiceDate": "2024-10-20"
     }
   },
   {
@@ -217,13 +243,16 @@
     "lawnSize": "700 sq ft",
     "visits": [
       {
-        "date": "2023-08-31",
+        "date": "2024-09-26",
         "paid": false,
-        "payment": {
-          "amount": 60,
-          "paid": false,
-          "method": "Check"
-        }
+        "complete": true,
+        "charge": 60
+      },
+      {
+        "date": "2024-10-10",
+        "paid": false,
+        "complete": true,
+        "charge": 60
       }
     ],
     "image": "https://wallpapers.com/images/hd/minecraft-houses-pictures-rbxg0b253b8t0es8.jpg",
@@ -233,8 +262,8 @@
     ],
     "schedule": {
       "frequency": "Biweekly",
-      "nextServiceDate": "2023-09-14",
-      "lastServiceDate": "2023-08-31"
+      "nextServiceDate": "2024-10-24",
+      "lastServiceDate": "2024-10-10"
     }
   },
   {
@@ -247,25 +276,21 @@
     "lawnSize": "650 sq ft",
     "visits": [
       {
-        "date": "2023-09-06",
+        "date": "2024-10-06",
         "paid": true,
-        "payment": {
-          "amount": 65,
-          "paid": true,
-          "method": "Online",
-          "platform": "PayPal"
-        }
+        "complete": true,
+        "charge": 65
       }
     ],
     "image": "https://cdn.prod.website-files.com/6329826d12e3aa3a6966eb1d/63b05fb759086b7b4366be6c_igloosystem.png",
     "selected": "Paid",
     "tags": [
-      { "day": "Wednesday", "occurrence": "Monthly" }
+      { "day": "Sunday", "occurrence": "Monthly" }
     ],
     "schedule": {
       "frequency": "Monthly",
-      "nextServiceDate": "2023-10-06",
-      "lastServiceDate": "2023-09-06"
+      "nextServiceDate": "2024-11-06",
+      "lastServiceDate": "2024-10-06"
     }
   },
   {
@@ -276,15 +301,23 @@
     "phone": "555-444-5555",
     "email": "henry.wilson@example.com",
     "lawnSize": "800 sq ft",
-    "visits": [],
+    "visits": [
+      {
+        "date": "2024-10-16",
+        "paid": false,
+        "complete": true,
+        "charge": 80
+      }
+    ],
     "image": "https://www.designarc.net/wp-content/uploads/2013/02/arcola-house-1920x1080-15a.jpg",
-    "selected": "None",
+    "selected": "Complete",
     "tags": [
-      { "day": "Thursday", "occurrence": "One-time" }
+      { "day": "Wednesday", "occurrence": "One-time" }
     ],
     "schedule": {
       "frequency": "One-time",
-      "nextServiceDate": "2023-09-21"
+      "nextServiceDate": null,
+      "lastServiceDate": "2024-10-16"
     }
   },
   {
@@ -297,22 +330,22 @@
     "lawnSize": "550 sq ft",
     "visits": [
       {
-        "date": "2023-09-07",
+        "date": "2024-10-03",
         "paid": true,
-        "payment": {
-          "amount": 55,
-          "paid": true,
-          "method": "Card"
-        }
+        "complete": true,
+        "charge": 55
       },
       {
-        "date": "2023-09-14",
+        "date": "2024-10-10",
         "paid": false,
-        "payment": {
-          "amount": 55,
-          "paid": false,
-          "method": "Card"
-        }
+        "complete": true,
+        "charge": 55
+      },
+      {
+        "date": "2024-10-17",
+        "paid": false,
+        "complete": true,
+        "charge": 55
       }
     ],
     "image": "https://www.wkrg.com/wp-content/uploads/sites/49/2017/10/breaking-bad-house_31260253_ver1.0.jpg?strip=1",
@@ -322,8 +355,8 @@
     ],
     "schedule": {
       "frequency": "Weekly",
-      "nextServiceDate": "2023-09-21",
-      "lastServiceDate": "2023-09-14"
+      "nextServiceDate": "2024-10-24",
+      "lastServiceDate": "2024-10-17"
     }
   }
 ]
