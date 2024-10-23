@@ -3,132 +3,174 @@
   position: absolute;
   top: 170px;
   left: 100px;
-  width: 320px;
-  max-width: 90vw;
-  padding: 15px;
-  box-sizing: border-box;
-  background-color: rgba(40, 40, 43, 0.85); /* Adjusted color */
-  color: #f0f0f0; /* Light text for contrast */
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  width: 360px;
+  padding: 20px;
+  background-color: rgba(30, 30, 33, 0.95);
+  color: #f0f0f0;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   z-index: 10;
-  display: flex;
-  flex-direction: column;
   user-select: none;
   cursor: grab;
 }
 
-/* Ensure minimum and maximum sizes */
-.calendar-container {
-  min-width: 400px;
-  min-height: 300px;
-  max-height: 90vh;
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
-/* Calendar Header */
 .calendar-container h2 {
-  margin: 0 0 10px 0;
-  padding: 0;
+  margin: 0;
   font-size: 1.5em;
-  text-align: center;
-  color: #ffffff; /* White text for header */
+  color: #ffffff;
 }
 
-/* Calendar Grid */
+.calendar-content {
+  display: flex;
+  flex-direction: column;
+}
+
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
-  width: 100%;
+  margin-bottom: 15px;
 }
 
-/* Weekday Headers */
+.balance-info {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 100%;
+  background-color: rgba(40, 40, 43, 0.95);
+  border-radius: 0 0 15px 15px;
+  padding: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.balance-info.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.balance-toggle {
+  background: none;
+  border: none;
+  color: #9e9e9e;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 5px;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.balance-toggle:hover, .balance-toggle.active {
+  opacity: 1;
+  color: #4CAF50;
+}
+
+.balance-toggle svg {
+  transition: transform 0.3s ease;
+}
+
+.balance-toggle.active svg {
+  transform: rotate(180deg);
+}
+
+.outstanding-balance {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1em;
+}
+
+.outstanding-balance .amount {
+  font-weight: bold;
+  color: #4CAF50;
+}
+
 .calendar-weekday {
   font-weight: bold;
   text-align: center;
-  padding: 5px 0;
-  color: #c0c0c0; /* Lighter shade for weekdays */
+  padding: 10px 0;
+  color: #9e9e9e;
   font-size: 0.9em;
-  border-bottom: 1px solid #555555;
 }
 
-/* Calendar Days */
 .calendar-day {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  padding: 8px;
-  border-radius: 8px;
+  height: 40px;
+  border-radius: 50%;
   font-size: 0.9em;
-  background-color: #2b2b2e; /* Dark background for days */
-  color: #e0e0e0;
-  transition: background-color 0.3s, transform 0.3s;
+  transition: all 0.3s ease;
 }
 
-/* Today's Date Highlight */
-.calendar-day.today {
-  background-color: #606060; /* Slightly lighter background for today */
-  color: #ffffff;
-}
-
-/* Paid Days */
-.calendar-day.paid {
-  background-color: #28a745; /* Green background for paid days */
-  color: #ffffff;
-}
-
-/* Not Paid Days */
-.calendar-day.not-paid {
-  background-color: #dc3545; /* Red background for not paid days */
-  color: #ffffff;
-}
-
-/* Hover Effect */
 .calendar-day:hover {
-  background-color: #38383b; /* Slightly lighter on hover */
-  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Previous Month Days */
+.calendar-day.today {
+  background-color: rgba(76, 175, 80, 0.2);
+  font-weight: bold;
+}
+
+.calendar-day.paid {
+  background-color: rgba(76, 175, 80, 0.3);
+}
+
+.calendar-day.not-paid {
+  background-color: rgba(244, 67, 54, 0.3);
+}
+
 .calendar-day.previous-month {
-  color: #888888; /* Lighter shade for previous month's days */
-  background-color: #1f1f21;
+  color: #666;
 }
 
-/* Empty Days (Padding at the Start) */
 .calendar-day.empty {
   background-color: transparent;
-  pointer-events: none;
 }
 
-/* Date Number */
-.calendar-day .date {
-  font-size: 1.2em;
-}
-
-.calendar-day.paid,
-.calendar-day.not-paid {
-  color: #ffffff; /* Override text color */
-}
-
-/* Tooltip container */
 .tooltip {
   position: absolute;
-  bottom: 100px;
+  top: 50%;
   left: 50%;
-  visibility: hidden; /* Hide by default */
+  transform: translate(-50%, -50%);
+  visibility: hidden;
+  background-color: rgba(0, 0, 0, 0.8);
   color: #fff;
   text-align: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  z-index: 1;
-  white-space: nowrap;
+  padding: 5px 10px;
+  border-radius: 6px;
   font-size: 0.8em;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+  z-index: 10;
 }
 
-/* Show tooltip on hover */
 .calendar-day:hover .tooltip {
   visibility: visible;
+  opacity: 1;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
 }

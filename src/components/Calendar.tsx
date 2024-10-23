@@ -1,8 +1,9 @@
 // Calendar.tsx
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Draggable from 'react-draggable';
 import './Calendar.css';
 import { Visit } from '../types/interfaces'; // Import Visit interface
+import { FaDollarSign } from 'react-icons/fa';
 
 // Interface for the Visit object
 
@@ -12,6 +13,7 @@ interface CalendarProps {
 }
 
 const Calendar: React.FC<CalendarProps> = ({ visits }) => {
+  const [showBalance, setShowBalance] = useState(false);
   const today = new Date();
 
   // Ref to access the calendar container
@@ -77,46 +79,59 @@ const Calendar: React.FC<CalendarProps> = ({ visits }) => {
   return (
     <Draggable onStart={handleDragStart}>
       <div className="calendar-container" ref={calendarRef}>
-        <h2>
-          {today.toLocaleDateString('default', { month: 'long' })} {today.getFullYear()}
-        </h2>
-
-        {/* Display total amount owed */}
-        <div className="total-amount-owed">
-          Outstanding Balance: ${totalAmountOwed.toFixed(2)}
+        <div className="calendar-header">
+          <h2>
+            {today.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
+          </h2>
+          <button 
+            className={`balance-toggle ${showBalance ? 'active' : ''}`} 
+            onClick={() => setShowBalance(!showBalance)}
+            title={showBalance ? "Hide Balance" : "Show Balance"}
+          >
+            <FaDollarSign />
+          </button>
         </div>
 
-        <div className="calendar-grid">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
-            <div key={index} className="calendar-weekday">{day}</div>
-          ))}
-          {paddedDays.map((day, index) =>
-            day ? (
-              <div key={index} className={getDayClassName(day)}>
-                <span className="date">{day.getDate()}</span>
-                {/* Show tooltip on hover if there's a visit */}
-                {(() => {
-                  const visit = visits.find(visit => {
-                    const [year, month, dayOfMonth] = visit.date.split('-').map(Number);
-                    const visitDate = new Date(year, month - 1, dayOfMonth);
-                    return visitDate.toDateString() === day.toDateString();
-                  });
-                  if (visit) {
-                    return (
-                      <div className="tooltip">
-                        <span className="tooltip-text">
-                          {visit.paid ? 'Paid' : 'Charged'} - ${visit.charge}
-                        </span>
-                      </div>
-                    );
-                  }
-                  return null;
-                })()}
-              </div>
-            ) : (
-              <div key={index} className="calendar-day empty" />
-            )
-          )}
+        <div className="calendar-content">
+          <div className="calendar-grid">
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+              <div key={index} className="calendar-weekday">{day}</div>
+            ))}
+            {paddedDays.map((day, index) =>
+              day ? (
+                <div key={index} className={getDayClassName(day)}>
+                  <span className="date">{day.getDate()}</span>
+                  {/* Show tooltip on hover if there's a visit */}
+                  {(() => {
+                    const visit = visits.find(visit => {
+                      const [year, month, dayOfMonth] = visit.date.split('-').map(Number);
+                      const visitDate = new Date(year, month - 1, dayOfMonth);
+                      return visitDate.toDateString() === day.toDateString();
+                    });
+                    if (visit) {
+                      return (
+                        <div className="tooltip">
+                          <span className="tooltip-text">
+                            {visit.paid ? 'Paid' : 'Due'}: ${visit.charge.toFixed(2)}
+                          </span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                </div>
+              ) : (
+                <div key={index} className="calendar-day empty" />
+              )
+            )}
+          </div>
+        </div>
+
+        <div className={`balance-info ${showBalance ? 'show' : ''}`}>
+          <div className="outstanding-balance">
+            <span>Outstanding Balance</span>
+            <span className="amount">${totalAmountOwed.toFixed(2)}</span>
+          </div>
         </div>
       </div>
     </Draggable>

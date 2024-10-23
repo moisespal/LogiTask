@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import addresses from './data.json';
 import Calendar from './components/Calendar';
 import TopBar from './components/TopBar';
+import AddClientModal from './components/AddClientModal';
 import { Client } from './types/interfaces';
 import './App.css';
+import { FaExchangeAlt, FaUserPlus } from 'react-icons/fa';
 
 // Utility functions
 const getStars = (lawnSize: string): number => {
@@ -33,9 +35,14 @@ const App: React.FC = () => {
   const [modeType, setModeType] = useState('Client');
   const [clients, setClients] = useState<Client[]>(addresses);
   const listRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
+  const [isModeRotated, setIsModeRotated] = useState(false);
 
   // Event Handlers
-  const handleModeClick = () => setModeType(prev => (prev === 'Client' ? 'Daily' : 'Client'));
+  const handleModeClick = () => {
+    setModeType(prev => (prev === 'Client' ? 'Daily' : 'Client'));
+    setIsModeRotated(prev => !prev);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
 
@@ -134,11 +141,18 @@ const App: React.FC = () => {
 
   const selectedClient = focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) : null;
 
+  const handleAddClient = (newClient: Partial<Client>) => {
+    // Logic to add the new client to your state or send to backend
+    console.log('New client:', newClient);
+    // Close the modal after adding the client
+    setIsAddClientModalOpen(false);
+  };
+
   return (
     <div 
       className="app-container" 
       style={{
-      backgroundImage: `url(${selectedClient?.image || 'https://wallpapers.com/images/hd/windows-default-background-ihuecjk2mhalw3nq.jpg'})`
+        backgroundImage: `url(${selectedClient?.image || 'https://wallpapers.com/images/hd/windows-default-background-ihuecjk2mhalw3nq.jpg'})`
       }}
     >
       
@@ -180,7 +194,7 @@ const App: React.FC = () => {
           ref={el => listRefs.current[index] = el}
           onClick={() => handleItemClick(item.id)}
         >
-          {item.address}
+          <div className="list-item-address">{item.address}</div>
           <div className="stars">{renderStars(getStars(item.lawnSize))}</div>
         </li>
       ))}
@@ -189,28 +203,43 @@ const App: React.FC = () => {
       <div className="bottom-menu">
       <div className="bottom-menu-container">
         <div className="bottom-menu-button-container">
-        <button className="mode-button" onClick={handleModeClick}>
-          {modeType}
+        <button 
+          className={`action-button mode-button ${isModeRotated ? 'rotated' : ''}`} 
+          onClick={handleModeClick} 
+          title={`Switch to ${modeType === 'Client' ? 'Daily' : 'Client'} Mode`}
+        >
+          <FaExchangeAlt />
         </button>
-        <button className="add-client">+</button>
+        <button className="action-button" onClick={() => setIsAddClientModalOpen(true)} title="Add Client">
+          <FaUserPlus />
+        </button>
         </div>
         
         <div className="company-profile-card">
-        <div className="company-info">
-          <img
+        <img
           id="company-image"
           src="https://art.pixilart.com/thumb/sr2e1188a7c216a.png"
           alt="Company Logo"
-          />
+        />
+        <div className="company-info">
           <div className="company-info-text">
-          <p className="company-name">Company Name</p>
-          <p className="level">Lvl 5</p>
+            <p className="company-name">Company Name</p>
+            <p className="level">Lvl 5</p>
+          </div>
+          <div className="xp-bar-container">
+            <div className="xp-bar"></div>
+            <div className="xp-glow"></div>
           </div>
         </div>
         </div>
       </div>
       </div>
-    
+
+      <AddClientModal
+        isOpen={isAddClientModalOpen}
+        onClose={() => setIsAddClientModalOpen(false)}
+        onSubmit={handleAddClient}
+      />
     </div>
   );
 }
