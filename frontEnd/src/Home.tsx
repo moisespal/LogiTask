@@ -6,6 +6,7 @@ import AddClientModal from './components/AddClientModal';
 import { Client } from './types/interfaces';
 import './App.css';
 import { FaExchangeAlt, FaUserPlus } from 'react-icons/fa';
+import api from "./api"
 
 // Utility functions
 const getStars = (lawnSize: string): number => {

@@ -5,19 +5,33 @@ import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import Home from "./Home";
 import ErrorPage from "./pages/ErrorPage";
-// import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
+
+const Logout:any = () =>{
+  localStorage.clear()
+  return <Navigate to="/login" />
+}
+
+const RegisterAndLogout:any = () =>{
+  localStorage.clear()
+  return <RegisterPage />
+}
+
 
 const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Error page route */}
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Home/>
+          </ProtectedRoute>
+        }
+        />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-
-        <Route path="/home" element={<Home />} />
-
-        <Route path="/404" element={<ErrorPage />} />
+        <Route path="logout" element={<Logout/>} />
+        <Route path="/register" element={<RegisterAndLogout />} />
+        <Route path="*" element={<ErrorPage />} />
 
       </Routes>
     </Router>

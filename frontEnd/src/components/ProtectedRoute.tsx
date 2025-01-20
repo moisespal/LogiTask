@@ -1,17 +1,20 @@
+
+import { ReactNode, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import jwt_decode, { jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import api from "../api";
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../constants";
-import { useState,useEffect } from "react";
 
+interface ProtectedRouteProps {
+    children: ReactNode;
+}
 
-function ProtectedRoute({ children }) {
-    const [isAuthorized, setIsAuthorized] = useState(null);
+function ProtectedRoute({ children }: ProtectedRouteProps) {
+    const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
     
     useEffect(() => {
-        auth().catch(() => setIsAuthorized(false))
-    }, [])
-
+        auth().catch(() => setIsAuthorized(false));
+    }, []);
 
     const refreshToken = async () => {
         const refreshToken = localStorage.getItem(REFRESH_TOKEN);
@@ -20,10 +23,10 @@ function ProtectedRoute({ children }) {
                 refresh: refreshToken,
             });
             if (res.status === 200) {
-                localStorage.setItem(ACCESS_TOKEN, res.data.access)
-                setIsAuthorized(true)
+                localStorage.setItem(ACCESS_TOKEN, res.data.access);
+                setIsAuthorized(true);
             } else {
-                setIsAuthorized(false)
+                setIsAuthorized(false);
             }
         } catch (error) {
             console.log(error);
@@ -33,22 +36,21 @@ function ProtectedRoute({ children }) {
 
     const auth = async () => {
         const token = localStorage.getItem(ACCESS_TOKEN);
-        if(!token){
+        if (!token) {
             setIsAuthorized(false);
-            return
+            return;
         }
-        const decoded = jwtDecode(token)
-        const tokenExp = decoded.exp
-        const now = Date.now()/1000;
+        const decoded: { exp: number } = jwtDecode(token);
+        const tokenExp = decoded.exp;
+        const now = Date.now() / 1000;
 
-        if(tokenExp < now){
+        if (tokenExp < now) {
             await refreshToken();
-        }else{
+        } else {
             setIsAuthorized(true);
         }
     };
 
-   
     if (isAuthorized === null) {
         return <div>loading...</div>;
     }
