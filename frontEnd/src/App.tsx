@@ -1,18 +1,27 @@
-import React from "react"
-import { BrowserRouter as Router,Route, Navigate } from "react-router-dom"
-import Login from "./pages/Login"
-import Register from "./pages/Register"
-import Home from "./Home"
-import ErrorPage from "./pages/ErrorPage"
-import ProtectedRoute from "./components/ProtectedRoute"
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-
-
+import LoginPage from "./pages/Login";
+import RegisterPage from "./pages/Register";
+import Home from "./Home";
+import ErrorPage from "./pages/ErrorPage";
+// import ProtectedRoute from "./components/ProtectedRoute";
 
 const App: React.FC = () => {
   return (
-    <Home/>
-  );
-}
+    <Router>
+      <Routes>
+        {/* Error page route */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-export default App
+        <Route path="/home" element={<Home />} />
+
+        <Route path="/404" element={<ErrorPage />} />
+
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
