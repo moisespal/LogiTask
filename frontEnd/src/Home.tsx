@@ -38,6 +38,36 @@ const Home: React.FC = () => {
   const listRefs = useRef<(HTMLLIElement | null)[]>([]);
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
+  
+  const [customers, setCustomer] = useState([])
+  const [properties, setProperties] = useState([])
+  
+  useEffect(()=>{
+    getClients();
+  }, [])
+
+  const getClients = () => {
+    api
+        .get("/api/clients/")
+        .then((res) => res.data)
+        .then((data) => {
+            setCustomer(data);
+            console.log(data);
+        })
+        .catch((err) => alert(err));
+};
+  
+  
+
+ 
+
+
+
+
+
+
+
+
 
   // Event Handlers
   const handleModeClick = () => {
@@ -239,7 +269,7 @@ const Home: React.FC = () => {
       <AddClientModal
         isOpen={isAddClientModalOpen}
         onClose={() => setIsAddClientModalOpen(false)}
-        onSubmit={handleAddClient}
+      
       />
     </div>
   );

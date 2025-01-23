@@ -1,39 +1,61 @@
 import React, { useState } from 'react';
 import { Client } from '../types/interfaces';
-import DatePicker from 'react-datepicker';
+//import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import api from '../api';
 
 interface AddClientModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (client: Partial<Client>) => void;
+ 
 }
 
-const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose, onSubmit }) => {
+const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose }) => {
   const [mode, setMode] = useState<'select' | 'single' | 'multiple'>('select');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [address, setAddress] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phoneNumber, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [lawnSize, setLawnSize] = useState('');
-  const [frequency, setFrequency] = useState('');
-  const [nextServiceDate, setNextServiceDate] = useState<Date | null>(null);
+  const [street, setStreet] = useState("")
+  const [city, setCity] = useState("")
+  const [zipCode, setzipCode] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({
-      firstName,
-      lastName,
-      address,
-      phone,
-      email,
-      lawnSize,
-      schedule: {
-        frequency,
-        nextServiceDate: nextServiceDate?.toISOString() || null,
-      },
-    });
+  
+    try {
+      // First, create the client
+      const clientResponse = await api.post("/api/clients/", {
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+      });
+  
+      if (clientResponse.status === 201) {
+        const clientId = clientResponse.data.id; // Assuming the server returns the created client's ID
+        alert("Client Created!");
+  
+        // Now, create the property using the client's ID
+        const propertyResponse = await api.post("/api/properties/", {
+          street,
+          city,
+          zipCode,
+          clientId: clientId, // Associate the property with the client
+        });
+  
+        if (propertyResponse.status === 201) {
+          alert("Property Created!");
+        } else {
+          alert("Failed to create property.");
+        }
+      } else {
+        alert("Failed to create client.");
+      }
+    } catch (err) {
+      alert(`Error: ${err}`);
+    }
+  
     onClose();
   };
 
@@ -84,21 +106,12 @@ const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose, onSubm
             />
           </div>
         </div>
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            required
-          />
-        </div>
         <div className="form-row">
           <div className="form-group">
             <input
               type="tel"
               placeholder="Phone"
-              value={phone}
+              value={phoneNumber}
               onChange={(e) => setPhone(e.target.value)}
               required
             />
@@ -113,39 +126,34 @@ const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose, onSubm
             />
           </div>
         </div>
+        <div className="form-group">
+          <input
+            type="text"
+            placeholder="Address"
+            value={street}
+            onChange={(e) => setStreet(e.target.value)}
+            required
+          />
+        </div>
         <div className="form-row">
           <div className="form-group">
             <input
-              type="number"
-              placeholder="Lawn Size (sq ft)"
-              value={lawnSize}
-              onChange={(e) => setLawnSize(e.target.value)}
+              type="text"
+              placeholder="City"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
               required
             />
           </div>
           <div className="form-group">
-            <select
-              value={frequency}
-              onChange={(e) => setFrequency(e.target.value)}
+            <input
+              type="text"
+              placeholder="ZipCode"
+              value={zipCode}
+              onChange={(e) => setzipCode(e.target.value)}
               required
-            >
-              <option value="">Select frequency</option>
-              <option value="one-time">One-time</option>
-              <option value="weekly">Weekly</option>
-              <option value="biweekly">Bi-weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
+            />
           </div>
-        </div>
-        <div className="form-group">
-          <DatePicker
-            selected={nextServiceDate}
-            onChange={(date: Date | null) => setNextServiceDate(date)}
-            dateFormat="MMMM d, yyyy"
-            minDate={new Date()}
-            placeholderText="Next Service Date"
-            required
-          />
         </div>
         <div className="form-actions">
           <button type="button" className="btn-secondary" onClick={() => setMode('select')}>

@@ -3,6 +3,8 @@ from . import views
 
 
 urlpatterns = [
-    path("notes/", views.NoteListCreate.as_view(), name="note-list"),
-    path("notes/delete/<int:pk>/", views.NoteDelete.as_view(),name="delete-note"),
+    path("clients/delete/<int:pk>/", views.ClientDelete.as_view(),name="client-note"),
+    path("properties/", views.PropertyListCreate.as_view(), name="property-list-create"),
+    path("clients/", views.ClientListCreate.as_view(), name="client-list"),
+
 ]
