@@ -6,7 +6,7 @@ import RegisterPage from "./pages/Register";
 import Home from "./Home";
 import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import Dev from "./pages/dev";
 const Logout:any = () =>{
   localStorage.clear()
   return <Navigate to="/login" />
@@ -31,6 +31,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/logout" element={<Logout/>} />
         <Route path="/register" element={<RegisterAndLogout />} />
+        <Route path="/dev" element={<Dev />} />
         <Route path="*" element={<ErrorPage />} />
 
       </Routes>

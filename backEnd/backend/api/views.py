@@ -44,9 +44,6 @@ class PropertyListCreate(generics.ListCreateAPIView):
 
 
     def get_queryset(self):
-        client_id = self.request.query_params.get("id")
-        if client_id:
-            return Property.objects.filter(id=client_id)
         return Property.objects.all()
     
     
