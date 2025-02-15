@@ -56,19 +56,6 @@ const Home: React.FC = () => {
         })
         .catch((err) => alert(err));
 };
-  
-  
-
- 
-
-
-
-
-
-
-
-
-
   // Event Handlers
   const handleModeClick = () => {
     setModeType(prev => (prev === 'Client' ? 'Daily' : 'Client'));
@@ -79,8 +66,8 @@ const Home: React.FC = () => {
 
   const handleItemClick = (id: number) => {
     if (modeType === 'Daily') {
-      setClients(prevClients => 
-        prevClients.map(client =>
+      setClients(prevCustomers => 
+        prevCustomers.map((client: Client) =>
           client.id === id
             ? { ...client, selected: getNextStatus(client) }
             : client
@@ -93,7 +80,8 @@ const Home: React.FC = () => {
   const handleSortChange = (option: string) => setSortOption(option);
 
   const getNextStatus = (client: Client) => {
-    if (client.id !== focusedItemId) return client.selected;
+    const currentStatus = client.selected ?? 'None';
+    if (client.id !== focusedItemId) return currentStatus;
     if (client.selected === 'Complete') return 'Paid';
     if (client.selected === 'Paid') return 'None';
     return 'Complete';
@@ -103,7 +91,7 @@ const Home: React.FC = () => {
   const filterClientsByMode = (clients: Client[]): Client[] => {
     if (modeType === 'Daily') {
       const todayDayString = getTodayDayString();
-      return clients.filter(client => client.tags.some(tag => tag.day === todayDayString));
+      return clients.filter(client =>(client.tags ?? []).some(tag => tag.day === todayDayString));
     }
     return clients;
   };
@@ -119,17 +107,18 @@ const Home: React.FC = () => {
       switch (sortOption) {
         case 'firstName': return a.firstName.localeCompare(b.firstName);
         case 'address': return a.address.localeCompare(b.address);
-        case 'phone': return a.phone.localeCompare(b.phone);
         case 'lawnSize': return parseInt(a.lawnSize) - parseInt(b.lawnSize);
         default: return 0;
       }
     });
 
-  const filteredClients = sortClients(filterClientsBySearch(filterClientsByMode(clients)));
+  const filteredClients = sortClients(filterClientsBySearch(filterClientsByMode(customers)));
 
   // Keyboard Navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (isAddClientModalOpen) return;
+      
       if (e.key === 'Backspace') setSearchTerm(prev => prev.slice(0, -1));
       else if (/^[a-zA-Z0-9,.\s]$/.test(e.key)) setSearchTerm(prev => prev + e.key);
       else if (e.key === 'ArrowRight') navigateFocusedItem(1);
@@ -141,6 +130,7 @@ const Home: React.FC = () => {
   }, [filteredClients]);
 
   const navigateFocusedItem = (direction: number) => {
+    if (filteredClients.length === 0) return;
     setFocusedItemId(prevId => {
       const currentIndex = filteredClients.findIndex(client => client.id === prevId);
       const newIndex = Math.min(Math.max(currentIndex + direction, 0), filteredClients.length - 1);
@@ -189,7 +179,7 @@ const Home: React.FC = () => {
       
       {modeType === 'Client' && (
       selectedClient ? (
-        <Calendar visits={selectedClient.visits} />
+        <Calendar visits={selectedClient.visits ?? []} />
       ) : null
       )}
     
@@ -215,7 +205,7 @@ const Home: React.FC = () => {
         </li>
       )}
     
-      {filteredClients.map((item: Client, index) => (
+      {customers.map((item: Client, index) => (
         <li
           key={item.id}
           className={`list-item 
@@ -225,8 +215,13 @@ const Home: React.FC = () => {
           ref={el => listRefs.current[index] = el}
           onClick={() => handleItemClick(item.id)}
         >
-          <div className="list-item-address">{item.address}</div>
-          <div className="stars">{renderStars(getStars(item.lawnSize))}</div>
+          <div className="list-item-header">
+            <div className="profile-pic-container">
+            <img src={item.image || 'https://st.depositphotos.com/1779253/5140/v/450/depositphotos_51405259-stock-illustration-male-avatar-profile-picture-use.jpg'} alt={`${item.firstName} ${item.lastName}`} className="profile-pic" />
+            </div>
+            <div className="list-item-name">{item.firstName} {item.lastName}</div>
+          </div>
+          <div className="stars">{renderStars(getStars("600"))}</div>
         </li>
       ))}
       </ul>

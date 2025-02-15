@@ -1,0 +1,35 @@
+/* Container for the whole page content */
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Section styling for client list and property list */
+.section {
+  margin-bottom: 40px;
+}
+
+/* Styling for section headings */
+.section h2 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+/* Grid styling for lists */
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+/* Card style for individual client or property items */
+.card {
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+}

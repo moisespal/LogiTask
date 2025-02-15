@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../api';
 import Client from '../components/client';
 import Property from '../components/Property';
+import './dev.css'
 
 function Dev(){
     const [firstName, setFirstName] = useState('');
@@ -11,7 +12,6 @@ function Dev(){
     const [street, setStreet] = useState("")
     const [city, setCity] = useState("")
     const [zipCode, setzipCode] = useState("")
-
     const [client, setClients] = useState([])
     const [properties, setProperties] = useState([])
 
@@ -22,25 +22,33 @@ function Dev(){
         getProperties();
       }, [])  
 
+      const deleteClient = (clientId: number) => {
+        api.delete(`/api/clients/delete/${clientId}/`)
+          .then((response) => {
+            console.log("Client deleted successfully!");
+            // Optionally, update your state to remove the client from your UI.
+          })
+          .catch((error) => {
+            console.error("Error deleting client:", error);
+            alert("Failed to delete client");
+          });
+      };
+
     const getClients = () => {
-        api
-            .get("/api/clients/")
-            .then((res) => res.data)
-            .then((data) => {
-                setClients(data);
-                console.log(data);
+        api.get("/api/clients/")
+            .then((res) =>{
+                console.log("Clients returned:", res.data);
+                setClients(res.data);
             })
             .catch((err) => alert(err));
     };
     const getProperties = () => {
-        api
-            .get("/api/properties/")
-            .then((res) => res.data)
-            .then((data) => {
-                setProperties(data);
-                console.log(data);
-            })
-            .catch((err) => alert(err));
+          api.get("/api/properties/")
+          .then((res) => {
+            console.log("Properties returned:", res.data);
+            setProperties(res.data);
+          })
+          .catch((err) => alert(err));
     };
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -82,104 +90,31 @@ function Dev(){
   };
     
     return (
-        <div>Hello
-            <h2>List of Clients</h2>
-            <div>
-            {client.map((note) => (
-                    <Client client={note} />
-                ))}
+        <div className="container">
+            <h1>Dev Page</h1>
+
+            <div className="section">
+                <h2>List of Clients</h2>
+                <div className="list">
+                    {client.map((note) => (
+                        <div className="card" key={note.id}>
+                          <Client client={note} />
+                        </div>
+                    ))}
+                </div>
             </div>
-            <h2>Property List</h2>
-            <div>
-            {properties.map((note) => (
-                    <Property property={note} />
-                ))}
+
+            <div className="section">
+                <h2>Property List</h2>
+                <div className="list">
+                    {properties.map((note) => (
+                        <div className="card" key={note.id}>
+                          <Property property={note} />
+                        </div>
+                    ))}
+                </div>
             </div>
-            <h2>Add New Client</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-row">
-          <div className="form-group">
-            <input
-              type="text"
-              placeholder="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="text"
-              placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-          </div>
         </div>
-        <div className="form-row">
-          <div className="form-group">
-            <input
-              type="tel"
-              placeholder="Phone"
-              value={phoneNumber}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Address"
-            value={street}
-            onChange={(e) => setStreet(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-row">
-          <div className="form-group">
-            <input
-              type="text"
-              placeholder="City"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="text"
-              placeholder="ZipCode"
-              value={zipCode}
-              onChange={(e) => setzipCode(e.target.value)}
-              required
-            />
-          </div>
-        </div>
-        <div className="form-actions">
-          <button type="submit" className="btn-primary">
-            <i className="fas fa-plus"></i> Add Client
-          </button>
-        </div>
-      </form>
-
-
-
-
-        </div>
-        
     )
 }
-
-
 export default Dev

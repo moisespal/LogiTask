@@ -46,6 +46,13 @@ const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose }) => {
   
         if (propertyResponse.status === 201) {
           alert("Property Created!");
+          setFirstName('');
+          setLastName('');
+          setPhone('');
+          setEmail('');
+          setStreet('');
+          setCity('');
+          setzipCode('');
         } else {
           alert("Failed to create property.");
         }

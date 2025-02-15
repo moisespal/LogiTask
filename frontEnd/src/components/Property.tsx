@@ -19,6 +19,7 @@ function Property({property}:FormProps) {
             <p className="note-content">{property.city}</p>
             <p className="note-date">{property.state}</p>
             <p className="note-email">{property.zipCode}</p>
+            <p className="note-client">Client ID: {property.client}</p>            
         </div>
     );
 }

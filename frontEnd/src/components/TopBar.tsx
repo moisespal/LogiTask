@@ -16,8 +16,7 @@ const TopBar: React.FC<TopBarProps> = ({ focusedItemId, selectedClient, sortOpti
         {focusedItemId !== null && (
           <>
             <div>{selectedClient?.firstName} {selectedClient?.lastName}</div>
-            <div>{selectedClient?.address}</div>
-            <div>{selectedClient?.phone}</div>
+            <div>{selectedClient?.phoneNumber}</div>
             <div>{selectedClient?.email}</div>
             <div>{selectedClient?.lawnSize}</div>
           </>
@@ -29,8 +28,6 @@ const TopBar: React.FC<TopBarProps> = ({ focusedItemId, selectedClient, sortOpti
         <div className="sort-dropdown">
           <button onClick={() => handleSortChange('none')}>None</button>
           <button onClick={() => handleSortChange('firstName')}>First Name</button>
-          <button onClick={() => handleSortChange('address')}>Address</button>
-          <button onClick={() => handleSortChange('phone')}>Phone Number</button>
           <button onClick={() => handleSortChange('lawnSize')}>Lawn Size</button>
         </div>
       </div>
