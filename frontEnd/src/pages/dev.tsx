@@ -50,6 +50,41 @@ function Dev(){
           })
           .catch((err) => alert(err));
     };
+
+    const addTestProperty = async () => {
+        const clientIdInput = prompt("Enter the Client ID for this property:");
+        if (!clientIdInput) return;
+        const clientId = parseInt(clientIdInput);
+        if (isNaN(clientId)) {
+          alert("Invalid Client ID");
+          return;
+        }
+    const streetInput = prompt("Enter the street address for this property:");
+    if (!streetInput) return;
+    const cityInput = prompt("Enter the city for this property:");
+    if (!cityInput) return;
+    const zipCodeInput = prompt("Enter the zip code for this property:");
+    if (!zipCodeInput) return;
+
+    try {
+      const res = await api.post("/api/properties/", {
+        street: streetInput,
+        city: cityInput,
+        zipCode: zipCodeInput,
+        clientId: clientId,
+      });
+      if (res.status === 201) {
+        alert("Property created successfully!");
+      } else {
+        alert("Failed to create property.");
+      }
+    } catch (err) {
+      alert(`Error: ${err}`);
+    }
+  }
+    
+
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
   
@@ -103,7 +138,10 @@ function Dev(){
                     ))}
                 </div>
             </div>
-
+            <div className="section">
+              <h2>Test: Add Property to Existing Client</h2>
+              <button onClick={addTestProperty}>Add Property</button>
+            </div>
             <div className="section">
                 <h2>Property List</h2>
                 <div className="list">

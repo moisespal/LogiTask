@@ -45,6 +45,9 @@ const Home: React.FC = () => {
   useEffect(()=>{
     getClients();
   }, [])
+  useEffect(()=>{
+    getProperties();
+  }, [])
 
   const getClients = () => {
     api
@@ -55,7 +58,20 @@ const Home: React.FC = () => {
             console.log(data);
         })
         .catch((err) => alert(err));
-};
+  };
+
+  const getProperties = () => {
+    api
+      .get("/api/properties/")
+      .then((res) => res.data)
+      .then((data) => {
+        setProperties(data);
+        console.log("properties loaded:", data);
+      })
+      .catch((err) => alert(err));
+  };
+
+
   // Event Handlers
   const handleModeClick = () => {
     setModeType(prev => (prev === 'Client' ? 'Daily' : 'Client'));
@@ -206,23 +222,42 @@ const Home: React.FC = () => {
       )}
     
       {customers.map((item: Client, index) => (
-        <li
-          key={item.id}
-          className={`list-item 
-            ${item.id === focusedItemId ? 'focused' : ''} 
-            ${modeType === 'Daily' && item.selected === 'Complete' ? 'complete' : ''} 
-            ${modeType === 'Daily' && item.selected === 'Paid' ? 'paid' : ''}`}
-          ref={el => listRefs.current[index] = el}
-          onClick={() => handleItemClick(item.id)}
-        >
-          <div className="list-item-header">
-            <div className="profile-pic-container">
-            <img src={item.image || 'https://st.depositphotos.com/1779253/5140/v/450/depositphotos_51405259-stock-illustration-male-avatar-profile-picture-use.jpg'} alt={`${item.firstName} ${item.lastName}`} className="profile-pic" />
+        <React.Fragment key={item.id}>
+          <li
+            className={`list-item 
+              ${item.id === focusedItemId ? 'focused' : ''} 
+              ${modeType === 'Daily' && item.selected === 'Complete' ? 'complete' : ''} 
+              ${modeType === 'Daily' && item.selected === 'Paid' ? 'paid' : ''}`}
+            ref={el => listRefs.current[index] = el}
+            onClick={() => handleItemClick(item.id)}
+          >
+            <div className="list-item-header">
+              <div className="profile-pic-container">
+                <img
+                  src={item.image || 'https://st.depositphotos.com/1779253/5140/v/450/depositphotos_51405259-stock-illustration-male-avatar-profile-picture-use.jpg'}
+                  alt={`${item.firstName} ${item.lastName}`}
+                  className="profile-pic"
+                />
+              </div>
+              <div className="list-item-name">{item.firstName} {item.lastName}</div>
             </div>
-            <div className="list-item-name">{item.firstName} {item.lastName}</div>
-          </div>
-          <div className="stars">{renderStars(getStars("600"))}</div>
-        </li>
+            <div className="stars">{renderStars(getStars("600"))}</div>
+          </li>
+
+          {item.id === focusedItemId &&
+            properties
+            .filter(prop => prop.client === item.id)
+            .map((prop, idx) => (
+              <li 
+                key={`${item.id}-address-${idx}`} 
+                className="address-item" 
+                style = {{animationDelay: `${idx * 0.1}s`}}>
+                {prop.street}, {prop.city}, {prop.state} {prop.zipCode}
+              </li>
+              
+            ))
+          }
+        </React.Fragment>
       ))}
       </ul>
     
