@@ -36,17 +36,12 @@ const Home: React.FC = () => {
   const [modeType, setModeType] = useState('Client');
   const [clients, setClients] = useState<Client[]>(addresses);
   const listRefs = useRef<(HTMLLIElement | null)[]>([]);
-  const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
+  const [isAddClientModelOpen, setIsAddClientModelOpen] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
-  
   const [customers, setCustomer] = useState([])
-  const [properties, setProperties] = useState([])
   
   useEffect(()=>{
     getClients();
-  }, [])
-  useEffect(()=>{
-    getProperties();
   }, [])
 
   const getClients = () => {
@@ -58,17 +53,6 @@ const Home: React.FC = () => {
             console.log(data);
         })
         .catch((err) => alert(err));
-  };
-
-  const getProperties = () => {
-    api
-      .get("/api/properties/")
-      .then((res) => res.data)
-      .then((data) => {
-        setProperties(data);
-        console.log("properties loaded:", data);
-      })
-      .catch((err) => alert(err));
   };
 
 
@@ -103,6 +87,10 @@ const Home: React.FC = () => {
     return 'Complete';
   };
 
+  const handleGearClick = (clientId: number) => {
+    console.log("Gear clicked for client:", clientId);
+  };
+
   // Filtering and Sorting
   const filterClientsByMode = (clients: Client[]): Client[] => {
     if (modeType === 'Daily') {
@@ -133,7 +121,7 @@ const Home: React.FC = () => {
   // Keyboard Navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isAddClientModalOpen) return;
+      if (isAddClientModelOpen) return;
       
       if (e.key === 'Backspace') setSearchTerm(prev => prev.slice(0, -1));
       else if (/^[a-zA-Z0-9,.\s]$/.test(e.key)) setSearchTerm(prev => prev + e.key);
@@ -182,7 +170,7 @@ const Home: React.FC = () => {
     // Logic to add the new client to your state or send to backend
     console.log('New client:', newClient);
     // Close the modal after adding the client
-    setIsAddClientModalOpen(false);
+    setIsAddClientModelOpen(false);
   };
 
   return (
@@ -240,14 +228,20 @@ const Home: React.FC = () => {
                 />
               </div>
               <div className="list-item-name">{item.firstName} {item.lastName}</div>
+              {item.id === focusedItemId && (
+                  <button
+                    className="gear-button"
+                    onClick={(e) => { e.stopPropagation(); handleGearClick(item.id); }}
+                    title="More options"
+                  >
+                    <i className="fas fa-cog"></i>
+                  </button>
+                )}
             </div>
             <div className="stars">{renderStars(getStars("600"))}</div>
           </li>
 
-          {item.id === focusedItemId &&
-            properties
-            .filter(prop => prop.client === item.id)
-            .map((prop, idx) => (
+          {item.id === focusedItemId && item.properties && item.properties.map((prop: any, idx: number) => (
               <li 
                 key={`${item.id}-address-${idx}`} 
                 className="address-item" 
@@ -271,7 +265,7 @@ const Home: React.FC = () => {
         >
           <FaExchangeAlt />
         </button>
-        <button className="action-button" onClick={() => setIsAddClientModalOpen(true)} title="Add Client">
+        <button className="action-button" onClick={() => setIsAddClientModelOpen(true)} title="Add Client">
           <FaUserPlus />
         </button>
         </div>
@@ -297,9 +291,8 @@ const Home: React.FC = () => {
       </div>
 
       <AddClientModal
-        isOpen={isAddClientModalOpen}
-        onClose={() => setIsAddClientModalOpen(false)}
-      
+        isOpen={isAddClientModelOpen}
+        onClose={() => setIsAddClientModelOpen(false)}
       />
     </div>
   );

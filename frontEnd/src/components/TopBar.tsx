@@ -1,5 +1,6 @@
 import React from 'react';
 import { Client } from '../types/interfaces';
+import './TopBar.css';
 
 interface TopBarProps {
   focusedItemId: number | null;
@@ -8,6 +9,13 @@ interface TopBarProps {
   handleSortChange: (option: string) => void;
 }
 
+const formatPhoneNumber = (phone: string | undefined): string => {
+  if (!phone) return "";
+  const cleaned = phone.replace(/\D/g, '');
+  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+  return match ? `(${match[1]}) ${match[2]}-${match[3]}` : phone;
+};
+
 const TopBar: React.FC<TopBarProps> = ({ focusedItemId, selectedClient, sortOption, handleSortChange }) => {
   return (
     <div className="top-bar">
@@ -15,10 +23,10 @@ const TopBar: React.FC<TopBarProps> = ({ focusedItemId, selectedClient, sortOpti
       <div className={`client-info ${focusedItemId !== null ? 'visible' : ''}`}>
         {focusedItemId !== null && (
           <>
+            <div>ID:{selectedClient?.id}</div>
             <div>{selectedClient?.firstName} {selectedClient?.lastName}</div>
-            <div>{selectedClient?.phoneNumber}</div>
-            <div>{selectedClient?.email}</div>
-            <div>{selectedClient?.lawnSize}</div>
+            <div className="client-phone">{formatPhoneNumber(selectedClient?.phoneNumber)}</div>
+            <div className="client-email">{selectedClient?.email}</div>
           </>
         )}
       </div>

@@ -25,17 +25,6 @@ body, html, #root {
   display: none; /* For Chrome, Safari, and Opera */
 }
 
-.top-menu-shape {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 520px;
-  background: rgba(40, 40, 43, 1);
-  clip-path: polygon(40% 30%, 50% 20%, 100% 20%, 100% 0, 0 0, 0 30%);
-  z-index: -1; /* Ensure this is below the top bar and sort dropdown */
-}
-
 .search-bar {
   position: fixed;
   top: 112px; /* Adjust the top position as needed */
@@ -277,82 +266,6 @@ body, html, #root {
   }
 }
 
-.top-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  font-family: Inter, sans-serif;
-  width: 100%;
-  height: 70px;
-  background: linear-gradient(90deg, rgba(40, 40, 43, 1) 0%, rgba(60, 60, 63, 1) 100%);
-  backdrop-filter: blur(5px);
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 10px;;
-  box-sizing: border-box;
-  z-index: 10; /* Ensure the top bar is above the list items */
-  flex-shrink: 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
-}
-
-.sort-button-container {
-  position: relative;
-  right: 25px; 
-  top: 35px;  
-  align-items: center;
-}
-
-.sort-button {
-  background-color: rgb(33, 33, 36);
-  padding: 10px;
-  font-size: 15px;
-  cursor: pointer;
-  border-radius: 10px;
-  min-width: 100px; /* Set a fixed minimum width */
-  text-align: center;
-}
-.sort-button:hover{
-  transform: scale(1.03);
-}
-
-.sort-dropdown {
-  display: none;
-  position: absolute;
-  background-color: rgba(0, 0, 0, 0.194);
-  margin-top: -8px;
-  width: 150px;
-  box-shadow: 10px 10px 10px 0px rgba(0, 0, 0, 0.2);
-  z-index: 70; /* Ensure dropdown is above other elements */
-  top: 50px;
-  right: 0;
-  border-radius: 5px;
-}
-
-.sort-dropdown button {
-  background-color: rgba(82, 82, 82, 0.64);
-  color: rgb(197, 197, 197);
-  padding: 10px;
-  text-align: left;
-  border: none;
-  width: 100%;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-
-.sort-button-container:hover .sort-dropdown {
-  display: block;
-}
-
-.client-info {
-  padding: 5px 10px;
-  line-height: 1.7;
-  font-size: 18px;
-  border-radius: 5px;
-  margin-top: 85px;
-} 
-
 .list-item.date-header{
   font-family: 'Arial Narrow';
   font-size: x-large;
@@ -537,37 +450,7 @@ body, html, #root {
   margin-right: 0.5rem;
 }
 
-/* Add styles for the DatePicker */
-.react-datepicker {
-  font-family: Arial, sans-serif;
-  background-color: rgba(40, 40, 43, 1);
-  color: #ffffff;
-  border: 1px solid #3a3a3a;
-  border-radius: 6px;
-}
 
-.react-datepicker__header {
-  background-color: rgba(33, 33, 36, 0.9);
-  border-bottom: 1px solid #3a3a3a;
-}
-
-.react-datepicker__current-month,
-.react-datepicker__day-name,
-.react-datepicker__day {
-  color: #ffffff;
-}
-
-.react-datepicker__day:hover {
-  background-color: #4CAF50;
-}
-
-.react-datepicker__day--selected {
-  background-color: #4CAF50;
-}
-
-.react-datepicker__day--keyboard-selected {
-  background-color: #45a049;
-}
 
 /* Add this to your existing styles for Font Awesome icons */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css');
@@ -726,3 +609,18 @@ body, html, #root {
     opacity: 0;
   }
 }
+
+.gear-button {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 10px; /* some spacing from the client name */
+  padding: 5px;
+}
+
+.gear-button:hover {
+  color: #ccc;
+} 
+

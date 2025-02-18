@@ -13,6 +13,15 @@ export interface Client {
   selected?: string; // Change the selected property to string
   tags: { day: string; occurrence: string }[]; // Add tags property
   schedule?: Schedule; // Add schedule property
+  properties?: Property[];
+}
+
+export interface Property {
+  id: number;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
 }
 
 export interface Visit {
