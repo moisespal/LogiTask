@@ -1,3 +1,25 @@
+# Python virtual environments
+env/
+venv/
+
+# Node dependencies
+node_modules/
+
+# Build artifacts
+dist/
+dist-ssr/
+.vite/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+db.sqlite3
+
+# Environment files
+.env
+*.local
+
 # Logs
 logs
 *.log
@@ -7,18 +29,19 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Django specific
+*.pot
+*.mo
+media/
+static/
