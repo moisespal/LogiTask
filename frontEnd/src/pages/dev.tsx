@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect} from 'react';
 import api from '../api';
-import Client from '../components/client';
-import Property from '../components/Property';
-import './dev.css'
+import Client from '../components/Client/Client';
+import Property from '../components/Property/Property';
+import '../styles/pages/dev.css'
 
 function Dev(){
     const [firstName, setFirstName] = useState('');
@@ -85,7 +85,7 @@ function Dev(){
     
 
     
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit  = async (e: React.FormEvent) => {
         e.preventDefault();
   
     try {

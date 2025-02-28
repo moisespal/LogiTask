@@ -1,8 +1,8 @@
 // Calendar.tsx
 import React, { useRef, useState } from 'react';
 import Draggable from 'react-draggable';
-import './Calendar.css';
-import { Visit } from '../types/interfaces'; // Import Visit interface
+import '../../styles/components/ClientCalendar.css';
+import { Visit } from '../../types/interfaces'; // Import Visit interface
 import { FaDollarSign } from 'react-icons/fa';
 
 // Interface for the Visit object
@@ -12,7 +12,7 @@ interface CalendarProps {
   visits: Visit[];
 }
 
-const Calendar: React.FC<CalendarProps> = ({ visits }) => {
+const ClientCalendar: React.FC<CalendarProps> = ({ visits }) => {
   const [showBalance, setShowBalance] = useState(false);
   const today = new Date();
 
@@ -138,4 +138,4 @@ const Calendar: React.FC<CalendarProps> = ({ visits }) => {
   );
 };
 
-export default Calendar;
+export default ClientCalendar;

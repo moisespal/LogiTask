@@ -1,8 +1,8 @@
 import { useState } from "react";
-import api from "../api"
+import api from "../../api"
 import { useNavigate} from "react-router-dom";
-import { ACCESS_TOKEN,REFRESH_TOKEN } from "../constants";
-import "./AuthPage.css"
+import "../../styles/components/AuthForm.css";
+import { ACCESS_TOKEN,REFRESH_TOKEN } from "../../constants";
 
 
 interface FormProps {
@@ -10,7 +10,7 @@ interface FormProps {
     method: string;
 }
 
-function Form({ route, method }: FormProps) {
+function AuthForm({ route, method }: FormProps) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -71,4 +71,4 @@ function Form({ route, method }: FormProps) {
     );
 }
 
-export default Form
+export default AuthForm

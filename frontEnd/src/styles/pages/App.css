@@ -1,0 +1,56 @@
+body, html, #root {
+  margin: 0;
+  height: 100%;
+  overflow: hidden; 
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  flex-direction: column;
+  align-items: flex-end; 
+  box-sizing: border-box;
+  padding: 10vh 0px 10vh 20vw;
+  overflow-y: auto; 
+  overflow-x: hidden;
+  background-size: cover;
+  background-position: center;
+  transition: background-image 0.1s ease-in-out;
+  scroll-behavior: smooth;
+  z-index: 1; 
+}
+
+.app-container::-webkit-scrollbar {
+  display: none; 
+}
+
+.search-bar {
+  position: fixed;
+  top: 115px; 
+  width: 20%;
+  height: 4%;
+  padding: 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: opacity 0.5s, background-color 0.5s, box-shadow 0.5s;
+  opacity: 100;
+  z-index: 10;
+  pointer-events: none; 
+  color: white;
+  background-color: rgba(47, 47, 48, 0.372); 
+}
+
+.right-aligned-list {
+  list-style: none;
+  padding: 0;
+  width: 100%; 
+  padding-top: 25px;
+  padding-bottom: 80px; 
+  z-index: 2; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: flex-end; 
+}

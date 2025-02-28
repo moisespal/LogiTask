@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { Client } from '../types/interfaces';
-//import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import api from '../api';
+import '../../styles/components/AddClientModal.css';
+import api from '../../api';
 
-interface AddClientModalProps {
+interface AddClientModelProps {
   isOpen: boolean;
   onClose: () => void;
- 
 }
 
-const AddClientModal: React.FC<AddClientModalProps> = ({ isOpen, onClose }) => {
+const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
   const [mode, setMode] = useState<'select' | 'single' | 'multiple'>('select');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');

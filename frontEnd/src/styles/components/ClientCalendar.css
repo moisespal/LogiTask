@@ -2,7 +2,7 @@
   font-family: 'Inter', sans-serif;
   position: absolute;
   top: 170px;
-  left: 100px;
+  left: 80px;
   width: 360px;
   padding: 20px;
   background-color: rgba(30, 30, 33, 0.95);
@@ -18,13 +18,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
 }
 
 .calendar-container h2 {
   margin: 0;
   font-size: 1.5em;
-  color: #ffffff;
 }
 
 .calendar-content {
@@ -63,7 +62,6 @@
 .balance-toggle {
   background: none;
   border: none;
-  color: #9e9e9e;
   font-size: 1.2em;
   cursor: pointer;
   padding: 5px;
@@ -82,6 +80,7 @@
 
 .balance-toggle.active svg {
   transform: rotate(180deg);
+  color: #4CAF50;
 }
 
 .outstanding-balance {

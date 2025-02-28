@@ -1,26 +1,60 @@
 READ ME
 
-BackEnd
-START VIRTUAL ENVIORMENT 
+## BackEnd
 
-COMMAND 
--python -m venv venv 
+### Setup Virtual Environment
 
--source venv/Scripts/activate # this command is for gitbash terminal 
+1. **Navigate to the Backend Directory:**
+   - Ensure you are in the directory containing `manage.py`.
 
--pip install -r requirements.txt
+2. **Create and Activate Virtual Environment:**
+   - Create the virtual environment:
+     ```bash
+     python -m venv venv
+     ```
+   - Activate the virtual environment:
+     - **Git Bash:** `source venv/Scripts/activate`
+     - **Windows Command Prompt:** `venv\Scripts\activate.bat`
+     - **Windows PowerShell:** `venv\Scripts\Activate.ps1`
+     - **Mac/Linux:** `source venv/bin/activate`
 
-How to run 
+3. **Install Dependencies:**
+   - Run:
+     ```bash
+     pip install -r requirements.txt
+     ```
 
-python manage.py runserver 
+### Running the Server
 
-Making Changes to Models
--python manage.py makemigrations
--python manage.py migrate
+- Start the Django server:
+  ```bash
+  python manage.py runserver
+  ```
 
-FrontEnd
+### Making Changes to Models
 
-How to run 
--npm install
--npm run dev
+- After modifying models, run:
+  ```bash
+  python manage.py makemigrations
+  python manage.py migrate
+  ```
+
+## FrontEnd
+
+### Running the Frontend
+
+1. **Navigate to the Frontend Directory:**
+   - Ensure you are in the directory containing `package.json`.
+
+2. **Install Dependencies:**
+   - Run:
+     ```bash
+     npm install
+     ```
+
+3. **Start the Development Server:**
+   - Run:
+     ```bash
+     npm run dev
+     ```
 

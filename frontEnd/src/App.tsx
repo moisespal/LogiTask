@@ -1,18 +1,18 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
-import Home from "./Home";
+import Home from "./pages/Home";
 import ErrorPage from "./pages/ErrorPage";
-import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import Dev from "./pages/dev";
-const Logout:any = () =>{
+
+const Logout: React.FC = () =>{
   localStorage.clear()
   return <Navigate to="/login" />
 }
 
-const RegisterAndLogout:any = () =>{
+const RegisterAndLogout: React.FC = () =>{
   localStorage.clear()
   return <RegisterPage />
 }

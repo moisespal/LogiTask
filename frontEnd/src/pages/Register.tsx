@@ -1,8 +1,8 @@
-import Form from "../components/Form"
+import AuthForm from "../components/Auth/AuthForm"
 
 
 function RegisterPage(){
-  return <Form route="api/user/register/" method="register"/>
+  return <AuthForm route="api/user/register/" method="register"/>
 }
 
 

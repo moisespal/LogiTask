@@ -1,6 +1,6 @@
 import React from 'react';
-import { Client } from '../types/interfaces';
-import './TopBar.css';
+import { Client } from '../../types/interfaces';
+import '../../styles/components/TopBar.css';
 
 interface TopBarProps {
   focusedItemId: number | null;
