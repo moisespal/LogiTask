@@ -1,0 +1,139 @@
+/* Container styling */
+.properties-container {
+  margin: -5px 0 10px 20px;
+  padding-left: 10px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Animation for all animated elements */
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Shared styles for animated items */
+.property-item, .add-property-item, .no-properties {
+  opacity: 0;
+  animation: slideIn 0.3s ease-out forwards;
+  cursor: pointer;
+}
+
+/* Property item styling */
+.property-item {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+  margin: 5px 0;
+  padding: 8px 12px;
+  border-left: 6px solid rgba(76, 175, 80, 0.5);
+}
+
+.property-item:hover {
+  background: rgba(40, 40, 40, 0.6);
+  transform: translateY(-2px);
+  transition: all 0.1s ease;
+}
+
+/* Property content */
+.property-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.property-address {
+  font-size: 0.9em;
+  color: #e0e0e0;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.property-location {
+  font-size: 0.8em;
+  color: #c8c8c8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Section title */
+.properties-title {
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+/* Add property button */
+.add-property-item {
+  display: flex;
+  align-items: center;
+  background: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.6);
+  border-radius: 6px;
+  padding: 4px 10px;
+  margin: 5px 0 5px 0;
+  user-select: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Create subtle pulsing highlight effect */
+.add-property-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0) 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.add-property-item:hover {
+  background: rgba(76, 175, 80, 0.25);
+  border-color: rgba(76, 175, 80, 0.9);
+  transform: translateY(-2px);
+}
+
+.add-property-item:hover::before {
+  opacity: 1;
+}
+
+.add-property-item:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.add-property-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: rgba(76, 175, 80, 1);
+}
+
+.add-property-text {
+  font-size: 0.85em;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: rgba(46, 125, 50, 0.9);
+  font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  text-transform: uppercase;
+}

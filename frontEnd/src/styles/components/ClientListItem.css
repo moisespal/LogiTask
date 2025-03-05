@@ -1,8 +1,15 @@
 /* START OF CLIENT LIST ITEM STYLES */
     .list-item.focused {
-        transform: scale(1.03);
-        animation: glow-blur 1s infinite linear;
-        z-index: 2;
+        transform: scale(1.01);
+        background: rgba(30, 30, 40, 0.5);
+        border-left: 6px solid rgba(70, 130, 220, 0.8);
+        z-index: 5;
+        position: relative;
+        overflow: hidden;
+    }
+    /* Enhance text clarity when focused */
+    .list-item.focused .list-item-header{
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     }
     
     .list-item {
@@ -12,25 +19,18 @@
         backdrop-filter: blur(25px);
         color: white;
         padding: 10px 20px;
-        margin: 8px 0;
+        margin: 5px 0;
         border-radius: 10px 0 0 10px;
         transition: transform 0.2s ease, background-color 0.3s ease;
         box-sizing: border-box;
         cursor: pointer;
         z-index: 10;
-        min-width: 50%;
-        max-width: 55%;
+        min-width: 100%;
         transform-origin: right center;
         user-select: none;
         display: flex;
-        flex-direction: column;  /* Change to column layout */
-        align-items: flex-start;  /* Align items to the start */
-    }
-    
-    .list-item.focused {
-        transform: scale(1.03);
-        box-shadow: inset 0 0 5px rgba(226, 226, 226, 0.6), inset 0 0 10px rgba(192, 192, 255, 0.6), inset 0 0 20px rgba(192, 192, 255, 0.6);
-        z-index: 2;
+        flex-direction: column;
+        align-items: flex-start;
     }
     
     .list-item:hover {
@@ -38,27 +38,40 @@
         z-index: 2;
     }
     
-    .list-item-address {
-        margin-bottom: 5px;  /* Add some space between address and stars */
-    }
-    
     .stars {
         display: flex;
         align-items: center;
-        margin-top: 5px;  /* Add some space above the stars */
+        margin-top: 5px;
     }
     
+    /* Star with transparent gradient coloring */
     .star {
-        color: rgb(228, 213, 136);
-        margin-left: 2px;
-        text-shadow: 0 0 8px rgb(255, 157, 0);
-        font-size: 1.2em; 
+        margin-left: 3px;
+        font-size: 1.1em;
+        position: relative;
+        transition: all 0.3s ease;
+        background: linear-gradient(90deg, 
+            rgba(255,255,255,0.3) 0%, 
+            rgba(255,255,255,0.6) 50%, 
+            rgba(255,255,255,0.3) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
     }
     
+    /* Focused state with enhanced shimmer */
     .list-item.focused .star {
-        color: rgb(255, 215, 0);
-        text-shadow: 0 0 12px rgb(255, 165, 0);
-    }
+        background: linear-gradient(90deg, 
+        rgba(255, 255, 200, 1) 0%,
+        rgba(255, 250, 150, 1) 50%,
+        rgba(255, 245, 180, 0.7) 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 4px rgba(225, 208, 14, 0.8));
+        transition: transform 0.2s ease-out, filter 0.2s ease-out;
+      }
     
     .list-item.date-header{
         font-family: 'Arial Narrow';
@@ -92,39 +105,28 @@
     }
     
     .address-item {
-        /* A subtle gradient adds some depth */
         background: linear-gradient(135deg, rgba(3, 3, 3, 0.671), rgba(255, 255, 255, 0.212));
         padding: 20px 20px;
         border-radius: 10px 0 0 10px;
         font-size: 14px;
         color: white;
         margin: -5px 0 10px;
-        min-width: 45%;
-        max-width: 60%;
         border-left: 3px solid rgba(255, 255, 255, 0.6);
         display: flex;
         align-items: center;
         box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.2);
-        
-        /* Smooth transitions for background, transform, and shadow */
         transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-        
-        /* Entry animation */
         animation: slideInFade 0.2s ease-out forwards;
-        
-        /* Adding a subtle text shadow for a glowing feel */
         text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
         opacity: 0;
         cursor: pointer;
     }
     
-    /* Hover effect for extra visual satisfaction */
     .address-item:hover {
         transform: scale(1.01);
         box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.4), 0 0 10px rgba(255, 255, 255, 0.3);
     }
     
-    /* Keyframes for entry animation */
     @keyframes slideInFade {
         0% {
         transform: translateY(-10px);
@@ -136,8 +138,6 @@
         }
     }
     
-    /* Optional exit animation class.
-        To use this, add the 'fade-out' class to your item before removal. */
     .fade-out {
         animation: slideOutFade .5s ease-out forwards;
     }
@@ -159,10 +159,10 @@
         color: #fff;
         cursor: pointer;
         font-size: 18px;
-        margin-left: 10px; /* some spacing from the client name */
+        margin-left: 10px;
         padding: 5px;
     }
     
     .gear-button:hover {
-        color: #ccc;
+        color: #ffffff;
     } 

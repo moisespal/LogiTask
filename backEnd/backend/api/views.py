@@ -37,16 +37,13 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = userSerializer
     permission_classes = [AllowAny]
 
-
 class PropertyListCreate(generics.ListCreateAPIView):
     serializer_class = PropertySerializer
     permission_classes = [IsAuthenticated]
 
-
     def get_queryset(self):
-        return Property.objects.all()
-    
-    
+        return Property.objects.filter(client__author=self.request.user)
+        
     def perform_create(self, serializer):
         client_id = self.request.data.get("clientId")
         if serializer.is_valid ():
