@@ -12,16 +12,17 @@ class userSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         return user
 
+class PropertySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Property
+        fields = ["id", "street", "city", "state", "zipCode"]
+
 class ClientSerializer(serializers.ModelSerializer):
+    properties = PropertySerializer(many=True, read_only=True)
     class Meta:
         model = Client
-        fields = ["id","firstName", "lastName", "phoneNumber","email"]
+        fields = ["id", "firstName", "lastName", "phoneNumber", "email", "properties"]
         extra_kwargs = {
             "created_at": {"read_only":True}
         }
 
-class PropertySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Property
-        fields = ["id","street", "city", "state","zipCode"]
-       
