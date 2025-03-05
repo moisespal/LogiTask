@@ -1,67 +1,114 @@
 import React, { useState } from 'react';
 import '../../styles/components/AddClientModal.css';
 import api from '../../api';
-
+import { ClientData, Property_list,Schedule } from '../../types/interfaces';
 interface AddClientModelProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+
+
+
 const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
   const [mode, setMode] = useState<'select' | 'single' | 'multiple'>('select');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [street, setStreet] = useState("")
-  const [city, setCity] = useState("")
-  const [zipCode, setzipCode] = useState("")
+ 
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    try {
-      // First, create the client
-      const clientResponse = await api.post("/api/clients/", {
-        firstName,
-        lastName,
-        phoneNumber,
-        email,
-      });
-  
-      if (clientResponse.status === 201) {
-        const clientId = clientResponse.data.id; // Assuming the server returns the created client's ID
-        alert("Client Created!");
-  
-        // Now, create the property using the client's ID
-        const propertyResponse = await api.post("/api/properties/", {
-          street,
-          city,
-          zipCode,
-          clientId: clientId, // Associate the property with the client
-        });
-  
-        if (propertyResponse.status === 201) {
-          alert("Property Created!");
-          setFirstName('');
-          setLastName('');
-          setPhone('');
-          setEmail('');
-          setStreet('');
-          setCity('');
-          setzipCode('');
-        } else {
-          alert("Failed to create property.");
-        }
-      } else {
-        alert("Failed to create client.");
-      }
-    } catch (err) {
-      alert(`Error: ${err}`);
-    }
-  
-    onClose();
+  const [clientData, setClientData] = useState<ClientData>({
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: "",
+    properties: [
+      {
+        street: "",
+        city: "",
+        state: "TX",
+        zipCode: "",
+        schedules: [
+          {
+            frequency: "",
+            nextDate: "",
+            service: "",
+            cost: 0.0,
+          },
+        ],
+      },
+    ],
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setClientData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
+
+  const handlePropertyChange = (index: number, field: keyof Property_list, value: string) => {
+    setClientData((prev) => {
+      const updatedProperties = [...prev.properties];
+      updatedProperties[index] = {
+        ...updatedProperties[index],
+        [field]: value,
+      };
+      return {
+        ...prev,
+        properties: updatedProperties,
+      };
+    });
+  };
+  
+  const updateSchedule = (propertyIndex: number, scheduleIndex: number, field: keyof Schedule, value: string | number) => {
+    setClientData((prev) => {
+      const updatedProperties = [...prev.properties];
+      const updatedSchedules = [...updatedProperties[propertyIndex].schedules];
+  
+      // Update the specific schedule
+      updatedSchedules[scheduleIndex] = {
+        ...updatedSchedules[scheduleIndex],
+        [field]: value,
+      };
+  
+      // Update the property with the new schedules
+      updatedProperties[propertyIndex] = {
+        ...updatedProperties[propertyIndex],
+        schedules: updatedSchedules,
+      };
+  
+      return {
+        ...prev,
+        properties: updatedProperties,
+      };
+    });
+  };
+  
+  
+ const handleSubmit = async (e:React.FormEvent) =>{
+  e.preventDefault();
+  try {
+    // First, create the client
+    console.log(JSON.stringify(clientData));
+    const clientResponse = await api.post("/api/clientPropertySetUp/", clientData, {
+      headers: {
+      'Content-Type': 'application/json'
+      }
+    });
+
+    if (clientResponse.status === 201) {
+      alert("Client Property Schedule Created!");
+      onClose()
+      window.location.reload();
+    }
+
+  }
+  catch(err){
+    console.log
+  }
+    
+ }
+
+  
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Handle file upload logic here
@@ -95,8 +142,9 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
             <input
               type="text"
               placeholder="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={clientData.firstName}
+              onChange={handleInputChange}
+              name="firstName"
               required
             />
           </div>
@@ -104,8 +152,9 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
             <input
               type="text"
               placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              value={clientData.lastName}
+              onChange={handleInputChange}
+              name='lastName'
               required
             />
           </div>
@@ -115,8 +164,9 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
             <input
               type="tel"
               placeholder="Phone"
-              value={phoneNumber}
-              onChange={(e) => setPhone(e.target.value)}
+              value={clientData.phoneNumber}
+              onChange={handleInputChange}
+              name='phoneNumber'
               required
             />
           </div>
@@ -124,41 +174,105 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
             <input
               type="email"
               placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={clientData.email}
+              onChange={handleInputChange}
+              name='email'
               required
             />
           </div>
         </div>
-        <div className="form-group">
-          <input
-            type="text"
-            placeholder="Address"
-            value={street}
-            onChange={(e) => setStreet(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-row">
-          <div className="form-group">
-            <input
-              type="text"
-              placeholder="City"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              required
-            />
+        {clientData.properties.map((prop, index) => (
+          <div key={index}>
+            <div className="form-group">
+              <input
+                type="text"
+                placeholder="Address"
+                value={prop.street}
+                name='street'
+                onChange={(e) => handlePropertyChange(index, "street", e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="City"
+                  value={prop.city}
+                  name='city'
+                  onChange={(e) => handlePropertyChange(index,"city",e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="ZipCode"
+                  name='zipCode'
+                  value={prop.zipCode}
+                  onChange={(e) => handlePropertyChange(index,"zipCode",e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <select 
+                  name="service"
+                  value={prop.schedules[0].service}
+                  onChange={(e) => updateSchedule(index,0, "service", e.target.value)}
+                  style={{color:"black"}}
+                  required
+                >
+                  <option value="" disabled selected>
+                    Select Service
+                  </option>
+                  <option value="Mowing">Mowing</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+                <div className="form-group">
+                <input 
+                  type="number" 
+                  placeholder="Cost" 
+                  name='cost'
+                  min='0.00'
+                  value={Number(prop.schedules[0].cost.toFixed(2))}
+                  onChange={(e) => updateSchedule(index,0,"cost", parseFloat(e.target.value))}
+                  required
+                  />
+                </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <input 
+                  type="date" 
+                  placeholder="Start Date"
+                  value={prop.schedules[0].nextDate}
+                  name='nextDate'
+                  onChange={(e)=> updateSchedule(index,0,"nextDate",e.target.value)}
+                  required
+                  />
+              </div>
+              <div className="form-group">
+                <select
+                  name="frequency"
+                  value={prop.schedules[0].frequency}
+                  onChange={(e)=>updateSchedule(index,0,"frequency",e.target.value)}
+                  style={{color:'black'}}
+                  required
+                >
+                  <option value="" disabled selected>
+                    Select Recurrence
+                  </option>
+                  <option value="Once">Once</option>
+                  <option value="Weekly">Weekly</option>
+                  <option value="BiWeekly">BiWeekly</option>
+                </select>
+              </div>
+            </div>
           </div>
-          <div className="form-group">
-            <input
-              type="text"
-              placeholder="ZipCode"
-              value={zipCode}
-              onChange={(e) => setzipCode(e.target.value)}
-              required
-            />
-          </div>
-        </div>
+        ))}
         <div className="form-actions">
           <button type="button" className="btn-secondary" onClick={() => setMode('select')}>
             <i className="fas fa-arrow-left"></i> Back
