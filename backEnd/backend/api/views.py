@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import ClientSerializer, userSerializer, PropertySerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Client, Property
+from .models import Client, Property, Schedule
 # Create your views here.
 
 class ClientListCreate(generics.ListCreateAPIView):
@@ -51,3 +51,19 @@ class PropertyListCreate(generics.ListCreateAPIView):
             serializer.save(client=client)
         else:
             print(serializer.errors)
+
+class ClientScheduleSetUp(generics.ListCreateAPIView):
+    serializer_class = ClientPropertySetUpSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = Client.objects.all()
+   
+    
+    def perform_create(self, serializer):
+        
+        if serializer.is_valid():
+            serializer.save(author=self.request.user)
+        else:
+            print(serializer)
+    
+   
+        

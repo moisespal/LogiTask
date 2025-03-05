@@ -31,8 +31,30 @@ export interface Visit {
   charge: number;     // Added property
 }
 
-export interface Schedule {
-  frequency: string;
-  nextServiceDate: string | null; // Updated to allow null
-  lastServiceDate?: string;
+// export interface Schedule {
+//   frequency: string;
+//   nextServiceDate: string | null; // Updated to allow null
+//   lastServiceDate?: string;
+// }
+
+export interface ClientData{
+  firstName:string;
+  lastName:string;
+  phoneNumber:string;
+  email:string;
+  properties:Property_list[]
+}
+export interface Schedule{
+  frequency:string;
+  nextDate:string;
+  service:string;
+  cost:number;
+}
+
+export interface Property_list{
+  street:string;
+  city:string;
+  state:string;
+  zipCode:string;
+  schedules:Schedule[];
 }
