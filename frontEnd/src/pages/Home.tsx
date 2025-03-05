@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ClientCalendar from '../components/Calendar/ClientCalendar';
 import ClientListItem from '../components/Client/ClientListItem';
+import ClientProperties from '../components/Client/ClientProperties';
 import TopBar from '../components/Layout/TopBar';
 import BottomBar from '../components/Layout/BottomBar';
 import AddClientModal from '../components/Client/AddClientModal';
@@ -23,14 +24,29 @@ const Home: React.FC = () => {
   const [focusedItemId, setFocusedItemId] = useState<number | null>(null);
   const [sortOption, setSortOption] = useState<string>('none');
   const [modeType, setModeType] = useState('Client');
-  const listRefs = useRef<(HTMLLIElement | null)[]>([]);
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
+  const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
-  const [customers, setCustomer] = useState([])
+  const [customers, setCustomer] = useState<Client[]>([]);
+  const focusedElementRef = useRef<HTMLDivElement | null>(null);
   
-  useEffect(()=>{
+  // Load clients when component mounts
+  useEffect(() => {
     getClients();
-  }, [])
+  }, []);
+  
+  // Listen for reload-clients event
+  useEffect(() => {
+    const handleReloadClients = () => {
+      getClients();
+    };
+    
+    window.addEventListener('reload-clients', handleReloadClients);
+    
+    return () => {
+      window.removeEventListener('reload-clients', handleReloadClients);
+    };
+  }, []);
 
   const getClients = () => {
     api
@@ -38,7 +54,7 @@ const Home: React.FC = () => {
         .then((res) => res.data)
         .then((data) => {
             setCustomer(data);
-            console.log(data);
+            console.log('Clients loaded:', data);
         })
         .catch((err) => alert(err));
   };
@@ -84,35 +100,56 @@ const Home: React.FC = () => {
   // Keyboard Navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isAddClientModalOpen) return;
+      // Create a more explicit check for modals being open
+      // and return early to prevent search from being affected
+      if (isAddClientModalOpen || isPropertyModalOpen) {
+        return;
+      }
       
-      if (e.key === 'Backspace') setSearchTerm(prev => prev.slice(0, -1));
-      else if (/^[a-zA-Z0-9,.\s]$/.test(e.key)) setSearchTerm(prev => prev + e.key);
-      else if (e.key === 'ArrowRight') navigateFocusedItem(1);
-      else if (e.key === 'ArrowLeft') navigateFocusedItem(-1);
+      // Check if the event target is an input, textarea, or other form element
+      const target = e.target as HTMLElement;
+      const isFormElement = 
+        target.tagName === 'INPUT' || 
+        target.tagName === 'TEXTAREA' || 
+        target.tagName === 'SELECT' ||
+        target.isContentEditable;
+        
+      // Don't capture keystrokes when user is typing in a form element
+      if (isFormElement) {
+        return;
+      }
+      
+      if (e.key === 'Backspace') {
+        setSearchTerm(prev => prev.slice(0, -1));
+      }
+      else if (/^[a-zA-Z0-9,.\s]$/.test(e.key)) {
+        setSearchTerm(prev => prev + e.key);
+      }
+      else if (e.key === 'ArrowRight') {
+        navigateFocusedItem(1);
+      }
+      else if (e.key === 'ArrowLeft') {
+        navigateFocusedItem(-1);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [filteredClients]);
+  }, [filteredClients, isAddClientModalOpen, isPropertyModalOpen]);
 
   const navigateFocusedItem = (direction: number) => {
     if (filteredClients.length === 0) return;
+    
     setFocusedItemId(prevId => {
       const currentIndex = filteredClients.findIndex(client => client.id === prevId);
       const newIndex = Math.min(Math.max(currentIndex + direction, 0), filteredClients.length - 1);
-      const newFocusedItemId = filteredClients[newIndex]?.id ?? null;
-  
-      if (newFocusedItemId !== null) {
-        const newItemIndex = filteredClients.findIndex(client => client.id === newFocusedItemId);
-        listRefs.current[newItemIndex]?.scrollIntoView({
-          behavior: 'auto',
-          block: 'center'
-        });
-      }
-  
-      return newFocusedItemId;
+      return filteredClients[newIndex]?.id ?? null;
     });
+  };
+
+  // Handle property modal state changes
+  const handlePropertyModalStateChange = (isOpen: boolean) => {
+    setIsPropertyModalOpen(isOpen);
   };
 
   // Automatically focus the first or reset focus when needed
@@ -123,10 +160,33 @@ const Home: React.FC = () => {
     }
   }, [filteredClients, focusedItemId]);
 
+  // This effect runs whenever focusedItemId changes
+  useEffect(() => {
+    if (focusedItemId === null) return;
+    
+    // Find the element with the matching data-client-id attribute
+    const focusedElement = document.querySelector(`[data-client-id="${focusedItemId}"]`);
+    if (focusedElement) {
+      // Store reference to focused element
+      focusedElementRef.current = focusedElement as HTMLDivElement;
+      
+      // Scroll into view with smooth behavior
+      focusedElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  }, [focusedItemId]);
+
   const selectedClient = focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) : null;
 
+  // Modify your client click handler
+  const handleClientClick = (id: number) => {
+    setFocusedItemId(id);
+  };
+
   return (
-    <div 
+    <div
       className="app-container" 
       style={{
         backgroundImage: `url(${selectedClient?.image || 'https://oldschoolgrappling.com/wp-content/uploads/2018/08/Background-opera-speeddials-community-web-simple-backgrounds.jpg'})`
@@ -154,14 +214,29 @@ const Home: React.FC = () => {
       />
     
       <ul className="right-aligned-list">
-        {customers.map((client: Client) => (
-          <ClientListItem
-            key={client.id}
-            client={client}
-            isFocused={focusedItemId === client.id}
-            onClick={() => setFocusedItemId(client.id)}
-            renderStars={renderStars}
-          />
+        {filteredClients.map((client: Client) => (
+          <div 
+            key={client.id} 
+            className="client-wrapper"
+            data-client-id={client.id}
+          >
+            <ClientListItem
+              client={client}
+              isFocused={focusedItemId === client.id}
+              onClick={() => handleClientClick(client.id)}
+              renderStars={renderStars}
+            />
+            
+            <ClientProperties 
+              client={{
+                ...client,
+                phoneNumber: client.phone || '',
+                properties: client.properties || []
+              }} 
+              visible={focusedItemId === client.id}
+              onPropertyModalStateChange={handlePropertyModalStateChange}
+            />
+          </div>
         ))}
       </ul>
       
