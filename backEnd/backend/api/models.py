@@ -33,4 +33,14 @@ class Note(models.Model):
 
     def __str__(self):
         return self.title
-    
+
+class Schedule(models.Model):
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="schedules")
+    frequency = models.CharField(max_length=50)
+    nextDate = models.DateField(null=False,blank=False)
+    endDate = models.DateField(null=True,blank=True)
+    service = models.CharField(max_length=50)
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.service} - {self.nextDate}"
