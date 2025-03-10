@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule
+from .models import Client, Property,Schedule,Job
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,3 +62,22 @@ class ClientPropertySetUpSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(f"Error Creating Property or Schedule")
         
         return client
+
+class OnlyClientSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Client
+        fields = ["id", "firstName", "lastName", "phoneNumber", "email"]
+        extra_kwargs = {
+            "created_at": {"read_only":True}
+        }
+
+
+class JobSerializer(serializers.ModelSerializer):
+    property = PropertySerializer()
+    schedule = ScheduleSerializer()
+    client = OnlyClientSerializer()
+
+    class Meta:
+        model = Job
+        fields = ['id', 'jobDate', 'status','cost','property','schedule','client']

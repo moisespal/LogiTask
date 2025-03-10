@@ -1,9 +1,14 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Client, Property, Schedule
+from .models import Client, Property, Schedule, Job
+from rest_framework.generics import ListAPIView
+from django.http import JsonResponse
+from django.utils.timezone import now
+
+
 # Create your views here.
 
 class ClientListCreate(generics.ListCreateAPIView):
@@ -65,5 +70,16 @@ class ClientScheduleSetUp(generics.ListCreateAPIView):
         else:
             print(serializer)
     
-   
+def generateTodaysJobs(request):
+   Schedule.generate_jobs()
+   return JsonResponse({"message": "Jobs generated successfully"}, status=200)
+
+
+class GetTodaysJobs(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = JobSerializer
+    today = now().date()
+    
+    def get_queryset(self):
+        return Job.objects.filter(jobDate=self.today)
         

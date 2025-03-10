@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.timezone import now
+from datetime import timedelta, datetime
 
 
 # Create your models here.
@@ -34,6 +36,8 @@ class Note(models.Model):
     def __str__(self):
         return self.title
 
+
+
 class Schedule(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="schedules")
     frequency = models.CharField(max_length=50)
@@ -41,6 +45,43 @@ class Schedule(models.Model):
     endDate = models.DateField(null=True,blank=True)
     service = models.CharField(max_length=50)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
+    isActive = models.BooleanField(default=True)
+    
+    @classmethod
+    def generate_jobs(cls):
+        today = now().date()
+        schedules = cls.objects.filter(nextDate=today, isActive=True)
 
+        
+        for schedule in schedules:
+            Job.objects.create(schedule=schedule, cost=schedule.cost, jobDate=schedule.nextDate, client=schedule.property.client)
+            if schedule.endDate and schedule.nextDate > schedule.endDate:
+                schedule.isActive = False
+                schedule.save()
+                continue
+            else:
+                if schedule.frequency.lower() == "daily":
+                    schedule.nextDate += timedelta(days=1)
+                elif schedule.frequency.lower() == "weekly":
+                    schedule.nextDate += timedelta(weeks=1)
+                elif schedule.frequency.lower() == "biweekly":
+                    schedule.nextDate += timedelta(weeks=2)
+                elif schedule.frequency.lower() == "once":
+                    schedule.isActive = False
+
+            
+            
+            schedule.save()
     def __str__(self):
         return f"{self.service} - {self.nextDate}"
+
+class Job(models.Model):
+    STATUS_CHOICES = [
+        ('complete', 'Complete'),
+        ('uncomplete', 'Uncomplete'),
+    ]
+    schedule = models.ForeignKey(Schedule,on_delete=models.SET_NULL,null=True)
+    client = models.ForeignKey(Client,on_delete=models.CASCADE)
+    jobDate = models.DateField(null=False,blank=False)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='uncomplete')
+    cost = models.DecimalField(max_digits=10,decimal_places=2)
