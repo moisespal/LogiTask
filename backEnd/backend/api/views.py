@@ -1,14 +1,12 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView,UpdateAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
-from django.utils import timezone
-import datetime
 
 
 # Create your views here.
@@ -80,13 +78,23 @@ def generateTodaysJobs(request):
 class GetTodaysJobs(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = JobSerializer
+    today = now().date()
+    
     def get_queryset(self):
-        today = now().date()
-        print(f"Today's date: {today}")
-        return Job.objects.filter(jobDate=today, client__author=self.request.user)
+        return Job.objects.filter(jobDate=self.today)
 
 
 class PropertyListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = PropertyAndScheduleSetUp
     queryset = Property.objects.all()
+
+
+
+class UpdateSchedule(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = JobSerializer
+    queryset = Job.objects.all()
+    
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)

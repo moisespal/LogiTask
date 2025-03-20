@@ -91,7 +91,7 @@ const Home: React.FC = () => {
   // Handle job completion
   const handleJobComplete = async (jobId: number) => {
     try {
-      await api.patch(`/api/jobs/${jobId}/`, { status: 'complete' });
+      await api.patch(`/api/Update-Schedule/${jobId}/`, { status: 'complete' });
       // Update jobs list
       setJobs(jobs.map(job => 
         job.id === jobId ? { ...job, status: 'complete' } : job

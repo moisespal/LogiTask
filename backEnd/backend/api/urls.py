@@ -10,5 +10,6 @@ urlpatterns = [
     path("clientPropertySetUp/", views.ClientScheduleSetUp.as_view(), name="client-property-schedule"),
     path("generateJobs/", views.generateTodaysJobs, name='generate-todays-jobs'),
     path("getTodaysJobs/", views.GetTodaysJobs.as_view(), name='job-list' ),
-    path("PropertySetup/", views.PropertyListCreateView.as_view(), name='payment-list-create')
+    path("PropertySetup/", views.PropertyListCreateView.as_view(), name='payment-list-create'),
+    path("Update-Schedule/<int:pk>/", views.UpdateSchedule.as_view(), name='update-schedule'),
 ]
