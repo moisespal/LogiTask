@@ -5,7 +5,8 @@ import ClientProperties from '../components/Client/ClientProperties';
 import TopBar from '../components/Layout/TopBar';
 import BottomBar from '../components/Layout/BottomBar';
 import AddClientModal from '../components/Client/AddClientModal';
-import { Client } from '../types/interfaces';
+import DailyListItem from '../components/Daily/DailyListItem';
+import { Client, Job } from '../types/interfaces';
 import api from "../api"
 import '../styles/pages/App.css';
 
@@ -29,6 +30,11 @@ const Home: React.FC = () => {
   const [isModeRotated, setIsModeRotated] = useState(false);
   const [customers, setCustomer] = useState<Client[]>([]);
   const focusedElementRef = useRef<HTMLDivElement | null>(null);
+  
+  // New job-related states
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [isGeneratingJobs, setIsGeneratingJobs] = useState(false);
   
   // Load clients when component mounts
   useEffect(() => {
@@ -59,11 +65,56 @@ const Home: React.FC = () => {
         .catch((err) => alert(err));
   };
 
+  // Function to generate today's jobs
+  const generateTodaysJobs = async () => {
+    try {
+      setIsGeneratingJobs(true);
+      await api.get('/api/generateJobs/');
+      await fetchTodaysJobs(); // Fetch jobs after generation
+    } catch (error) {
+      console.error('Error generating jobs:', error);
+    } finally {
+      setIsGeneratingJobs(false);
+    }
+  };
+
+  // Function to fetch today's jobs
+  const fetchTodaysJobs = async () => {
+    try {
+      const response = await api.get('/api/getTodaysJobs/');
+      setJobs(response.data);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
+  // Handle job completion
+  const handleJobComplete = async (jobId: number) => {
+    try {
+      await api.patch(`/api/jobs/${jobId}/`, { status: 'complete' });
+      // Update jobs list
+      setJobs(jobs.map(job => 
+        job.id === jobId ? { ...job, status: 'complete' } : job
+      ));
+    } catch (error) {
+      console.error('Error completing job:', error);
+    }
+  };
 
   // Event Handlers
-  const handleModeClick = () => {
-    setModeType(prev => (prev === 'Client' ? 'Daily' : 'Client'));
+  const handleModeClick = async () => {
+    const newMode = modeType === 'Client' ? 'Daily' : 'Client';
+    setModeType(newMode);
     setIsModeRotated(prev => !prev);
+    
+    if (newMode === 'Daily') {
+      // When switching to Daily mode, generate and fetch jobs
+      await generateTodaysJobs();
+    }
+    
+    // Reset focused item when switching modes
+    setFocusedItemId(null);
+    setSelectedJob(null);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
@@ -192,52 +243,86 @@ const Home: React.FC = () => {
         backgroundImage: `url(${selectedClient?.image || 'https://oldschoolgrappling.com/wp-content/uploads/2018/08/Background-opera-speeddials-community-web-simple-backgrounds.jpg'})`
       }}
     >      
-      {modeType === 'Client' && (
-      selectedClient ? (
+      {modeType === 'Client' && selectedClient && (
         <ClientCalendar visits={selectedClient.visits ?? []} />
-      ) : null
       )}
     
       <TopBar
-      focusedItemId={focusedItemId}
-      selectedClient={selectedClient || null}
-      sortOption={sortOption}
-      handleSortChange={handleSortChange}
+        focusedItemId={focusedItemId}
+        selectedClient={selectedClient || null}
+        selectedJob={selectedJob}
+        mode={modeType as 'Client' | 'Daily'}
+        sortOption={sortOption}
+        handleSortChange={handleSortChange}
       />
 
       <input
-      type="text"
-      className={`search-bar ${searchTerm ? 'active' : ''}`}
-      value={searchTerm}
-      onChange={handleChange}
-      placeholder="Search: Type to search"
+        type="text"
+        className={`search-bar ${searchTerm ? 'active' : ''}`}
+        value={searchTerm}
+        onChange={handleChange}
+        placeholder={modeType === 'Client' ? "Search clients..." : "Search jobs..."}
       />
     
       <ul className="right-aligned-list">
-        {filteredClients.map((client: Client) => (
-          <div 
-            key={client.id} 
-            className="client-wrapper"
-            data-client-id={client.id}
-          >
-            <ClientListItem
-              client={client}
-              isFocused={focusedItemId === client.id}
-              onClick={() => handleClientClick(client.id)}
-              renderStars={renderStars}
-            />
-            
-            <ClientProperties 
-              client={{
-                ...client,
-                phoneNumber: client.phone || '',
-                properties: client.properties || []
-              }} 
-              visible={focusedItemId === client.id}
-              onPropertyModalStateChange={handlePropertyModalStateChange}
-            />
-          </div>
-        ))}
+        {modeType === 'Client' ? (
+          // Client list rendering
+          filteredClients.map((client: Client) => (
+            <div 
+              key={client.id} 
+              className="client-wrapper"
+              data-client-id={client.id}
+            >
+              <ClientListItem
+                client={client}
+                isFocused={focusedItemId === client.id}
+                onClick={() => handleClientClick(client.id)}
+                renderStars={renderStars}
+              />
+              
+              <ClientProperties 
+                client={{
+                  ...client,
+                  phoneNumber: client.phone || '',
+                  properties: client.properties || []
+                }} 
+                visible={focusedItemId === client.id}
+                onPropertyModalStateChange={handlePropertyModalStateChange}
+              />
+            </div>
+          ))
+        ) : (
+          // Daily jobs list rendering
+          <>
+            {isGeneratingJobs ? (
+              <div className="loading-jobs">
+                Generating today's jobs...
+              </div>
+            ) : jobs.length === 0 ? (
+              <div className="no-jobs-message">
+                No jobs scheduled for today
+              </div>
+            ) : (
+              jobs.map((job: Job) => (
+                <div 
+                  key={job.id}
+                  className="job-wrapper"
+                  data-job-id={job.id}
+                >
+                  <DailyListItem
+                    job={job}
+                    isFocused={focusedItemId === job.id}
+                    onClick={(id) => {
+                      setFocusedItemId(id);
+                      setSelectedJob(job);
+                    }}
+                    onComplete={handleJobComplete}
+                  />
+                </div>
+              ))
+            )}
+          </>
+        )}
       </ul>
       
       <BottomBar

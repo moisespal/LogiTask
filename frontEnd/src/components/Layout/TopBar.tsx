@@ -1,10 +1,12 @@
 import React from 'react';
-import { Client } from '../../types/interfaces';
+import { Client, Job } from '../../types/interfaces';
 import '../../styles/components/TopBar.css';
 
 interface TopBarProps {
   focusedItemId: number | null;
   selectedClient: Client | null;
+  selectedJob: Job | null;
+  mode: 'Client' | 'Daily';
   sortOption: string;
   handleSortChange: (option: string) => void;
 }
@@ -16,21 +18,69 @@ const formatPhoneNumber = (phone: string | undefined): string => {
   return match ? `(${match[1]}) ${match[2]}-${match[3]}` : phone;
 };
 
-const TopBar: React.FC<TopBarProps> = ({ focusedItemId, selectedClient, sortOption, handleSortChange }) => {
+const TopBar: React.FC<TopBarProps> = ({ 
+  focusedItemId, 
+  selectedClient, 
+  selectedJob,
+  mode,
+  sortOption, 
+  handleSortChange 
+}) => {
   return (
     <div className="top-bar">
-      <div className="top-menu-shape"></div>
-      <div className={`client-info ${focusedItemId !== null ? 'visible' : ''}`}>
-        {focusedItemId !== null && (
-          <>
-            <div>ID:{selectedClient?.id}</div>
-            <div>{selectedClient?.firstName} {selectedClient?.lastName}</div>
-            <div className="client-phone">{formatPhoneNumber(selectedClient?.phoneNumber)}</div>
-            <div className="client-email">{selectedClient?.email}</div>
-          </>
-        )}
+      <div className="top-menu-shape" />
+      <div className={`info-container ${focusedItemId !== null ? 'visible' : ''}`}>
+        {mode === 'Client' && selectedClient && focusedItemId !== null ? (
+          <div className="client-info">
+            <div className="client-item">
+              <i className="fa-solid fa-user" />
+              <span>{selectedClient.firstName} {selectedClient.lastName}</span>
+            </div>
+              <div className="client-item">
+                <i className="fa-solid fa-phone" />
+                <span>{formatPhoneNumber(selectedClient.phoneNumber)}</span>
+              </div>
+              <div className="client-item">
+                <i className="fa-solid fa-envelope"></i>
+                <span>{selectedClient.email}</span>
+              </div>
+          </div>
+        ) : mode === 'Daily' && selectedJob && focusedItemId !== null ? (
+          <div className="job-info">
+            <div className="property">
+              <div className="address">
+                <i className="fa-solid fa-location-dot" />
+                {selectedJob.property.street}, {selectedJob.property.city}, {selectedJob.property.state} {selectedJob.property.zipCode}
+              </div>
+            </div>
+            <div className="contact">
+              <div className="job-client">
+                <i className="fa-solid fa-user" />
+                <span>{selectedJob.client.firstName} {selectedJob.client.lastName}</span>
+              </div>
+              <div className="phone">
+                <i className="fa-solid fa-phone" />
+                {formatPhoneNumber(selectedJob.client.phoneNumber)}
+              </div>
+            </div>
+            <div className="service-tags">
+              <div className="service-pill">
+                <i className="fa-solid fa-briefcase" />
+                {selectedJob.schedule.service}
+              </div>
+              <div className="frequency-pill">
+                <i className="fa-solid fa-calendar-days" />
+                {selectedJob.schedule.frequency}
+              </div>
+              <div className="cost-pill">
+                <i className="fa-solid fa-dollar-sign" />
+                {Math.floor(selectedJob.cost)}
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
-      <div className="sort-button-container" style={{ marginTop: '20px' }}>
+      <div className="sort-button-container">
         Sort
         <button className="sort-button">By {sortOption.charAt(0).toUpperCase() + sortOption.slice(1)}</button>
         <div className="sort-dropdown">

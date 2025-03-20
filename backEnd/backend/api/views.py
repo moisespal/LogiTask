@@ -7,6 +7,8 @@ from .models import Client, Property, Schedule, Job
 from rest_framework.generics import ListAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
+from django.utils import timezone
+import datetime
 
 
 # Create your views here.
@@ -78,8 +80,8 @@ def generateTodaysJobs(request):
 class GetTodaysJobs(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = JobSerializer
-    today = now().date()
-    
     def get_queryset(self):
-        return Job.objects.filter(jobDate=self.today)
+        today = now().date()
+        print(f"Today's date: {today}")
+        return Job.objects.filter(jobDate=today, client__author=self.request.user)
         

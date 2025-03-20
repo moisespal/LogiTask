@@ -1,0 +1,187 @@
+@import './listItem.css';
+
+:root {
+  /* Main Colors - Simplified */
+  --item-bg: rgba(40, 40, 50, 0.5);
+  --item-bg-focused: rgba(60, 60, 70, 0.5);
+  --item-bg-complete: rgba(76, 175, 80, 0.2);
+  
+  /* Status Colors - Clear and intuitive */
+  --color-pending: #90caf9; /* Lighter blue for better visibility */
+  --color-focused: #ffca28; /* Bright yellow/amber for attention */
+  --color-complete: #81C784; /* Green for completed */
+  
+  /* Text Colors - High contrast */
+  --text-primary: rgba(255, 255, 255, 0.98);
+  --text-secondary: rgba(255, 255, 255, 0.85);
+}
+
+/* Container */
+.job-wrapper {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Base Item Styles - Simpler, rounder design */
+.daily-item {
+  position: relative;
+  font-family: Inter;
+  background: var(--item-bg);
+  color: var(--text-primary);
+  padding: 14px 16px;
+  margin: 5px 0;
+  border-radius: 10px 0px 0px 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+  min-width: 100%;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  transition: all 0.25s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Item States - Simple hover and focus states */
+.daily-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.daily-item.daily-focused {
+  background: var(--item-bg-focused);
+  padding: 12px 14px; /* Adjust for border */
+}
+
+.daily-item.daily-complete {
+  background: var(--item-bg-complete);
+  border: 2px solid var(--color-complete);
+  padding: 12px 14px; /* Adjust for border */
+}
+
+/* Layout Components - Simple flex layout */
+.daily-item-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.daily-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+}
+
+/* Checkbox Styles - Rounded, clear checkboxes */
+.daily-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  transition: all 0.25s ease;
+}
+
+.daily-icon i {
+  color: var(--color-pending);
+}
+
+.daily-focused .daily-icon i {
+  color: var(--color-focused);
+}
+
+.daily-complete .daily-icon i {
+  color: var(--color-complete);
+}
+
+/* Text Elements - Large, easy to read */
+.daily-address {
+  font-size: 16px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.daily-focused .daily-address {
+  font-weight: 600;
+}
+
+.daily-complete .daily-address {
+  opacity: 0.6;
+}
+
+/* Status Indicator - Clear, pill-shaped status */
+.daily-status {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 30px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Status Colors - Clear, consistent with theme */
+.daily-item .daily-status {
+  color: var(--color-pending);
+}
+
+.daily-focused .daily-status {
+  color: var(--color-focused);
+}
+
+.daily-complete .daily-status {
+  color: var(--color-complete);
+}
+
+/* Client Info Styles (Vertical Layout)
+------------------------------------------*/
+.client-info {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 350px;
+  padding: 0px 25px;
+}
+
+.client-item {
+  display: flex;
+  align-items: center;
+}
+
+.client-item i {
+  width: 24px;
+  text-align: center;
+  font-size: 18px;
+}
+
+
+.client-item:first-child i {
+  color: #2196F3; /* Blue highlight color */
+  font-size: 19px;
+}
+
+.client-item:first-child span {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.client-item:nth-child(2) i {
+  color: #4CAF50; /* Green for phone */
+}
+
+.client-item:nth-child(3) i {
+  color: #ffffff; /* White for email */
+}
+
+.client-item span {
+  font-size: 16px;
+}
+
+.client-item:nth-child(2) span {
+  font-family: 'Arial', sans-serif;
+}
+
+

@@ -74,10 +74,14 @@ class OnlyClientSerializer(serializers.ModelSerializer):
 
 
 class JobSerializer(serializers.ModelSerializer):
-    property = PropertySerializer()
+    property = serializers.SerializerMethodField()
     schedule = ScheduleSerializer()
     client = OnlyClientSerializer()
 
     class Meta:
         model = Job
-        fields = ['id', 'jobDate', 'status','cost','property','schedule','client']
+        fields = ['id', 'jobDate', 'status', 'cost', 'property', 'schedule', 'client']
+        
+    def get_property(self, obj):
+        property_obj = obj.schedule.property
+        return PropertySerializer(property_obj).data

@@ -58,3 +58,29 @@ export interface Property_list{
   zipCode:string;
   schedules:Schedule[];
 }
+
+export interface Job {
+  id: number;
+  jobDate: string;
+  status: string;
+  cost: number;
+  property: {
+    id: number;
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+  };
+  schedule: {
+    id: number;
+    frequency: string;
+    service: string;
+  };
+  client: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    email: string;
+  };
+}
