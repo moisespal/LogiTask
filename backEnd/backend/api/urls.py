@@ -9,5 +9,6 @@ urlpatterns = [
     path("clients/", views.ClientListCreate.as_view(), name="client-list"),
     path("clientPropertySetUp/", views.ClientScheduleSetUp.as_view(), name="client-property-schedule"),
     path("generateJobs/", views.generateTodaysJobs, name='generate-todays-jobs'),
-    path("getTodaysJobs/", views.GetTodaysJobs.as_view(), name='job-list' )
+    path("getTodaysJobs/", views.GetTodaysJobs.as_view(), name='job-list' ),
+    path("PropertySetup/", views.PropertyListCreateView.as_view(), name='payment-list-create')
 ]

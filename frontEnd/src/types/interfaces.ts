@@ -58,3 +58,4 @@ export interface Property_list{
   zipCode:string;
   schedules:Schedule[];
 }
+
