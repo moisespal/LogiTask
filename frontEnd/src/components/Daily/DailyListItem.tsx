@@ -34,7 +34,7 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
           {isComplete ? (
             <i className="fa-solid fa-circle-check"></i>
           ) : isFocused ? (
-            <i className="fa-regular fa-circle-check"></i>
+            <i className="fa-regular fa-circle"></i>
           ) : (
             <i className="fa-regular fa-circle"></i>
           )}
@@ -45,7 +45,7 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
           </div>
           <div className="daily-status">
             {isComplete ? (
-              <span className="complete-text">Done</span>
+              <span className="complete-text">Done!</span>
             ) : isFocused ? (
               <span className="click-hint">Click to finish</span>
             ) : (

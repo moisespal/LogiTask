@@ -186,37 +186,58 @@ const Home: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [filteredClients, isAddClientModalOpen, isPropertyModalOpen]);
+  }, [filteredClients, jobs, modeType, isAddClientModalOpen, isPropertyModalOpen]);
 
   const navigateFocusedItem = (direction: number) => {
-    if (filteredClients.length === 0) return;
-    
-    setFocusedItemId(prevId => {
-      const currentIndex = filteredClients.findIndex(client => client.id === prevId);
-      const newIndex = Math.min(Math.max(currentIndex + direction, 0), filteredClients.length - 1);
-      return filteredClients[newIndex]?.id ?? null;
-    });
-  };
-
-  // Handle property modal state changes
-  const handlePropertyModalStateChange = (isOpen: boolean) => {
-    setIsPropertyModalOpen(isOpen);
+    if (modeType === 'Client') {
+      if (filteredClients.length === 0) return;
+      
+      setFocusedItemId(prevId => {
+        const currentIndex = filteredClients.findIndex(client => client.id === prevId);
+        const newIndex = Math.min(Math.max(currentIndex + direction, 0), filteredClients.length - 1);
+        return filteredClients[newIndex]?.id ?? null;
+      });
+    } else {
+      // Daily mode - navigate through jobs
+      if (jobs.length === 0) return;
+      
+      const currentJobIndex = jobs.findIndex(job => job.id === focusedItemId);
+      const newJobIndex = Math.min(Math.max(currentJobIndex + direction, 0), jobs.length - 1);
+      const selectedJob = jobs[newJobIndex];
+      
+      if (selectedJob) {
+        setFocusedItemId(selectedJob.id);
+        setSelectedJob(selectedJob);
+      }
+    }
   };
 
   // Automatically focus the first or reset focus when needed
   useEffect(() => {
-    if (filteredClients.length === 1) setFocusedItemId(filteredClients[0].id);
-    else if (filteredClients.length > 1 && !filteredClients.some(client => client.id === focusedItemId)) {
-      setFocusedItemId(null);
+    if (modeType === 'Client') {
+      if (filteredClients.length === 1) setFocusedItemId(filteredClients[0].id);
+      else if (filteredClients.length > 1 && !filteredClients.some(client => client.id === focusedItemId)) {
+        setFocusedItemId(null);
+      }
+    } else {
+      // Auto-focus first job in Daily mode when jobs change
+      if (jobs.length > 0 && (!focusedItemId || !jobs.some(job => job.id === focusedItemId))) {
+        setFocusedItemId(jobs[0].id);
+        setSelectedJob(jobs[0]);
+      }
     }
-  }, [filteredClients, focusedItemId]);
+  }, [filteredClients, jobs, focusedItemId, modeType]);
 
   // This effect runs whenever focusedItemId changes
   useEffect(() => {
     if (focusedItemId === null) return;
     
-    // Find the element with the matching data-client-id attribute
-    const focusedElement = document.querySelector(`[data-client-id="${focusedItemId}"]`);
+    // Find the element with the matching data attribute
+    const selector = modeType === 'Client' 
+      ? `[data-client-id="${focusedItemId}"]` 
+      : `[data-job-id="${focusedItemId}"]`;
+    
+    const focusedElement = document.querySelector(selector);
     if (focusedElement) {
       // Store reference to focused element
       focusedElementRef.current = focusedElement as HTMLDivElement;
@@ -227,13 +248,18 @@ const Home: React.FC = () => {
         block: 'center'
       });
     }
-  }, [focusedItemId]);
+  }, [focusedItemId, modeType]);
 
   const selectedClient = focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) : null;
 
   // Modify your client click handler
   const handleClientClick = (id: number) => {
     setFocusedItemId(id);
+  };
+
+  // Handle property modal state changes
+  const handlePropertyModalStateChange = (isOpen: boolean) => {
+    setIsPropertyModalOpen(isOpen);
   };
 
   return (
