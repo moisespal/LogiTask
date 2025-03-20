@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/components/AddPropertyModal.css';
 import api from '../../api';
-
+import { Property_list,Schedule } from '../../types/interfaces';
 interface AddPropertyModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -13,10 +13,22 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
     onClose, 
     clientId
 }) => {
-    const [street, setStreet] = useState('');
-    const [city, setCity] = useState('');
-    const [state, setState] = useState('');
-    const [zipCode, setZipCode] = useState('');
+ 
+
+      const [clientData, setClientData] = useState<Property_list>({
+        street: "",
+        city: "",
+        state: "",
+        zipCode: "",
+        schedules: [
+        {
+            frequency: "",
+            nextDate: "",
+            service: "",
+            cost: 0.00
+        }
+  ]
+      });
 
     // Add keyboard event prevention for when modal is open
     useEffect(() => {
@@ -35,25 +47,57 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
         };
     }, [isOpen]);
 
+
+     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setClientData((prevData) => ({
+          ...prevData,
+          [name]: value,
+        }));
+      };
+    
+    const handlePropertyChange = (index: number, field: keyof Schedule, value: string | number) => {
+      setClientData((prev) => {
+        const updatedProperties = [...prev.schedules];
+        updatedProperties[index] = {
+        ...updatedProperties[index],
+        [field]: value,
+        };
+        return {
+        ...prev,
+        schedules: updatedProperties,
+        };
+      });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         try {
             // Create the property associated with the client
-            const propertyResponse = await api.post("/api/properties/", {
-                street,
-                city,
-                state,
-                zipCode,
-                clientId
-            });
+            const propertyResponse = await api.post("/api/PropertySetup/", {
+                ...clientData,
+                clientId: clientId
+            }, { headers:{
+                'Content-Type': 'application/json'
+            }});
 
             if (propertyResponse.status === 201) {
                 // Reset form fields
-                setStreet('');
-                setCity('');
-                setState('');
-                setZipCode('');
+                setClientData({
+                    street: "",
+                    city: "",
+                    state: "",
+                    zipCode: "",
+                    schedules: [
+                        {
+                            frequency: "",
+                            nextDate: "",
+                            service: "",
+                            cost: 0.00
+                        }
+                    ]
+                });
                 
                 // Close modal first
                 onClose();
@@ -89,8 +133,9 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                         <input
                             type="text"
                             placeholder="Street Address"
-                            value={street}
-                            onChange={(e) => setStreet(e.target.value)}
+                            value={clientData.street}
+                            onChange={handleInputChange}
+                            name='street'
                             required
                         />
                     </div>
@@ -100,8 +145,9 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                             <input
                                 type="text"
                                 placeholder="City"
-                                value={city}
-                                onChange={(e) => setCity(e.target.value)}
+                                value={clientData.city}
+                                onChange={handleInputChange}
+                                name='city'
                                 required
                             />
                         </div>
@@ -110,8 +156,9 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                             <input
                                 type="text"
                                 placeholder="State"
-                                value={state}
-                                onChange={(e) => setState(e.target.value)}
+                                value={clientData.state}
+                                onChange={handleInputChange}
+                                name='state'
                                 required
                             />
                         </div>
@@ -121,11 +168,72 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                         <input
                             type="text"
                             placeholder="ZIP Code"
-                            value={zipCode}
-                            onChange={(e) => setZipCode(e.target.value)}
+                            value={clientData.zipCode}
+                            onChange={handleInputChange}
+                            name='zipCode'
                             required
                         />
                     </div>
+                    
+              {clientData.schedules.map((prop,index) => 
+                <div key={index}>
+                    <div className="form-group">
+                        <select 
+                        name="service"
+                        value={prop.service}
+                        onChange={(e) => handlePropertyChange(index,"service",e.target.value)}
+                        style={{color:"black"}}
+                        required
+                        >
+                        <option value="" disabled>
+                            Select Service
+                        </option>
+                        <option value="Mowing">Mowing</option>
+                        <option value="Other">Other</option>
+                        </select>
+                    </div>
+                        <div className="form-group">
+                        <input 
+                        type="number" 
+                        placeholder="Cost" 
+                        name='cost'
+                        min='0.00'
+                        value={Number(prop.cost.toFixed(2))}
+                        onChange={(e) => handlePropertyChange(index,"cost", parseFloat(e.target.value))}
+                        required
+                        />
+                        </div>
+                        <div className="form-row">
+              <div className="form-group">
+                <input 
+                  type="date" 
+                  placeholder="Start Date"
+                  value={prop.nextDate}
+                  name='nextDate'
+                  onChange={(e)=> handlePropertyChange(index,"nextDate",e.target.value)}
+                  required
+                  />
+              </div>
+              <div className="form-group">
+                <select
+                  name="frequency"
+                  value={prop.frequency}
+                  onChange={(e)=>handlePropertyChange(index,"frequency",e.target.value)}
+                  style={{color:'black'}}
+                  required
+                >
+                  <option value="" disabled>
+                    Select Recurrence
+                  </option>
+                  <option value="Once">Once</option>
+                  <option value="Weekly">Weekly</option>
+                  <option value="BiWeekly">BiWeekly</option>
+                </select>
+              </div>
+            </div>
+                    </div>
+                    )}
+                    
                     
                     <div className="form-actions">
                         <button type="button" className="btn-secondary" onClick={onClose}>

@@ -85,3 +85,27 @@ class JobSerializer(serializers.ModelSerializer):
     def get_property(self, obj):
         property_obj = obj.schedule.property
         return PropertySerializer(property_obj).data
+
+
+
+class PropertyAndScheduleSetUp(serializers.ModelSerializer):
+    schedules = ScheduleSerializer(many=True)
+    clientId = serializers.IntegerField(write_only=True)
+    class Meta:
+        model = Property
+        fields = ["id","street", "city", "state","zipCode","clientId","schedules"]
+    
+    def create(self, validated_data):
+        schedules_data = validated_data.pop('schedules', [])
+        client_id = validated_data.pop('clientId')
+        
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            raise serializers.ValidationError({"client_id": "Invalid client ID"})
+        
+        property_instance = Property.objects.create(client=client,**validated_data)
+        
+        for schedule_data in schedules_data:
+            Schedule.objects.create(property=property_instance, **schedule_data)
+        return property_instance

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job
 from rest_framework.generics import ListAPIView
@@ -84,4 +84,9 @@ class GetTodaysJobs(ListAPIView):
         today = now().date()
         print(f"Today's date: {today}")
         return Job.objects.filter(jobDate=today, client__author=self.request.user)
-        
+
+
+class PropertyListCreateView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = PropertyAndScheduleSetUp
+    queryset = Property.objects.all()
