@@ -81,7 +81,7 @@ class GetTodaysJobs(ListAPIView):
     today = now().date()
     
     def get_queryset(self):
-        return Job.objects.filter(jobDate=self.today)
+        return Job.objects.filter(jobDate=self.today, client__author=self.request.user)
 
 
 class PropertyListCreateView(generics.ListCreateAPIView):

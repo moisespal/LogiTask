@@ -1,16 +1,17 @@
 @import './listItem.css';
 
 :root {
-  /* Main Colors - Simplified */
+  /* Main Colors - Rich but not overwhelming */
   --item-bg: rgba(40, 40, 50, 0.5);
-  --item-bg-focused: rgba(60, 60, 70, 0.5);
-  --item-bg-complete: rgba(76, 175, 80, 0.2);
+  --item-bg-focused: rgba(50, 50, 65, 0.7);
+  --item-bg-complete: rgba(52, 168, 83, 0.35);
+  --item-bg-complete-focused: rgba(52, 168, 83, 0.5);
   
-  /* Status Colors - Clear and intuitive */
-  --color-pending: #90caf9; /* Lighter blue for better visibility */
-  --color-focused: #ffca28; /* Bright yellow/amber for attention */
-  --color-complete: #3cbc42d6;
- /* Green for completed */
+  /* Status Colors - Clear but not distracting */
+  --color-pending: #90caf9; 
+  --color-focused: #ffca28;
+  --color-complete: rgba(76, 175, 80, 0.95);
+  --color-complete-focused: rgba(76, 175, 80, 1);
   
   /* Text Colors - High contrast */
   --text-primary: rgba(255, 255, 255, 0.98);
@@ -24,14 +25,14 @@
   flex-direction: column;
 }
 
-/* Base Item Styles - Simpler, rounder design */
+/* Base Item Styles */
 .daily-item {
   position: relative;
   font-family: Inter;
   background: var(--item-bg);
   color: var(--text-primary);
   padding: 14px 16px;
-  margin: 5px 0;
+  margin: 8px 0;
   border-radius: 10px 0px 0px 10px;
   box-sizing: border-box;
   cursor: pointer;
@@ -39,37 +40,84 @@
   user-select: none;
   display: flex;
   align-items: center;
-  transition: all 0.25s ease;
+  transition: all 0.2s cubic-bezier(0.05, 0.7, 0.1, 1.0);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  border-left: 3px solid transparent;
 }
 
-/* Item States - Simple hover and focus states */
+/* Hover state - subtle lift */
 .daily-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px) translateX(2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Focus state - more distinctive */
 .daily-item.daily-focused {
   background: var(--item-bg-focused);
-  padding: 12px 14px; /* Adjust for border */
+  border-left: 3px solid var(--color-focused);
+  padding-left: 16px;
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
+/* Completed state - subtle but satisfying */
 .daily-item.daily-complete {
-  border-left: none;
-  border-top: none;
-  border-bottom: none;
-  border-right: 4px solid rgba(76, 175, 80, 0.4);
-  padding: 12px 14px;
-  background-color: rgba(66, 130, 68, 0.532);
+  opacity: 0.85;
+  background-color: var(--item-bg-complete);
   transform: translateX(8px);
-  opacity: 0.80;
+  position: relative;
+  border-left: 3px solid var(--color-complete);
 }
 
-/* Layout Components - Simple flex layout */
+/* Complete + focused - more noticeable */
+.daily-item.daily-complete.daily-focused {
+  background-color: var(--item-bg-complete-focused);
+  border-left: 3px solid var(--color-complete-focused);
+  opacity: 0.95;
+  transform: translateX(12px) translateY(-1px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Add a dark semi-transparent background overlay */
+.daily-item.daily-complete:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px 0 0 10px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Subtle pattern for completed items */
+.daily-item.daily-complete:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(135deg, 
+                     rgba(255, 255, 255, 0.03) 25%, 
+                     transparent 25%, 
+                     transparent 50%, 
+                     rgba(255, 255, 255, 0.03) 50%, 
+                     rgba(255, 255, 255, 0.03) 75%, 
+                     transparent 75%, 
+                     transparent);
+  background-size: 8px 8px;
+  border-radius: 10px 0 0 10px;
+  pointer-events: none;
+}
+
+/* Layout Components */
 .daily-item-header {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   width: 100%;
 }
 
@@ -80,60 +128,104 @@
   flex: 1;
 }
 
-/* Checkbox Styles - Rounded, clear checkboxes */
+/* Icon styles */
 .daily-icon {
   width: 28px;
   height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-  transition: all 0.25s ease;
+  font-size: 20px;
+  transition: all 0.2s cubic-bezier(0.05, 0.7, 0.1, 1.0);
 }
 
 .daily-icon i {
   color: var(--color-pending);
+  transition: transform 0.2s ease;
 }
 
 .daily-focused .daily-icon i {
   color: var(--color-focused);
+  transform: scale(1.15);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .daily-complete .daily-icon i {
   color: var(--color-complete);
 }
 
-/* Text Elements - Large, easy to read */
+.daily-complete.daily-focused .daily-icon i {
+  color: var(--color-complete-focused);
+  transform: scale(1.15);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Text Elements */
 .daily-address {
   font-size: 16px;
   font-weight: 500;
   flex: 1;
+  transition: all 0.15s ease;
 }
 
 .daily-focused .daily-address {
   font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transform: translateX(2px);
+  letter-spacing: 0.2px;
 }
 
-/* Status Indicator - Clear, pill-shaped status */
+.daily-complete .daily-address {
+  opacity: 0.95;
+  text-decoration: none;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.daily-complete.daily-focused .daily-address {
+  opacity: 1;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* Status Indicator */
 .daily-status {
   font-size: 14px;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 5px 12px;
   border-radius: 30px;
   background: rgba(0, 0, 0, 0.2);
+  transition: all 0.2s cubic-bezier(0.05, 0.7, 0.1, 1.0);
+  transform-origin: right center;
 }
 
-/* Status Colors - Clear, consistent with theme */
+/* Status Colors */
 .daily-item .daily-status {
   color: var(--color-pending);
 }
 
 .daily-focused .daily-status {
   color: var(--color-focused);
+  background: rgba(0, 0, 0, 0.3);
+  transform: scale(1.05);
+  padding: 5px 14px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .daily-complete .daily-status {
-  color: var(--color-complete);
+  color: white;
+  background: var(--color-complete);
+  padding: 5px 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.daily-complete.daily-focused .daily-status {
+  background: var(--color-complete-focused);
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Client Info Styles (Vertical Layout)

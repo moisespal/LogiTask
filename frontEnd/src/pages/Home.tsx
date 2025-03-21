@@ -88,16 +88,19 @@ const Home: React.FC = () => {
     }
   };
 
-  // Handle job completion
+  // Handle job completion toggle
   const handleJobComplete = async (jobId: number) => {
     try {
-      await api.patch(`/api/Update-Schedule/${jobId}/`, { status: 'complete' });
-      // Update jobs list
+      const job = jobs.find(job => job.id === jobId);
+      if (!job) return;
+      const newStatus = job.status === 'complete' ? 'uncomplete' : 'complete';
+      
+      await api.patch(`/api/Update-Schedule/${jobId}/`, { status: newStatus })
       setJobs(jobs.map(job => 
-        job.id === jobId ? { ...job, status: 'complete' } : job
+        job.id === jobId ? { ...job, status: newStatus } : job
       ));
     } catch (error) {
-      console.error('Error completing job:', error);
+      console.error('Error toggling job completion:', error);
     }
   };
 

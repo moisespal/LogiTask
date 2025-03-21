@@ -10,12 +10,12 @@ interface DailyListItemProps {
 }
 
 const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, onComplete}) => {
-  const isComplete = job.status === 'COMPLETE';
+  const isComplete = job.status === 'complete';
   const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isFocused && onComplete && !isComplete) {
+    if (isFocused && onComplete) {
       onComplete(job.id);
     } else {
       onClick(job.id);
@@ -28,13 +28,14 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      data-job-id={job.id}
     >
       <div className="daily-item-header">
         <div className="daily-icon">
           {isComplete ? (
-            <i className="fa-solid fa-circle-check"></i>
+            <i className="fa-solid fa-check-circle"></i>
           ) : isFocused ? (
-            <i className="fa-regular fa-circle"></i>
+            <i className="fa-regular fa-circle-dot"></i>
           ) : (
             <i className="fa-regular fa-circle"></i>
           )}
@@ -45,9 +46,11 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
           </div>
           <div className="daily-status">
             {isComplete ? (
-              <span className="complete-text">Done!</span>
+              <span className="complete-text">
+                {isFocused ? "Click to cancel" : "Done!"}
+              </span>
             ) : isFocused ? (
-              <span className="click-hint">Click to finish</span>
+              <span className="click-hint">Click to complete</span>
             ) : (
               <span className="pending-text">To do</span>
             )}
