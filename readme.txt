@@ -23,6 +23,8 @@ READ ME
      ```bash
      pip install -r requirements.txt
      ```
+     ### updates requirements if you install new packages 
+     pip freeze > requirements.txt
 
 ### Running the Server
 

@@ -7,6 +7,10 @@ from .models import Client, Property, Schedule, Job
 from rest_framework.generics import ListAPIView,UpdateAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser
+import pandas as pd
+
 
 
 # Create your views here.
@@ -98,3 +102,41 @@ class UpdateSchedule(UpdateAPIView):
     
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
+
+class UploadExcelView(APIView):
+    parser_classes = [MultiPartParser]  # Allows file uploads
+
+    def post(self, request, *args, **kwargs):
+        file = request.FILES.get('file')
+        if not file:
+            return JsonResponse({"error": "No file uploaded"}, status=400)
+
+        try:
+            df = pd.read_excel(file)  # Read Excel file
+            for _, row in df.iterrows():
+                client = Client.objects.create(
+                    firstName=row['firstName'],
+                    lastName=row['lastName'],  # Change column names based on Excel file
+                    email=row['email'],
+                    phoneNumber=row['phoneNumber'],
+                    author=self.request.user
+                )
+                property_obj = Property.objects.create(
+                    street=row['street'],
+                    city=row['city'],
+                    state=row['state'],
+                    zipCode=row['zipCode'],
+                    client=client
+                ) 
+                Schedule.objects.create(
+                    property=property_obj,
+                    frequency=row['frequency'],
+                    nextDate=row['nextDate'],
+                    service=row['service'],
+                    cost=row['cost']
+                )
+
+
+            return JsonResponse({"message": "Clients uploaded successfully"}, status=201)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)

@@ -10,7 +10,11 @@ interface AddClientModelProps {
 
 const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
   const [mode, setMode] = useState<'select' | 'single' | 'multiple'>('select');
- 
+  //multiple files logic 
+  const [file,setFile] = useState<File|null>(null)
+  const [uploading, setUploading] = useState<boolean>(false);
+  
+  
   const [clientData, setClientData] = useState<ClientData>({
     firstName: "",
     lastName: "",
@@ -118,12 +122,49 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     // Handle file upload logic here
-    console.log("File uploaded:", e.target.files);
+    if (event.target.files && event.target.files.length > 0) {
+      setFile(event.target.files[0]); // Store the selected file
+      console.log("Selected file:", event.target.files[0].name);
+  }
     // You would typically process the file here
-    onClose();
+    
   };
+
+  const uploadFile = async () => {
+    if (!file) {
+        alert("Please select a file first!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setUploading(true); // Set uploading state
+
+    try {
+        const response = await api.post("/api/multiple-clientsSetup", formData, {
+            headers: {
+                // Axios sets "Content-Type": "multipart/form-data" automatically
+            }
+        });
+
+        if (response.status === 201) {
+            alert("Client Property Schedule Created!");
+            onClose();
+            window.location.reload();
+        } else {
+            alert(`Error uploading file: ${response.data.error || "Unknown error"}`);
+        }
+    } catch (error) {
+        console.error("Upload failed:", error);
+        alert(`Something went wrong! `);
+    } finally {
+        setUploading(false); // Reset uploading state
+    }
+};
+
 
   const renderModeSelection = () => (
     <div className="mode-selection">
@@ -333,7 +374,16 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
           <span>Drop your file here or click to upload</span>
         </label>
       </div>
+      {file && <p>Selected: {file.name}</p>}
       <div className="form-actions">
+          <button 
+                type="button" 
+                className="btn-primary" 
+                onClick={uploadFile}
+                disabled={uploading}
+            >
+                {uploading ? "Uploading..." : "Upload File"}
+            </button>
         <button type="button" className="btn-secondary" onClick={() => setMode('select')}>
           <i className="fas fa-arrow-left"></i> Back
         </button>
