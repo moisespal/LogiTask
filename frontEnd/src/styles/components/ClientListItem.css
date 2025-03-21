@@ -59,6 +59,7 @@
   width: 100%;
 }
 
+/* Profile Pic and stars specific to ClientListItem */
 .profile-pic-container {
   width: 40px;
   height: 40px;
@@ -164,16 +165,58 @@
   }
 }
 
-.gear-button {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  font-size: 18px;
-  margin-left: 10px;
-  padding: 5px;
+/* Action buttons container styles */
+.client-action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-.gear-button:hover {
-  color: #ffffff;
+/* Shared button styles */
+.gear-button,
+.client-payment-button {
+  background-color: rgba(50, 50, 55, 0.7);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Button hover effects */
+.gear-button:hover,
+.client-payment-button:hover {
+  background-color: rgba(60, 60, 65, 0.8);
+}
+
+/* Button active effects */
+.gear-button:active,
+.client-payment-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Payment button specific styles */
+.client-payment-button {
+  background-color: rgba(40, 120, 40, 0.7);
+}
+
+.client-payment-button:hover {
+  background-color: rgba(45, 130, 45, 0.8);
+}
+
+.client-payment-button i {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+}
+
+/* Gear button specific styles */
+.gear-button i {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
 } 

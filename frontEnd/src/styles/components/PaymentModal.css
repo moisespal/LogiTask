@@ -1,177 +1,4 @@
-@import './listItem.css';
-
-:root {
-  /* Main Colors - Clean and distinct */
-  --item-bg: rgba(40, 40, 50, 0.6);
-  --item-bg-focused: rgba(50, 50, 65, 0.8);
-  --item-bg-complete: rgba(52, 168, 83, 0.4);
-  --item-bg-complete-focused: rgba(52, 168, 83, 0.6);
-  
-  /* Status Colors - Clear and intuitive */
-  --color-pending: #90caf9; 
-  --color-focused: #ffca28;
-  --color-complete: #4CAF50;
-  --color-complete-focused: #4CAF50;
-  
-  /* Text Colors */
-  --text-primary: rgba(255, 255, 255, 0.95);
-  --text-secondary: rgba(255, 255, 255, 0.85);
-  
-  /* Payment Colors */
-  --color-payment: #4CAF50;
-  --color-payment-hover: #66BB6A;
-}
-
-/* Container */
-.job-wrapper {
-  width: 60%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Override list-item class for daily items */
-.daily-item.list-item {
-  background: var(--item-bg);
-  color: var(--text-primary);
-  padding: 14px 16px;
-  margin: 8px 0;
-  border-radius: 10px 0 0 10px;
-  transition: all 0.2s ease-out;
-  border-left: 3px solid transparent;
-}
-
-/* Hover state - subtle lift */
-.daily-item.list-item:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 2;
-}
-
-/* Focus state - more distinctive */
-.daily-item.list-item.focused {
-  background: var(--item-bg-focused);
-  border-left: 6px solid var(--color-focused);
-  transform: scale(1.01);
-  z-index: 5;
-  position: relative;
-  animation: focusPulse 0.3s ease-out;
-}
-
-/* Completed state */
-.daily-item.daily-complete {
-  background-color: var(--item-bg-complete);
-  border-left-color: var(--color-complete);
-}
-
-/* Complete + focused */
-.daily-item.daily-complete.focused {
-  background-color: var(--item-bg-complete-focused);
-  border-left-color: var(--color-complete-focused);
-}
-
-/* Icon styles */
-.daily-icon {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* Status colors and styles for icons */
-.daily-icon.status-pending i {
-  color: var(--color-pending);
-}
-
-.daily-icon.status-focused i {
-  color: var(--color-focused);
-}
-
-.daily-icon.status-complete i {
-  color: var(--color-complete);
-}
-
-/* Enhanced styles for status states */
-.daily-icon.status-pending {
-  /* Styles removed */
-}
-
-.daily-icon.status-focused {
-  /* Styles removed */
-}
-
-.daily-icon.status-complete {
-  /* Styles removed */
-}
-
-/* Daily content styles */
-.daily-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-  margin-left: 10px;
-}
-
-/* Text Elements */
-.daily-address {
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.daily-focused .daily-address {
-  font-weight: 600;
-}
-
-/* Client Info Styles */
-.client-info {
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 350px;
-  padding: 0px 25px;
-}
-
-.client-item {
-  display: flex;
-  align-items: center;
-}
-
-.client-item i {
-  width: 24px;
-  text-align: center;
-  font-size: 18px;
-}
-
-.client-item:first-child i {
-  color: #2196F3;
-  font-size: 19px;
-}
-
-.client-item:first-child span {
-  font-size: 19px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-}
-
-.client-item:nth-child(2) i {
-  color: #4CAF50;
-}
-
-.client-item:nth-child(3) i {
-  color: #ffffff;
-}
-
-.client-item span {
-  font-size: 16px;
-}
-
-/* Keep payment modal styles unchanged */
+/* Payment Modal Overlay */
 .payment-modal-overlay {
   position: fixed;
   top: 0;
@@ -185,6 +12,7 @@
   z-index: 99999;
 }
 
+/* Payment Modal Container */
 .payment-modal-container {
   background-color: rgba(40, 40, 43, 0.97);
   color: #ffffff;
@@ -199,6 +27,7 @@
   max-height: 95vh;
 }
 
+/* Payment Modal H3 */
 .payment-modal-container h3 {
   margin-top: 0;
   margin-bottom: 0.6rem;
@@ -208,6 +37,7 @@
   font-weight: 500;
 }
 
+/* Form Section */
 .payment-form-section {
   margin-bottom: 0.5rem;
 }
@@ -217,6 +47,7 @@
   padding-top: 0.4rem;
 }
 
+/* Payment Form Actions */
 .payment-form-actions {
   display: flex;
   justify-content: space-between;
@@ -224,6 +55,7 @@
   margin-top: 0.6rem;
 }
 
+/* Button Styles (copied from property modal) */
 .property-btn-primary,
 .property-btn-secondary {
   padding: 0.4rem 0.8rem;
@@ -266,6 +98,22 @@
   box-shadow: none;
 }
 
+/* Payment Modal Header */
+.payment-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.payment-modal-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
 .close-modal-btn {
   position: absolute;
   top: 10px;
@@ -288,6 +136,7 @@
   color: #f44336;
 }
 
+/* Section Title */
 .payment-section-title {
   font-size: 0.75rem;
   color: #90CAF9;
@@ -297,6 +146,7 @@
   letter-spacing: 0.5px;
 }
 
+/* Property Info */
 .payment-property-info,
 .payment-client-info {
   padding: 0.4rem 0.8rem;
@@ -311,14 +161,14 @@
 }
 
 .payment-property-info i {
-  color: #fc574ed4;
+  color: #fc574ed4; /* Red for location (matching TopBar) */
   font-size: 16px;
   width: 20px;
   text-align: center;
 }
 
 .payment-client-info i {
-  color: #64b5f6;
+  color: #64b5f6; /* Blue for user (matching TopBar) */
   font-size: 16px;
   width: 20px;
   text-align: center;
@@ -330,9 +180,20 @@
   font-size: 0.9rem;
 }
 
+/* Amount Input */
 .payment-amount-container {
   padding: 0.4rem 0.8rem;
   border-bottom: none;
+}
+
+.payment-amount-container label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #90CAF9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .payment-amount-input-container {
@@ -370,6 +231,21 @@
   box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
+/* Payment Method */
+.payment-method-container {
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.payment-method-container p {
+  font-size: 0.8rem;
+  margin: 0 0 0.5rem 0;
+  font-weight: 500;
+  color: #90CAF9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .payment-method-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -404,18 +280,66 @@
   box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
+/* Icon colors for payment methods */
 .payment-method-pill i.fa-money-bill {
-  color: #4CAF50;
+  color: #4CAF50; /* Green for cash */
 }
 
 .payment-method-pill i.fa-credit-card {
-  color: #2196F3;
+  color: #2196F3; /* Blue for card */
 }
 
 .payment-method-pill i.fa-money-check-dollar {
-  color: #FFC107;
+  color: #FFC107; /* Yellow for check */
 }
 
 .payment-method-pill i.fa-brands.fa-venmo {
-  color: #3D95CE;
+  color: #3D95CE; /* Venmo blue */
 }
+
+/* Payment Actions */
+.payment-actions {
+  padding: 1rem 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.record-payment-btn {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.record-payment-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(76, 175, 80, 0.3);
+}
+
+.record-payment-btn:disabled {
+  background-color: rgba(76, 175, 80, 0.3);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Animations */
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+} 
