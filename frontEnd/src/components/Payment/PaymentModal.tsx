@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Job, Client } from '../../types/interfaces';
 import '../../styles/components/PaymentModal.css';
-
+import api from '../../api';
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -47,17 +47,30 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     setPaymentMethod(method);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!paymentMethod) {
-      alert("Please select a payment method");
-      return;
-    }
-    
+   
+    try {
+      job?.client.id
+      const propertyResponse = await api.post("/api/payments/", {
+          amount:paymentAmount,
+          paymentType:paymentMethod,
+          client_id: client?.id || job?.client.id
+      }, { headers: { // Correctly formatted object
+          'Content-Type': 'application/json'
+      }});
+      if (propertyResponse.status === 201) {
+        alert("Payment received")
+      }
+    }catch (err) {
+      console.error("Error adding Payment:", err);
+      alert(`Error: ${err}`);
+  }   
+
     onPaymentSubmit(paymentAmount, paymentMethod);
     onClose();
     setPaymentMethod('');
+    setPaymentAmount('0')
   };
 
   if (!isOpen) return null;
@@ -92,63 +105,63 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         <h3>Record Payment</h3>
         
         <form onSubmit={handleSubmit}>
-          <div className="payment-form-section">
-            <div className="payment-section-title">
-              {job ? 'Property Information' : 'Client Information'}
-            </div>
-            
-            {/* Only show property info if job is provided */}
-            {job && (
-              <div className="payment-property-info">
-                <i className="fa-solid fa-location-dot"></i>
-                <span>{job.property.street}</span>
+            <div className="payment-form-section">
+              <div className="payment-section-title">
+                {job ? 'Property Information' : 'Client Information'}
               </div>
-            )}
-            
-            <div className="payment-client-info">
-              <i className="fa-solid fa-user"></i>
-              <span>
-                {job ? `${job.client.firstName} ${job.client.lastName}` : 
-                  client ? `${client.firstName} ${client.lastName}` : 'Client'}
-              </span>
+              
+              {/* Only show property info if job is provided */}
+              {job && (
+                <div className="payment-property-info">
+                  <i className="fa-solid fa-location-dot"></i>
+                  <span>{job.property.street}</span>
+                </div>
+              )}
+              
+              <div className="payment-client-info">
+                <i className="fa-solid fa-user"></i>
+                <span>
+                  {job ? `${job.client.firstName} ${job.client.lastName}` : 
+                    client ? `${client.firstName} ${client.lastName}` : 'Client'}
+                </span>
+              </div>
             </div>
-          </div>
-          
-          <div className="payment-form-section">
-            <label htmlFor="payment-amount" className="payment-section-title">Payment Amount</label>
-            <div className="payment-amount-container">
-              <div className="payment-amount-input-container">
-                <span className="dollar-sign">$</span>
-                <input
-                  id="payment-amount"
+            
+            <div className="payment-form-section">
+              <label htmlFor="payment-amount" className="payment-section-title">Payment Amount</label>
+              <div className="payment-amount-container">
+                <div className="payment-amount-input-container">
+                  <span className="dollar-sign">$</span>
+                  <input
+                    id="payment-amount"
                   name="payment-amount"
-                  type="number"
+                    type="number"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
-                  min="0"
-                  step="1"
-                  required
+                    min="0"
+                    step="1"
+                    required
                   onClick={(e) => e.stopPropagation()}
-                  placeholder="Amount"
-                />
+                    placeholder="Amount"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          
-          <div className="payment-form-section">
-            <div className="payment-section-title">Payment Method</div>
-            <div className="payment-method-options" role="radiogroup">
-              <button 
-                type="button"
+            
+            <div className="payment-form-section">
+              <div className="payment-section-title">Payment Method</div>
+              <div className="payment-method-options" role="radiogroup">
+          <button
+            type="button"
                 className={`payment-method-pill ${paymentMethod === 'cash' ? 'active' : ''}`}
-                onClick={(e) => {
-                  e.stopPropagation();
+            onClick={(e) => {
+              e.stopPropagation();
                   handlePaymentMethodSelect('cash');
-                }}
+            }}
                 aria-pressed={paymentMethod === 'cash'}
-              >
+          >
                 <i className="fa-solid fa-money-bill"></i> Cash
-              </button>
+          </button>
               <button 
                 type="button"
                 className={`payment-method-pill ${paymentMethod === 'card' ? 'active' : ''}`}
@@ -190,28 +203,30 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 value={paymentMethod} 
                 required
               />
+      </div>
             </div>
-          </div>
-          
-          <div className="payment-form-actions">
-            <button 
-              type="button"
-              className="property-btn-secondary" 
+            
+            <div className="payment-form-actions">
+              <button 
+                type="button"
+                className="property-btn-secondary" 
               onClick={(e) => {
                 e.stopPropagation();
-                onClose();
-              }}
-            >
-              <i className="fas fa-times"></i> Cancel
-            </button>
-            <button 
-              type="submit"
-              className="property-btn-primary" 
-              disabled={!paymentMethod}
-            >
-              <i className="fas fa-check"></i> Record Payment
-            </button>
-          </div>
+                  onClose();
+                }}
+              >
+                <i className="fas fa-times"></i> Cancel
+              </button>
+              <button 
+                type="submit"
+                className="property-btn-primary" 
+                disabled={!paymentMethod}
+                onClick={(e) => e.stopPropagation()} // Ensure this does not block form submission
+              >
+                <i className="fas fa-check"></i> Record Payment
+              </button>
+              
+            </div>
         </form>
       </div>
     </div>

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule,Job
+from .models import Client, Property,Schedule,Job,Payment
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -109,3 +109,9 @@ class PropertyAndScheduleSetUp(serializers.ModelSerializer):
         for schedule_data in schedules_data:
             Schedule.objects.create(property=property_instance, **schedule_data)
         return property_instance
+
+class PaymentSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Payment
+        fields = ["id","amount","paymentType","paymentDate"]

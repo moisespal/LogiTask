@@ -12,5 +12,6 @@ urlpatterns = [
     path("getTodaysJobs/", views.GetTodaysJobs.as_view(), name='job-list' ),
     path("PropertySetup/", views.PropertyListCreateView.as_view(), name='payment-list-create'),
     path("Update-Schedule/<int:pk>/", views.UpdateSchedule.as_view(), name='update-schedule'),
-    path('multiple-clientsSetup', views.UploadExcelView.as_view(),name='upload_clients')
+    path('multiple-clientsSetup', views.UploadExcelView.as_view(),name='upload_clients'),
+    path('payments/', views.PaymentListCreate.as_view(), name='payment-list-create'),
 ]

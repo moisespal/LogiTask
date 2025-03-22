@@ -85,3 +85,9 @@ class Job(models.Model):
     jobDate = models.DateField(null=False,blank=False)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='uncomplete')
     cost = models.DecimalField(max_digits=10,decimal_places=2)
+
+class Payment(models.Model):
+    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10,decimal_places=2)
+    paymentType = models.CharField(max_length=50,default='cash')
+    paymentDate = models.DateField(auto_now_add=True)

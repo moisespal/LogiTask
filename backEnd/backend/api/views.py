@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Client, Property, Schedule, Job
+from .models import Client, Property, Schedule, Job,Payment
 from rest_framework.generics import ListAPIView,UpdateAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
@@ -140,3 +140,23 @@ class UploadExcelView(APIView):
             return JsonResponse({"message": "Clients uploaded successfully"}, status=201)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
+
+class PaymentListCreate(generics.ListCreateAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Payment.objects.all()
+        client_id = self.requeste.query_params.get("client_id")
+        if client_id:
+            queryset = Payment.filter(client=client_id)
+        return queryset
+        
+    def perform_create(self, serializer):
+        client_id = self.request.data.get("client_id")
+
+        if client_id:
+            client = Client.objects.get(id=client_id)
+            serializer.save(client=client)
+        else:
+            print(serializer.errors)
