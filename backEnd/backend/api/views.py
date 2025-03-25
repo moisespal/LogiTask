@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Client, Property, Schedule, Job,Payment
+from .models import Client, Property, Schedule, Job,Payment,Company
 from rest_framework.generics import ListAPIView,UpdateAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
@@ -160,3 +160,20 @@ class PaymentListCreate(generics.ListCreateAPIView):
             serializer.save(client=client)
         else:
             print(serializer.errors)
+
+class CompanyListCreate(generics.ListCreateAPIView):
+    permission_classes=[IsAuthenticated]
+    serializer_class = CompanySerializer
+
+    def perform_create(self, serializer):
+        if serializer.is_valid():
+            serializer.save(client=self.request.user)
+        else:
+            print(serializer)
+
+class CompanyUpdateView(generics.UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = CompanySerializer
+    queryset = Company.objects.all()
+
+    

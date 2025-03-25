@@ -5,6 +5,11 @@ from datetime import timedelta, datetime
 
 
 # Create your models here.
+class Company(models.Model):
+    companyName = models.CharField(max_length=100)
+    logo = models.URLField(max_length=200, null=True, blank=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
 class Client(models.Model):
     firstName = models.CharField(max_length=100)
     lastName = models.CharField(max_length=100)
