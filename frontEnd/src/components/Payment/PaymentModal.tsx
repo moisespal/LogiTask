@@ -70,7 +70,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     onPaymentSubmit(paymentAmount, paymentMethod);
     onClose();
     setPaymentMethod('');
-    setPaymentAmount('0')
+    const cost = job?.cost || '0'
+    setPaymentAmount(cost.toString())
   };
 
   if (!isOpen) return null;
