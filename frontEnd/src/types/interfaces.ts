@@ -83,4 +83,11 @@ export interface Job {
     phoneNumber: string;
     email: string;
   };
+}          
+
+export interface Company {  
+  name: string;
+  image: string;
+  level: string;
 }
+
