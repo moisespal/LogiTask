@@ -167,9 +167,12 @@ class CompanyListCreate(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         if serializer.is_valid():
-            serializer.save(client=self.request.user)
+            serializer.save(user=self.request.user)
         else:
             print(serializer)
+    
+    def get_queryset(self):
+        return Company.objects.filter(user=self.request.user)
 
 class CompanyUpdateView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
