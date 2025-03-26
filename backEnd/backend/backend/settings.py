@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     'background_task',
+    'whitenoise'
 ]
 
 MIDDLEWARE = [
