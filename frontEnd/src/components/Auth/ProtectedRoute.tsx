@@ -1,6 +1,5 @@
-
 import { ReactNode, useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import api from "../../api";
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../../constants";
@@ -11,10 +10,42 @@ interface ProtectedRouteProps {
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
     const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
-    
+    const [companyChecked, setCompanyChecked] = useState(false);
+    const [hasCompany, setHasCompany] = useState(false);
+    const location = useLocation();
+    const isCompanySetupRoute = location.pathname === "/company-setup";
+
+    // Check authentication when component mounts
     useEffect(() => {
         auth().catch(() => setIsAuthorized(false));
     }, []);
+
+    // Check for company data when authentication is confirmed
+    useEffect(() => {
+        if (isAuthorized === true) {
+            if (isCompanySetupRoute) {
+                // Skip company check when on setup page
+                setCompanyChecked(true);
+            } else {
+                // Use a simpler company check
+                checkCompanyStatus();
+            }
+        }
+    }, [isAuthorized, isCompanySetupRoute]);
+
+    // Simplified company check that first looks at localStorage
+    const checkCompanyStatus = () => {
+        const cachedCompanyName = localStorage.getItem("companyName");
+        
+        if (cachedCompanyName) {
+            // Company data exists in localStorage
+            setHasCompany(true);
+            setCompanyChecked(true);
+        } else {
+            // No company in localStorage, check API
+            checkCompanyFromAPI();
+        }
+    };
 
     const refreshToken = async () => {
         const refreshToken = localStorage.getItem(REFRESH_TOKEN);
@@ -51,11 +82,57 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
         }
     };
 
+    // Simplified API check for company data
+    const checkCompanyFromAPI = async () => {
+        try {
+            const res = await api.get("/api/companySetup/");
+            if (res.data && res.data.length > 0) {
+                // Company exists
+                setHasCompany(true);
+                
+                // Store in localStorage
+                localStorage.setItem("companyName", res.data[0].companyName);
+                if (res.data[0].logo) {
+                    localStorage.setItem("companyLogo", res.data[0].logo);
+                } else {
+                    localStorage.removeItem("companyLogo");
+                }
+            } else {
+                // No company found
+                setHasCompany(false);
+                localStorage.removeItem("companyName");
+                localStorage.removeItem("companyLogo");
+            }
+        } catch (error) {
+            console.error("Error checking company:", error);
+            setHasCompany(false);
+        } finally {
+            setCompanyChecked(true);
+        }
+    };
+
+    // Show loading while checking auth
     if (isAuthorized === null) {
-        return <div>loading...</div>;
+        return <div>Loading...</div>;
     }
 
-    return isAuthorized ? children : <Navigate to="/login" />;
+    // Redirect to login if not authorized
+    if (!isAuthorized) {
+        return <Navigate to="/login" />;
+    }
+    
+    // Show loading while checking company
+    if (!companyChecked) {
+        return <div>Loading company information...</div>;
+    }
+    
+    // Redirect to setup if no company (except on setup page)
+    if (!hasCompany && !isCompanySetupRoute) {
+        return <Navigate to="/company-setup" />;
+    }
+
+    // All checks passed, render children
+    return <>{children}</>;
 }
 
 export default ProtectedRoute;

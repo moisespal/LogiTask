@@ -2,13 +2,29 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
 from datetime import timedelta, datetime
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 
 # Create your models here.
 class Company(models.Model):
     companyName = models.CharField(max_length=100)
-    logo = models.URLField(max_length=200, null=True, blank=True)
+    logo = models.ImageField(upload_to='company_logos/', null=True, blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    def save(self, *args, **kwargs):
+        if self.logo:
+            try:
+                img = Image.open(self.logo)
+                img.thumbnail((400, 400))
+                buffer = BytesIO()
+                img.save(buffer, format='PNG', quality=80, optimize=True)
+                buffer.seek(0)
+                self.logo.save(self.logo.name, ContentFile(buffer.getvalue()), save=False)
+            except Exception as e:
+                print("error processing image", e)
+        super().save(*args, **kwargs)
 
 class Client(models.Model):
     firstName = models.CharField(max_length=100)
