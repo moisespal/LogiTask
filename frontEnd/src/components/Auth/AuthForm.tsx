@@ -13,13 +13,11 @@ interface FormProps {
 function AuthForm({ route, method }: FormProps) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const name = method === "login" ? "Login" : "Register";
 
     const handleSubmit = async (event: React.FormEvent) => {
-        setLoading(true);
 
         event.preventDefault();
         try {
@@ -33,8 +31,6 @@ function AuthForm({ route, method }: FormProps) {
             }
         } catch (error) {
             alert(error);
-        } finally {
-            setLoading(false);
         }
     };
 

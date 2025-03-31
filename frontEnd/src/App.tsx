@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import Dev from "./pages/dev";
+import { CompanySetUp } from "./pages/CompanySetUp";
 
 const Logout: React.FC = () =>{
   localStorage.clear()
@@ -22,18 +23,26 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
+        {/* Protected Home Route */}
         <Route path="/" element={
           <ProtectedRoute>
             <Home/>
           </ProtectedRoute>
-        }
-        />
+        } />
+        
+        {/* Protected Company Setup Route */}
+        <Route path="/company-setup" element={
+          <ProtectedRoute>
+            <CompanySetUp />
+          </ProtectedRoute>
+        } />
+        
+        {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/logout" element={<Logout/>} />
         <Route path="/register" element={<RegisterAndLogout />} />
         <Route path="/dev" element={<Dev />} />
-        <Route path="*" element={<ErrorPage />} />
-
+        <Route path="*" element={<ErrorPage />} />  
       </Routes>
     </Router>
   );

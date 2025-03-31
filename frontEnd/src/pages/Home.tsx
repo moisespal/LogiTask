@@ -135,7 +135,7 @@ const Home: React.FC = () => {
 
   const filterClientsBySearch = (clients: Client[]): Client[] => 
     clients.filter(client =>
-      [client.firstName, client.lastName, client.address, client.phone, client.email, client.lawnSize]
+      [client.firstName, client.lastName, client.address, client.phoneNumber, client.email, client.lawnSize]
         .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
@@ -312,7 +312,7 @@ const Home: React.FC = () => {
               <ClientProperties 
                 client={{
                   ...client,
-                  phoneNumber: client.phone || '',
+                  phoneNumber: client.phoneNumber || '',
                   properties: client.properties || []
                 }} 
                 visible={focusedItemId === client.id}

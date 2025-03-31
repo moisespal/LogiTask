@@ -5,7 +5,7 @@ export interface Client {
   firstName: string;
   lastName: string;
   address: string;
-  phone: string;
+  phoneNumber: string;
   email: string;
   lawnSize: string;
   visits: Visit[];
