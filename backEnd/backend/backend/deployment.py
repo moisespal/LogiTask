@@ -20,7 +20,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'https://proud-grass-07e49b910.6.azurestaticapps.net' 
+    'https://mango-water-033be9610.6.azurestaticapps.net' 
 ]
 
 
