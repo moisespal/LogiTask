@@ -62,6 +62,12 @@ function AuthForm({ route, method }: FormProps) {
                 <button type="submit" className="auth-btn">
                     {name}
                 </button>
+                {name === "Login" && (
+                    <button type="button" className="auth-btn" onClick={() => navigate('/register')}>
+                        Register
+                    </button>
+                )}
+             
             </div>
         </form>
     );
