@@ -1,13 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils.timezone import now
-from datetime import timedelta, datetime
+from django.utils import timezone
+from datetime import timedelta
 from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
+import pytz
 
 
 # Create your models here.
+class userProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    timezone = models.CharField(max_length=100, default='UTC')
 class Company(models.Model):
     companyName = models.CharField(max_length=100)
     logo = models.ImageField(upload_to='company_logos/', null=True, blank=True)
@@ -69,11 +73,24 @@ class Schedule(models.Model):
     isActive = models.BooleanField(default=True)
     
     @classmethod
-    def generate_jobs(cls):
-        today = now().date()
-        schedules = cls.objects.filter(nextDate=today, isActive=True)
+    def generate_jobs(cls, user):
+        try:
+            profile = userProfile.objects.get(user=user)
+            user_timezone = pytz.timezone(profile.timezone)
+        except (userProfile.DoesNotExist, pytz.exceptions.UnknownTimeZoneError):
+            user_timezone = pytz.UTC
 
-        
+        # Get current UTC time and convert to user's timezone
+        utc_now = timezone.now()
+        local_now = utc_now.astimezone(user_timezone)
+        today_in_user_tz = local_now.date()
+
+        schedules = cls.objects.filter(
+            nextDate=today_in_user_tz,
+            isActive=True,
+            property__client__author=user  # Only get schedules for this user
+        )
+
         for schedule in schedules:
             Job.objects.create(schedule=schedule, cost=schedule.cost, jobDate=schedule.nextDate, client=schedule.property.client)
             if schedule.endDate and schedule.nextDate > schedule.endDate:
@@ -89,10 +106,8 @@ class Schedule(models.Model):
                     schedule.nextDate += timedelta(weeks=2)
                 elif schedule.frequency.lower() == "once":
                     schedule.isActive = False
-
-            
-            
             schedule.save()
+
     def __str__(self):
         return f"{self.service} - {self.nextDate}"
 

@@ -3,13 +3,17 @@ from django.contrib.auth.models import User
 from rest_framework import generics
 from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Client, Property, Schedule, Job,Payment,Company
+from .models import Client, Property, Schedule, Job,Payment,Company,userProfile
 from rest_framework.generics import ListAPIView,UpdateAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser
 import pandas as pd
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+import pytz
+from django.utils import timezone
 
 
 
@@ -73,20 +77,34 @@ class ClientScheduleSetUp(generics.ListCreateAPIView):
             serializer.save(author=self.request.user)
         else:
             print(serializer)
-    
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def generateTodaysJobs(request):
-   Schedule.generate_jobs()
+   Schedule.generate_jobs(request.user)
    return JsonResponse({"message": "Jobs generated successfully"}, status=200)
 
 
 class GetTodaysJobs(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = JobSerializer
-    today = now().date()
     
     def get_queryset(self):
-        return Job.objects.filter(jobDate=self.today, client__author=self.request.user)
-
+        profile = userProfile.objects.get(user=self.request.user)
+        user_timezone = profile.timezone
+        try:
+            user_timezone = pytz.timezone(user_timezone)
+        except pytz.exceptions.UnknownTimeZoneError:
+            user_timezone = pytz.UTC
+        utc_now = timezone.now()
+        local_now = utc_now.astimezone(user_timezone)
+        today_in_user_tz = local_now.date()
+        
+        return Job.objects.filter(
+            jobDate=today_in_user_tz,
+            client__author=self.request.user
+        )
 
 class PropertyListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -179,4 +197,11 @@ class CompanyUpdateView(generics.UpdateAPIView):
     serializer_class = CompanySerializer
     queryset = Company.objects.all()
 
-    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_timezone(request):
+    timezone = request.data.get('timezone')
+    profile, created = userProfile.objects.get_or_create(user=request.user)
+    profile.timezone = timezone
+    profile.save()
+    return Response({'status': 'success', 'timezone': timezone})
