@@ -120,3 +120,15 @@ class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = ['id','companyName','logo']
+
+class JobOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = ['id', 'jobDate', 'status', 'cost']
+
+class ScheduleJobsSerializer(serializers.ModelSerializer):
+    jobs = JobOnlySerializer(source='job_set',many=True,read_only=True)
+
+    class Meta:
+        model = Schedule
+        fields = fields = ["id", "frequency","service","cost","nextDate","endDate","isActive","jobs"]

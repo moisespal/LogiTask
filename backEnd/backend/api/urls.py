@@ -17,4 +17,5 @@ urlpatterns = [
     path('companySetup/', views.CompanyListCreate.as_view(), name='company-list-create'),
     path('update-company/<int:pk>/', views.CompanyUpdateView.as_view(), name='update-company'),
     path('update-timezone/', views.update_timezone, name='update-timezone'),
+    path('schedule-jobs/', views.ScheduleJobsView.as_view(), name='view-schedule-jobs ')
 ]

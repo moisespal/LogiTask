@@ -1,7 +1,36 @@
 import React from 'react';
+import api from '../api';
 
 const Dev: React.FC = () => {
-  return <div>Dev</div>;
+  
+
+
+  const handlesubmit = async (e:React.FormEvent) =>{
+    e.preventDefault();
+
+    try{
+      const response = await api.get("/api/schedule-jobs/?property_id=33", {
+        
+      });
+      if(response.status===201){
+        return response.data
+      }
+    
+
+      }catch(err){
+        console.error("Error adding property:", err);
+        alert(`Error: ${err}`);
+    }
+  }
+  
+  
+  return(
+  <>
+    <div>Dev</div>;
+    <button onClick={handlesubmit}> TRY ME</button>
+  </>
+  )
+  
 };
 
 export default Dev;

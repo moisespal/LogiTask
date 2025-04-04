@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -14,6 +14,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 import pytz
 from django.utils import timezone
+from django.db.models import Prefetch
 
 
 
@@ -205,3 +206,22 @@ def update_timezone(request):
     profile.timezone = timezone
     profile.save()
     return Response({'status': 'success', 'timezone': timezone})
+
+class ScheduleJobsView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ScheduleJobsSerializer
+
+    def get_queryset(self):
+        property_id = self.request.query_params.get("property_id")
+        if not property_id:
+            return Schedule.objects.none()
+
+        # Get all Jobs related to Schedules under this property
+        jobs_queryset = Job.objects.filter(schedule__property_id=property_id)
+
+        # Prefetch these Jobs and attach them to their Schedules
+        return Schedule.objects.filter(
+            property_id=property_id
+        ).prefetch_related(
+            Prefetch('job_set', queryset=jobs_queryset, to_attr='jobs')
+        )
