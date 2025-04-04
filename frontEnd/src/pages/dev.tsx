@@ -9,7 +9,7 @@ const Dev: React.FC = () => {
     e.preventDefault();
 
     try{
-      const response = await api.get("/api/schedule-jobs/?property_id=33", {
+      const response = await api.get("/api/properties-service-info/?client_id=33", {
         
       });
       if(response.status===201){

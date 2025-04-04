@@ -132,3 +132,11 @@ class ScheduleJobsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = fields = ["id", "frequency","service","cost","nextDate","endDate","isActive","jobs"]
+
+class PropertyServiceInfoSerializer(serializers.ModelSerializer):
+    schedules = ScheduleJobsSerializer(many=True,read_only=True)
+    
+    class Meta:
+        model = Property
+        fields = ["id", "street", "city", "state", "zipCode", 'schedules']
+        

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import generics
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -225,3 +225,29 @@ class ScheduleJobsView(ListAPIView):
         ).prefetch_related(
             Prefetch('job_set', queryset=jobs_queryset, to_attr='jobs')
         )
+
+class PropertyServiceInfoView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        client_id = request.query_params.get("client_id")
+        if not client_id:
+            return Response({"error": "client_id is required"}, status=400)
+
+        # Get all properties for this client
+        properties = Property.objects.filter(client_id=client_id).prefetch_related(
+            'schedules__job_set'
+        )
+
+        # Get all payments for this client
+        payments = Payment.objects.filter(client_id=client_id)
+
+        # Serialize both
+        property_data = PropertyServiceInfoSerializer(properties, many=True).data
+        payment_data = PaymentSerializer(payments, many=True).data
+
+        return Response({
+            "properties": property_data,
+            "payments": payment_data
+        })
+    
