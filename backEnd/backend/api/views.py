@@ -18,6 +18,7 @@ from django.db.models import Prefetch
 
 
 
+
 # Create your views here.
 
 class ClientListCreate(generics.ListCreateAPIView):
@@ -251,3 +252,17 @@ class PropertyServiceInfoView(ListAPIView):
             "payments": payment_data
         })
     
+class ScheduleCreate(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ScheduleSerializer
+        
+    
+    
+    def perform_create(self, serializer):
+        property_id =  self.request.data.get('property_id')
+        if property_id:
+            property_obj = Property.objects.get(id=property_id)
+            serializer.save(property= property_obj)
+        else:
+            print(serializer.errors)
+        

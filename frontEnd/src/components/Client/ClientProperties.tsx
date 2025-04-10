@@ -43,6 +43,7 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
     const handleModalState = (isOpen: boolean) => {
         setIsModalOpen(isOpen);
     };
+    
 
     return (
         <div className="properties-container">
@@ -60,8 +61,16 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
                             <div className="property-location">
                                 {property.city}, {property.state || 'TX'} {property.zipCode}
                             </div>
+                            <button
+                                className="payment-button client-payment-button" 
+                                title="Record payment"
+                            >
+                                <i className="fa-solid fa-calendar"></i>
+                            </button>
+                           
                         </div>
                     </div>
+                   
                 ))
             ) : (
                 <div className="no-properties">No properties found for this client</div>
@@ -89,6 +98,7 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
                 onClose={() => handleModalState(false)}
                 clientId={client.id}
             />
+            
         </div>
     );
 };
