@@ -165,14 +165,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           </button>
               <button 
                 type="button"
-                className={`payment-method-pill ${paymentMethod === 'card' ? 'active' : ''}`}
+                className={`payment-method-pill ${paymentMethod === 'zelle' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handlePaymentMethodSelect('card');
+                  handlePaymentMethodSelect('zelle');
                 }}
-                aria-pressed={paymentMethod === 'card'}
+                aria-pressed={paymentMethod === 'zelle'}
               >
-                <i className="fa-solid fa-credit-card"></i> Card
+                <i className="fa-solid fa-money-bill-transfer"></i>Zelle
               </button>
               <button 
                 type="button"
@@ -187,14 +187,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               </button>
               <button 
                 type="button"
-                className={`payment-method-pill ${paymentMethod === 'venmo' ? 'active' : ''}`}
+                className={`payment-method-pill ${paymentMethod === 'card' ? 'active' : ''}`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handlePaymentMethodSelect('venmo');
+                  handlePaymentMethodSelect('card');
                 }}
-                aria-pressed={paymentMethod === 'venmo'}
+                aria-pressed={paymentMethod === 'card'}
               >
-                <i className="fa-brands fa-venmo"></i> Venmo
+                <i className="fa-solid fa-credit-card"></i> Card
               </button>
               
               {/* Hidden input to store the selected payment method for form submission */}

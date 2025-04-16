@@ -19,5 +19,6 @@ urlpatterns = [
     path('update-timezone/', views.update_timezone, name='update-timezone'),
     path('schedule-jobs/', views.ScheduleJobsView.as_view(), name='view-schedule-jobs '),
     path('properties-service-info/',views.PropertyServiceInfoView.as_view(),name='view-property-service-info'),
-    path('createSchedule/', views.ScheduleCreate.as_view(), name='create-schedule')
+    path('createSchedule/', views.ScheduleCreate.as_view(), name='create-schedule'),
+    path('get-balance/', views.update_balance_view.as_view(), name="view-balance")
 ]

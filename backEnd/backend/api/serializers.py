@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule,Job,Payment,Company
+from .models import Client, Property,Schedule,Job,Payment,Company,Balance
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -140,3 +140,12 @@ class PropertyServiceInfoSerializer(serializers.ModelSerializer):
         model = Property
         fields = ["id", "street", "city", "state", "zipCode", 'schedules']
         
+class BalanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Balance
+        fields = ["id", "balance_adjustment","current_balance", "updated_at"]
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "updated_at": {"read_only": True},
+        }
