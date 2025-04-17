@@ -43,8 +43,7 @@ class Client(models.Model):
     def __str__(self):
         return self.firstName
     
-    def get_balance(self):
-        return self.
+    
     
 
 class Property(models.Model):
