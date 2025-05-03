@@ -28,7 +28,7 @@ export interface Visit {
   date: string;
   paid: boolean;
   complete: boolean; // Added property
-  charge: number;     // Added property
+  charge: number; // Added property
 }
 
 // export interface Schedule {
@@ -37,26 +37,26 @@ export interface Visit {
 //   lastServiceDate?: string;
 // }
 
-export interface ClientData{
-  firstName:string;
-  lastName:string;
-  phoneNumber:string;
-  email:string;
-  properties:Property_list[]
+export interface ClientData {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string;
+  properties: Property_list[];
 }
-export interface Schedule{
-  frequency:string;
-  nextDate:string;
-  service:string;
-  cost:number;
+export interface Schedule {
+  frequency: string;
+  nextDate: string;
+  service: string;
+  cost: number;
 }
 
-export interface Property_list{
-  street:string;
-  city:string;
-  state:string;
-  zipCode:string;
-  schedules:Schedule[];
+export interface Property_list {
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  schedules: Schedule[];
 }
 
 export interface Job {
@@ -83,11 +83,27 @@ export interface Job {
     phoneNumber: string;
     email: string;
   };
-}          
+}
 
-export interface Company {  
+export interface Company {
   name: string;
   image: string;
   level: string;
 }
 
+export interface Schedule {
+  id: number;
+  frequency: string;
+  service: string;
+  cost: number;
+  nextDate: string;
+  endDate: string;
+  isActive: boolean;
+  jobs: {
+    id: number;
+    jobDate: string;
+    status: string;
+    cost: number;
+  }[];
+}
+[];
