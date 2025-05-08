@@ -285,7 +285,7 @@
   color: #4CAF50; /* Green for cash */
 }
 
-.payment-method-pill i.fa-credit-card {
+.payment-method-pill i.fa-money-bill-transfer{
   color: #2196F3; /* Blue for card */
 }
 
@@ -293,8 +293,8 @@
   color: #FFC107; /* Yellow for check */
 }
 
-.payment-method-pill i.fa-brands.fa-venmo {
-  color: #3D95CE; /* Venmo blue */
+.payment-method-pill i.fa-credit-card{
+  color: peru; /* LinkedIn blue */
 }
 
 /* Payment Actions */

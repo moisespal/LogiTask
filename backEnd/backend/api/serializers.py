@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule,Job,Payment,Company
+from .models import Client, Property,Schedule,Job,Payment,Company,Balance
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,7 +30,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ["id", "frequency","nextDate","service","cost"]
+        fields = ["id", "frequency","nextDate","endDate","service","cost"]
 
 class PropertyAndSchedule(serializers.ModelSerializer):
     schedules = ScheduleSerializer(many=True)
@@ -132,3 +132,20 @@ class ScheduleJobsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = fields = ["id", "frequency","service","cost","nextDate","endDate","isActive","jobs"]
+
+class PropertyServiceInfoSerializer(serializers.ModelSerializer):
+    schedules = ScheduleJobsSerializer(many=True,read_only=True)
+    
+    class Meta:
+        model = Property
+        fields = ["id", "street", "city", "state", "zipCode", 'schedules']
+        
+class BalanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Balance
+        fields = ["id", "balance_adjustment","current_balance", "updated_at"]
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "updated_at": {"read_only": True},
+        }

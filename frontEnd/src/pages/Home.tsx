@@ -264,7 +264,7 @@ const Home: React.FC = () => {
   const handlePropertyModalStateChange = (isOpen: boolean) => {
     setIsPropertyModalOpen(isOpen);
   };
-
+  
   return (
     <div
       className="app-container" 
@@ -273,7 +273,7 @@ const Home: React.FC = () => {
       }}
     >      
       {modeType === 'Client' && selectedClient && (
-        <ClientCalendar visits={selectedClient.visits ?? []} />
+        <ClientCalendar visits={selectedClient?.visits ?? []} client_id={selectedClient?.id} />
       )}
     
       <TopBar

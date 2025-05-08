@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import models, transaction
+from django.db.models import Sum
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
@@ -6,6 +7,7 @@ from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
 import pytz
+from decimal import Decimal
 
 
 # Create your models here.
@@ -40,6 +42,8 @@ class Client(models.Model):
 
     def __str__(self):
         return self.firstName
+    
+    
     
 
 class Property(models.Model):
@@ -121,9 +125,43 @@ class Job(models.Model):
     jobDate = models.DateField(null=False,blank=False)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='uncomplete')
     cost = models.DecimalField(max_digits=10,decimal_places=2)
+    is_applied_to_balance = models.BooleanField(default=False)
 
 class Payment(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10,decimal_places=2)
     paymentType = models.CharField(max_length=50,default='cash')
     paymentDate = models.DateField(auto_now_add=True)
+    is_applied_to_balance = models.BooleanField(default=False)
+class Balance(models.Model):
+    client = models.OneToOneField(Client, on_delete=models.CASCADE)
+    balance_adjustment = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    current_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def recalculate_balance(self):
+
+        with transaction.atomic():
+            unapplied_jobs = Job.objects.filter(client=self.client,  is_applied_to_balance=False, status='complete')
+            unapplied_payments = Payment.objects.filter(client=self.client, is_applied_to_balance=False)
+
+            # Totals
+            total_jobs = unapplied_jobs.aggregate(Sum("cost"))["cost__sum"] or 0
+            total_payments = unapplied_payments.aggregate(Sum("amount"))["amount__sum"] or 0
+
+            #convert to decimal
+            total_jobs = Decimal(total_jobs)
+            total_payments  = Decimal(total_payments)
+            # Update current balance using balance adjustment
+            delta = total_payments - total_jobs + Decimal(self.balance_adjustment)
+            self.current_balance += delta
+
+            # Clear the adjustment once it's applied
+            self.balance_adjustment = 0.0
+            self.save()
+
+            # Mark jobs/payments as applied
+            unapplied_jobs.update(is_applied_to_balance=True)
+            unapplied_payments.update(is_applied_to_balance=True)
+
+        return self.current_balance

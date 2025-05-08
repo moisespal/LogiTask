@@ -110,6 +110,7 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
         onClose={() => handleModalState(false)}
         clientId={client.id}
       />
+            
     </div>
   );
 };

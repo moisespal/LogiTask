@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
-from rest_framework import generics
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer
+from rest_framework import generics, status
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Client, Property, Schedule, Job,Payment,Company,userProfile
+from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance
 from rest_framework.generics import ListAPIView,UpdateAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
@@ -15,6 +15,7 @@ from rest_framework.response import Response
 import pytz
 from django.utils import timezone
 from django.db.models import Prefetch
+
 
 
 
@@ -225,3 +226,68 @@ class ScheduleJobsView(ListAPIView):
         ).prefetch_related(
             Prefetch('job_set', queryset=jobs_queryset, to_attr='jobs')
         )
+
+class PropertyServiceInfoView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        client_id = request.query_params.get("client_id")
+        if not client_id:
+            return Response({"error": "client_id is required"}, status=400)
+
+        # Get all properties for this client
+        properties = Property.objects.filter(client_id=client_id).prefetch_related(
+            'schedules__job_set'
+        )
+
+        # Get all payments for this client
+        payments = Payment.objects.filter(client_id=client_id)
+
+        # Serialize both
+        property_data = PropertyServiceInfoSerializer(properties, many=True).data
+        payment_data = PaymentSerializer(payments, many=True).data
+
+        return Response({
+            "properties": property_data,
+            "payments": payment_data
+        })
+    
+class ScheduleCreate(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ScheduleSerializer
+        
+    
+    
+    def perform_create(self, serializer):
+        property_id =  self.request.data.get('property_id')
+        if property_id:
+            property_obj = Property.objects.get(id=property_id)
+            serializer.save(property= property_obj)
+        else:
+            print(serializer.errors)
+
+class update_balance_view(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        client_id = request.query_params.get("client_id")
+        if not client_id:
+            return Response({"error": "client_id is required"}, status=400)
+
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return Response({"error": "Client not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+        #get balance table
+        balance, _ = Balance.objects.get_or_create(client=client)
+
+        #recalculate
+        balance.recalculate_balance()
+        
+        serializer = BalanceSerializer(balance)
+        return Response(serializer.data)
+
+#needs to be fixed
+
