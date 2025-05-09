@@ -45,7 +45,7 @@ const PropertyView: React.FC = () => {
         schedulesData.forEach((schedule: Schedule) => {
           if (schedule.jobs && Array.isArray(schedule.jobs)) {
             schedule.jobs.forEach((job) => {
-              if (job.status === "Complete" || job.status === "Completed") {
+              if (job.status === "complete") {
                 completed++;
                 revenue += parseFloat(String(job.cost || 0));
               }
@@ -84,6 +84,41 @@ const PropertyView: React.FC = () => {
     return amount;
   };
 
+  const formatDateLocal = (dateString: string): string => {
+    const userTimezone = localStorage.getItem("userTimeZone") || "UTC";
+    const date = new Date(dateString);
+
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: userTimezone,
+      year: "numeric",
+      month: "short",
+      weekday: "short",
+      day: "numeric",
+    };
+    return date.toLocaleDateString("en-US", options);
+  }
+
+  const formatDayofWeek = (dateString: string): string => {
+    const userTimezone = localStorage.getItem("userTimeZone") || "UTC";
+    const date = new Date(dateString);
+
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: userTimezone,
+      weekday: "long",
+    };
+    return date.toLocaleDateString("en-US", options);
+  }
+
+  const daysUntilNextService = (nextDate: string): string => {
+    const today = new Date();
+    const nextServiceDate = new Date(nextDate);
+
+    const daysDiff = nextServiceDate.getTime() - today.getTime();
+    const daysUntil = Math.ceil(daysDiff / (1000 * 3600 * 24)) + 1;
+
+    return daysUntil > 0 ? `${daysUntil} days` : "Today";
+  }
+
   const toggleSchedule = (scheduleId: string, isActive: boolean) => {
     // Only toggle if the schedule is active
     if (isActive) {
@@ -111,39 +146,14 @@ const PropertyView: React.FC = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "Not scheduled";
-
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
-    } catch (e) {
-      return dateString;
-    }
-  };
-
   // Helper to get service icon based on service name
   const getServiceIcon = (serviceName: string) => {
     const service = serviceName?.toLowerCase() || "";
 
     if (service.includes("mow") || service.includes("lawn")) {
       return "🚜";
-    } else if (service.includes("trim") || service.includes("hedge")) {
-      return "✂️";
-    } else if (service.includes("clean") || service.includes("sweep")) {
-      return "🧹";
-    } else if (service.includes("snow")) {
-      return "❄️";
-    } else if (service.includes("plant") || service.includes("garden")) {
-      return "🌱";
-    } else if (service.includes("fertiliz")) {
-      return "💦";
     } else {
-      return "🛠️";
+      return "🛠️"; // Default icon for other services
     }
   };
 
@@ -272,7 +282,7 @@ const PropertyView: React.FC = () => {
                           </div>
                           {schedule.nextDate && (
                             <div className="next-service-date">
-                              Next: {formatDate(schedule.nextDate)}
+                              Next: {formatDateLocal(schedule.nextDate)}
                             </div>
                           )}
                         </div>
@@ -297,7 +307,7 @@ const PropertyView: React.FC = () => {
                                     className="job-item"
                                   >
                                     <div className="job-date">
-                                      {formatDate(job.jobDate)}
+                                      {formatDateLocal((job.jobDate))}
                                     </div>
                                     <div className="job-status">
                                       <span
@@ -358,7 +368,8 @@ const PropertyView: React.FC = () => {
                   .find((s) => new Date(s.nextDate) >= today);
 
                 return upcoming
-                  ? formatDate(upcoming.nextDate)
+                  ? formatDayofWeek(upcoming.nextDate) + " in " +
+                      daysUntilNextService(upcoming.nextDate)
                   : "None scheduled";
               })()}
             </div>
