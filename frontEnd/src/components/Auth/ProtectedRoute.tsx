@@ -20,34 +20,6 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
     auth().catch(() => setIsAuthorized(false));
   }, []);
 
-  useEffect(() => {
-    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    localStorage.setItem("userTimeZone", userTimeZone);
-
-    // Send timezone to server if user is authorized
-    if (isAuthorized) {
-      api
-        .post(
-          "/api/update-timezone/",
-          { timezone: userTimeZone },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        )
-        .then((response) => {
-          console.log("Server updated timezone:", response.data);
-        })
-        .catch((error) => {
-          console.error(
-            "Error details:",
-            error.response?.data || error.message
-          );
-        });
-    }
-  }, [isAuthorized]);
-
   // Check for company data when authentication is confirmed
   useEffect(() => {
     if (isAuthorized === true) {

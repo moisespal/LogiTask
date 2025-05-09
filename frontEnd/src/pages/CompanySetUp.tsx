@@ -14,10 +14,27 @@ const CompanySetUp: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
+        // Check if the user has a company name stored in localStorage
+        // If so, redirect them to the home page 
         const companyName = localStorage.getItem("companyName");
         if (companyName) {
             navigate('/', { replace: true });
         }
+
+        // This Fetches the user's timezone and stores it in localStorage and send it to the server
+        const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        localStorage.setItem("userTimeZone", userTimeZone);
+        api.post('/api/update-timezone/', { timezone: userTimeZone }, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then((response) => {
+            console.log('Server updated timezone:', response.data);
+        }
+        ).catch((error) => {
+            console.error('Error updating timezone:', error);
+        });
+
     }, [navigate]);
 
     const handleCompanyNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
