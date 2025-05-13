@@ -91,7 +91,7 @@ export interface Company {
   level: string;
 }
 
-export interface Schedule {
+export interface ClientSchedule {
   id: number;
   frequency: string;
   service: string;

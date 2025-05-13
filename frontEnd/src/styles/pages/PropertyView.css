@@ -1,28 +1,24 @@
-/* PropertyView.css - Dark Theme with Modern Design */
-
 /* Base Styling */
 .property-view-container {
   height: 100vh;
   width: 100%;
   margin: 0;
-  padding: 20px;
+  padding: 12px;
   font-family: "Segoe UI", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
   color: #e0e0e0;
-  background-color: #1a1a2e;
-  background-image: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background: rgba(40, 40, 43, 1);
   overflow-y: auto;
 }
 
 /* Property Header Card */
 .property-header-card {
   display: flex;
-  background: #242f4d;
+  background: rgb(47, 47, 52);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  padding: 24px;
-  margin-bottom: 24px;
+  padding: 16px;
+  margin-bottom: 16px;
   position: relative;
-  border: 1px solid #3a4464;
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -37,6 +33,7 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  user-select: none;
 }
 
 .property-map img {
@@ -76,11 +73,10 @@
 }
 
 .property-details h2 {
-  font-size: 28px;
-  margin: 0 0 18px 0;
+  font-size: 32px;
   font-weight: 600;
   color: #ffffff;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.70px;
 }
 
 /* Client Info Container */
@@ -88,11 +84,11 @@
   display: flex;
   flex-direction: column;
   margin-top: 20px;
-  background-color: #242f4d;
+  background-color: rgba(40, 40, 43, 1);
   border-radius: 12px;
   padding: 18px;
   width: 300px;
-  border: 1px solid #3a4464;
+  user-select: none;
 }
 
 .client-info-container .client-header {
@@ -117,7 +113,6 @@
   position: absolute;
   top: 0;
   left: 0;
-  border: 3px solid #3a4464;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -142,16 +137,16 @@
 }
 
 .contact-icons i {
-  color: white;
+  color: rgba(255, 255, 255, 0.623);
   font-size: 18px;
-  padding: 10px;
-  background-color: #1a2133;
+  padding: 2px;
+  background-color: rgba(70, 130, 220, 0.004);
   border-radius: 8px;
   transition: background-color 0.2s ease;
 }
 
 .contact-icons i:hover {
-  background-color: #3a4464;
+  color: white
 }
 
 .contact-icons span {
@@ -161,8 +156,8 @@
 /* Content Layout */
 .content-layout {
   display: flex;
-  gap: 24px;
-  min-height: calc(100% - 150px);
+  gap: 16px;
+  min-height: calc(100% - 140px);
   max-width: 1200px;
   margin-left: auto;
   margin-right: auto;
@@ -171,11 +166,10 @@
 
 .schedules-column {
   flex: 2;
-  background: #242f4d;
+  background: rgba(40, 40, 43, 1);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  border: 1px solid #3a4464;
   height: fit-content;
   min-width: 0;
 }
@@ -184,7 +178,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
   height: fit-content;
 }
 
@@ -192,10 +186,19 @@
 .schedules-header {
   display: flex;
   align-items: center;
-  background-color: #2c3652;
-  background-image: linear-gradient(to right, #2c3652, #242f4d);
-  padding: 18px 24px;
-  border-bottom: 1px solid #3a4464;
+  background: linear-gradient(to right, #31314e, #2d2d52);
+  padding: 14px 20px;
+  user-select: none;
+}
+
+.schedule-summary {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(to right, #373754, #484880);
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .schedules-header h2 {
@@ -210,63 +213,49 @@
 .add-schedule-btn {
   background: none;
   border: none;
-  font-size: 24px;
-  cursor: pointer;
-  margin-right: 12px;
-  color: #64b5f6;
-  padding: 8px;
-  border-radius: 50%;
-}
-
-.add-schedule-btn:hover {
-  background-color: rgba(100, 181, 246, 0.2);
-}
-
-.toggle-dropdown-btn {
-  background: none;
-  border: none;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
   color: #b0bec5;
-  width: 36px;
-  height: 36px;
+  width: 40px; /* Set consistent width */
+  height: 40px; /* Set consistent height */
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
 }
 
-.toggle-dropdown-btn:hover {
-  color: #64b5f6;
-  background-color: rgba(100, 181, 246, 0.2);
+.add-schedule-btn:hover, .toggle-dropdown-btn:hover {
+  color: #ffffff;
+  transform: scale(1.1); /* Slight scaling effect */
+}
+
+.toggle-dropdown-btn {
+  background: none;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  color: #b0bec5;
+  width: 50px; /* Set consistent width */
+  height: 50px; /* Set consistent height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  
 }
 
 .schedules-list {
-  padding: 12px;
+  padding: 8px;
+  background-color: #2c2e33;
+  user-select: none;
 }
 
 /* Schedule Item Styling */
 .schedule-item {
   transition: box-shadow 0.2s ease;
-
-  margin: 16px 0;
+  margin: 12px 0;
   overflow: hidden;
   position: relative;
-}
-
-.schedule-item.inactive {
-  background-color: #2a3344;
-  opacity: 0.9;
-}
-
-.schedule-summary {
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  background-color: #3949ab;
-  background-image: linear-gradient(to right, #3949ab, #5c6bc0);
-  border-radius: 12px;
-  color: white;
 }
 
 /* When job history is open, change bottom corners of summary */
@@ -278,14 +267,14 @@
 .service-icon {
   font-size: 32px;
   margin-right: 15px;
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.15);
   border-radius: 10px;
 }
 
@@ -294,6 +283,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 /* Top Row (Name and Price) */
@@ -301,7 +291,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  width: 100%;
 }
 
 .service-name-container {
@@ -311,7 +302,7 @@
 }
 
 .service-name {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: white;
   margin-right: 12px;
@@ -319,26 +310,40 @@
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
+.frequency-label-container {
+  display: flex;
+  align-items: center;
+}
+
 .frequency-label {
+  display: inline-flex;
+  align-items: center;
   font-size: 12px;
-  color: #3949ab;
   font-weight: 600;
-  padding: 4px 8px;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 6px;
+  padding: 5px 10px;
+  background-color: rgba(79, 134, 235, 0.15);
+  color: #81a4ff;
+  border: 1px solid rgba(79, 134, 235, 0.3);
+  border-radius: 20px;
   white-space: nowrap;
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.recurrence-icon {
+  font-size: 12px;
+  margin-right: 5px;
 }
 
 .service-price-container {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  margin-left: auto;
 }
 
 .service-cost {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
   color: white;
   letter-spacing: -0.5px;
@@ -348,8 +353,19 @@
 /* Bottom Row (Next Date and Status) */
 .service-bottom-row {
   display: flex;
-  margin-right: 30px;
   justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.left-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.service-status-badge {
+  display: flex;
   align-items: center;
 }
 
@@ -359,11 +375,13 @@
   font-weight: 500;
   display: flex;
   align-items: center;
+  padding-right: 30px;
 }
 
 .next-service-date::before {
   content: "\1F4C5"; /* calendar emoji */
   margin-right: 6px;
+  font-size: 14px;
 }
 
 /* Status Badge */
@@ -375,52 +393,16 @@
 .status-badge {
   display: inline-flex;
   align-items: center;
-  padding: 8px 14px;
-  border-radius: 24px;
-  font-size: 14px;
-  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .status-badge::before {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.status-badge.active {
-  background-color: rgba(56, 123, 63, 0.501);
-  color: #66bb6a;
-}
-
-.status-badge.active::before {
-  background-color: #66bb6a;
-}
-
-.status-badge.inactive {
-  background-color: rgba(197, 34, 31, 0.2);
-  color: #ef5350;
-}
-
-.status-badge.inactive::before {
-  background-color: #ef5350;
-}
-
-/* Job Status Badge */
-.job-status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.job-status-badge::before {
   content: "";
   display: inline-block;
   width: 6px;
@@ -429,33 +411,65 @@
   margin-right: 6px;
 }
 
-.job-status-badge.status-complete,
-.job-status-badge.status-completed {
-  background-color: rgba(19, 115, 51, 0.2);
+.status-badge.active {
+  background-color: rgba(76, 175, 80, 0.15);
   color: #66bb6a;
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  transition: all 0.2s ease;
 }
 
-.job-status-badge.status-complete::before,
-.job-status-badge.status-completed::before {
+.status-badge.active:hover {
+  background-color: rgba(76, 175, 80, 0.25);
+}
+
+.status-badge.active::before {
   background-color: #66bb6a;
+  box-shadow: 0 0 4px rgba(102, 187, 106, 0.6);
+  animation: pulse 2s infinite;
 }
 
-.job-status-badge.status-pending {
-  background-color: rgba(176, 96, 0, 0.2);
-  color: #ffa726;
+.status-badge.inactive {
+  background-color: rgba(244, 67, 54, 0.247);
+  color: #ff7671;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+  transition: all 0.2s ease;
 }
 
-.job-status-badge.status-pending::before {
-  background-color: #ffa726;
+.status-badge.inactive:hover {
+  background-color: rgba(244, 67, 54, 0.25);
 }
 
-.job-status-badge.status-cancelled {
-  background-color: rgba(197, 34, 31, 0.2);
-  color: #ef5350;
+.status-badge.inactive::before {
+  background-color: #ff5252;
+  box-shadow: 0 0 4px rgba(255, 82, 82, 0.6);
+  animation: pulse 2s infinite;
 }
 
-.job-status-badge.status-cancelled::before {
-  background-color: #ef5350;
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+/* Job Status Badge */
+.job-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.job-status-badge.status-complete {
+  background-color: rgba(19, 115, 51, 0.2);
+  color: #8dc490;
+}
+
+.job-status-badge.status-uncomplete {
+  background-color: rgba(221, 23, 23, 0.2);
+  color: #ca9a9a;
 }
 
 /* Status Indicator Styling */
@@ -500,22 +514,17 @@
   transition: background-color 0.2s ease;
 }
 
-.toggle-btn:hover {
-  background-color: #e0e0e0;
-}
-
 /* Job History Section */
 .job-history-section {
-  background-color: #242f4d;
+  background-color: #050505;
   padding: 0;
   margin: 0;
   position: relative;
-  width: 95%;
+  width: 98%;
   margin-left: auto;
-  margin-right: 8px;
+  margin-right: 4px;
   border-radius: 0 0 12px 12px;
   overflow: hidden;
-  border: 1px solid #3a4464;
 }
 
 .job-history-header {
@@ -523,7 +532,6 @@
   align-items: center;
   margin-bottom: 0;
   padding: 8px 16px;
-  background-color: #5c6bc0;
   color: white;
   border-bottom: none;
 }
@@ -537,7 +545,7 @@
 }
 
 .job-table {
-  background-color: #1e293b;
+  background-color: #3f3f3fb0;
   border-radius: 0;
   overflow: hidden;
   box-shadow: none;
@@ -546,15 +554,13 @@
 
 .job-table-header {
   display: flex;
-  background-color: #2a3344;
-  background-image: none;
-  padding: 10px 16px;
+  background-color: #272727;
+  padding: 8px 12px;
   font-size: 12px;
   font-weight: 700;
-  color: #b0bec5;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  border-bottom: 1px solid #3a4464;
+  cursor: pointer;
 }
 
 .job-date-column,
@@ -567,14 +573,14 @@
 
 .job-date-column {
   flex: 1;
-  border-right: 1px solid #3a4464;
+  border-right: 1px solid #838383;
 }
 
 .job-status-column {
   width: 120px;
   text-align: center;
   justify-content: center;
-  border-right: 1px solid #3a4464;
+  border-right: 1px solid #838383;
 }
 
 .job-cost-column {
@@ -590,13 +596,12 @@
 
 .job-item {
   display: flex;
-  padding: 12px 16px;
-  border-bottom: 1px solid #3a4464;
+  padding: 8px 12px;
   align-items: center;
 }
 
 .job-item:nth-child(odd) {
-  background-color: #1a2133;
+  background-color: #444444c7;
 }
 
 .job-item:last-child {
@@ -608,7 +613,7 @@
   font-weight: 500;
   color: #e0e0e0;
   padding: 0 8px;
-  border-right: 1px solid #3a4464;
+  border-right: 1px solid #838383;
 }
 
 .job-status {
@@ -617,7 +622,7 @@
   display: flex;
   justify-content: center;
   padding: 0 8px;
-  border-right: 1px solid #3a4464;
+  border-right: 1px solid #838383;
 }
 
 .job-cost {
@@ -630,11 +635,11 @@
 
 /* Stats Cards */
 .stat-card {
-  background: #242f4d;
+  background: rgba(40, 40, 43, 1);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  padding: 24px;
-  border: 1px solid #3a4464;
+  padding: 18px;
+  margin-bottom: 12px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -643,7 +648,7 @@
 }
 
 .stat-card h3 {
-  margin: 0 0 16px 0;
+  margin: 0 0 5px 0;
   font-size: 16px;
   font-weight: 600;
   color: #b0bec5;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
 import { useLocation } from "react-router-dom";
-import { Property, Schedule, ClientData } from "../types/interfaces";
+import { Property, ClientSchedule, ClientData } from "../types/interfaces";
 import "../styles/pages/PropertyView.css";
 
 const PropertyView: React.FC = () => {
@@ -11,7 +11,7 @@ const PropertyView: React.FC = () => {
     client: ClientData;
   };
 
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [schedules, setSchedules] = useState<ClientSchedule[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [expandedSchedules, setExpandedSchedules] = useState<
     Record<string, boolean>
@@ -31,7 +31,7 @@ const PropertyView: React.FC = () => {
 
         // Set all active schedules to expanded by default
         const expandedMap: Record<string, boolean> = {};
-        schedulesData.forEach((schedule: Schedule) => {
+        schedulesData.forEach((schedule: ClientSchedule) => {
           if (schedule.id && schedule.isActive) {
             expandedMap[String(schedule.id)] = true;
           }
@@ -42,7 +42,7 @@ const PropertyView: React.FC = () => {
         let completed = 0;
         let revenue = 0;
 
-        schedulesData.forEach((schedule: Schedule) => {
+        schedulesData.forEach((schedule: ClientSchedule) => {
           if (schedule.jobs && Array.isArray(schedule.jobs)) {
             schedule.jobs.forEach((job) => {
               if (job.status === "complete") {
@@ -90,7 +90,6 @@ const PropertyView: React.FC = () => {
 
     const options: Intl.DateTimeFormatOptions = {
       timeZone: userTimezone,
-      year: "numeric",
       month: "short",
       weekday: "short",
       day: "numeric",
@@ -109,25 +108,27 @@ const PropertyView: React.FC = () => {
     return date.toLocaleDateString("en-US", options);
   }
 
-  const daysUntilNextService = (nextDate: string): string => {
+  const daysUntilNextService = (nextDate: string): { days: number, text: string } => {
     const today = new Date();
     const nextServiceDate = new Date(nextDate);
 
     const daysDiff = nextServiceDate.getTime() - today.getTime();
-    const daysUntil = Math.ceil(daysDiff / (1000 * 3600 * 24)) + 1;
+    const daysUntil = Math.ceil(daysDiff / (1000 * 3600 * 24));
 
-    return daysUntil > 0 ? `${daysUntil} days` : "Today";
+    // Return both the numeric value and formatted text
+    if (daysUntil === 1) {
+      return { days: 1, text: "Tomorrow" };
+    } else {
+      return { days: daysUntil, text: `${daysUntil} days` };
+    }
   }
 
-  const toggleSchedule = (scheduleId: string, isActive: boolean) => {
-    // Only toggle if the schedule is active
-    if (isActive) {
-      setExpandedSchedules((prev) => ({
-        ...prev,
-        [scheduleId]: !prev[scheduleId],
-      }));
-    }
-  };
+  const toggleSchedule = (scheduleId: string) => {
+    setExpandedSchedules((prev) => ({
+      ...prev,
+      [scheduleId]: !prev[scheduleId],
+  }));
+};
 
   const toggleAllSchedules = () => {
     setShowSchedules(!showSchedules);
@@ -233,24 +234,15 @@ const PropertyView: React.FC = () => {
                     }`}
                   >
                     <div className="schedule-summary">
-                      <div className="service-icon">
-                        {getServiceIcon(schedule.service)}
-                      </div>
 
                       <div className="service-content">
                         <div className="service-top-row">
                           <div className="service-name-container">
+                            <div className="service-icon">
+                              {getServiceIcon(schedule.service)}
+                            </div>
                             <div className="service-name">
                               {schedule.service || "Unnamed Service"}
-                            </div>
-                            <div className="service-status-badge">
-                              <span
-                                className={`status-badge ${
-                                  schedule.isActive ? "active" : "inactive"
-                                }`}
-                              >
-                                {schedule.isActive ? "ACTIVE" : "INACTIVE"}
-                              </span>
                             </div>
                           </div>
 
@@ -258,38 +250,49 @@ const PropertyView: React.FC = () => {
                             <div className="service-cost">
                               ${formatCurrency(schedule.cost)}
                             </div>
-                            {schedule.isActive && (
-                              <button
-                                className="toggle-dropdown-btn"
-                                onClick={() =>
-                                  toggleSchedule(
-                                    String(schedule.id || index),
-                                    schedule.isActive
-                                  )
-                                }
-                              >
-                                {expandedSchedules[String(schedule.id || index)]
-                                  ? "▼"
-                                  : "▲"}
-                              </button>
-                            )}
+                            <button
+                              className="toggle-dropdown-btn"
+                              onClick={() =>
+                                toggleSchedule(
+                                  String(schedule.id || index),
+                                )
+                              }
+                            >
+                              {expandedSchedules[String(schedule.id || index)]
+                                ? "▼"
+                                : "▲"}
+                            </button>
                           </div>
                         </div>
 
                         <div className="service-bottom-row">
-                          <div className="frequency-label">
-                            {getFrequencyLabel(schedule.frequency)}
+
+                          <div className="left-info">
+                            <div className="service-status-badge">
+                                <span
+                                  className={`status-badge ${
+                                    schedule.isActive ? "active" : "inactive"
+                                  }`}
+                                >
+                                  {schedule.isActive ? "ACTIVE" : "INACTIVE"}
+                                </span>
+                              </div>
+                            <div className="frequency-label-container">
+                              <span className="frequency-label">
+                                {getFrequencyLabel(schedule.frequency)}
+                              </span>
+                            </div>
                           </div>
-                          {schedule.nextDate && (
+                          {schedule.isActive && (
                             <div className="next-service-date">
-                              Next: {formatDateLocal(schedule.nextDate)}
+                              {formatDateLocal(schedule.nextDate)}
                             </div>
                           )}
                         </div>
                       </div>
                     </div>
 
-                    {schedule.isActive &&
+                    {
                       expandedSchedules[String(schedule.id || index)] && (
                         <div className="job-history-section">
                           <div className="job-table">
@@ -345,7 +348,7 @@ const PropertyView: React.FC = () => {
           </div>
 
           <div className="stat-card">
-            <h3>Revenue to Date</h3>
+            <h3>Service Total</h3>
             <div className="stat-value">${totalRevenue}</div>
           </div>
 
@@ -368,8 +371,14 @@ const PropertyView: React.FC = () => {
                   .find((s) => new Date(s.nextDate) >= today);
 
                 return upcoming
-                  ? formatDayofWeek(upcoming.nextDate) + " in " +
-                      daysUntilNextService(upcoming.nextDate)
+                  ? (() => {
+                      const serviceInfo = daysUntilNextService(upcoming.nextDate);
+                      if (serviceInfo.days === 1) {
+                        return "Tomorrow";
+                      } else {
+                        return `${formatDayofWeek(upcoming.nextDate)} in ${serviceInfo.text}`;
+                      }
+                    })()
                   : "None scheduled";
               })()}
             </div>
