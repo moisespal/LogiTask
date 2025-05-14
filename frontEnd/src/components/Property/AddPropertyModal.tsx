@@ -13,7 +13,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
     onClose, 
     clientId
 }) => {
- 
+    const [jobList, setJobList] = useState<string[]>(["mow"]);
     const [clientData, setClientData] = useState<Property_list>({
         street: "",
         city: "",
@@ -116,6 +116,27 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
         }   
     };
 
+     const getJobsNames = async () =>{
+        try {
+        // First, create the client
+        const jobList = await api.get("/api/job-names/", {
+            headers: {
+            'Content-Type': 'application/json'
+            }
+        });
+
+        if (jobList.status === 200) {
+            setJobList(jobList.data)
+        }
+        }
+        catch(err){
+        console.error("Error getting clients:", err);
+        }
+    };
+    useEffect(() => {
+        getJobsNames();
+    }, []);
+
     if (!isOpen) return null;
 
     return (
@@ -184,18 +205,19 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                             <div className="property-section-title">Service Information</div>
                             <div className="property-form-row">
                                 <div className="property-form-group">
-                                    <select 
+                                    <input 
+                                        list="service-options"
                                         name="service"
                                         value={prop.service}
                                         onChange={(e) => handlePropertyChange(index, "service", e.target.value)}
+                                        placeholder="Service Type"
                                         required
-                                    >
-                                        <option value="" disabled>
-                                            Select Service
-                                        </option>
-                                        <option value="Mowing">Mowing</option>
-                                        <option value="Other">Other</option>
-                                    </select>
+                                    />
+                                    <datalist id="service-options">
+                                        {jobList.map((service, i) => (
+                                            <option key={i} value={service} />
+                                            ))}
+                                    </datalist>
                                 </div>
                                 
                                 <div className="property-form-group">
