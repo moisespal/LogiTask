@@ -15,6 +15,7 @@ from rest_framework.response import Response
 import pytz
 from django.utils import timezone
 from django.db.models import Prefetch
+from django.db.models.functions import Lower
 
 
 
@@ -291,3 +292,12 @@ class update_balance_view(ListAPIView):
 
 #needs to be fixed
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_unique_jobs(request):
+    jobs = Schedule.objects \
+    .annotate(lower_service=Lower('service')) \
+    .values_list('lower_service', flat=True) \
+    .distinct()
+
+    return Response(jobs)

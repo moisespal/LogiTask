@@ -110,6 +110,7 @@ class Schedule(models.Model):
                     schedule.nextDate += timedelta(weeks=2)
                 elif schedule.frequency.lower() == "once":
                     schedule.isActive = False
+                    schedule.endDate = today_in_user_tz
             schedule.save()
 
     def __str__(self):
