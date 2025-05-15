@@ -24,7 +24,9 @@ const Home: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [focusedItemId, setFocusedItemId] = useState<number | null>(null);
   const [sortOption, setSortOption] = useState<string>('none');
-  const [modeType, setModeType] = useState('Client');
+  const [modeType, setModeType] = useState(()=>{
+    return localStorage.getItem('mode') || "Client";
+  });
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
@@ -107,6 +109,7 @@ const Home: React.FC = () => {
   // Event Handlers
   const handleModeClick = async () => {
     const newMode = modeType === 'Client' ? 'Daily' : 'Client';
+    localStorage.setItem('mode',newMode)
     setModeType(newMode);
     setIsModeRotated(prev => !prev);
     
