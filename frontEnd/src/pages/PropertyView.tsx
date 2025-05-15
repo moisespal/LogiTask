@@ -169,9 +169,27 @@ const PropertyView: React.FC = () => {
     }
   };
 
-  const handleStatusConfirm = () => {
+   
+
+  const handleStatusConfirm = async() => {
   // Here you would make your API call to update the status
-  console.log(`Changing schedule ${dialogData.scheduleId} to ${dialogData.newStatus ? 'ACTIVE' : 'INACTIVE'}`);
+  //console.log(`Changing schedule ${dialogData.scheduleId} to ${dialogData.newStatus ? 'ACTIVE' : 'INACTIVE'}`);
+  try{
+    console.log(dialogData.newStatus)
+    const newStatus = dialogData.newStatus
+    const response = await api.patch(`/api/update-schedule-status/${dialogData.scheduleId}/`, {isActive:newStatus})
+    if (response.status === 200){
+    setSchedules(prev =>
+      prev.map(schedule =>
+        schedule.id === dialogData.scheduleId
+          ? { ...schedule, isActive: Boolean(newStatus) }
+          : schedule
+      )
+    ); 
+    }
+  } catch(error){
+     console.error('Error toggling schedule status :', error);
+  }
   
   // Close the dialog
   setDialogOpen(false);

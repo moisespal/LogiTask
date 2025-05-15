@@ -30,7 +30,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ["id", "frequency","nextDate","endDate","service","cost"]
+        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive"]
 
 class PropertyAndSchedule(serializers.ModelSerializer):
     schedules = ScheduleSerializer(many=True)

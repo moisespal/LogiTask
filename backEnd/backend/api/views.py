@@ -301,3 +301,10 @@ def get_unique_jobs(request):
     .distinct()
 
     return Response(jobs)
+
+class UpdateScheduleStatus(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ScheduleSerializer
+    queryset = Schedule.objects.all()
+    
+    

@@ -21,5 +21,6 @@ urlpatterns = [
     path('properties-service-info/',views.PropertyServiceInfoView.as_view(),name='view-property-service-info'),
     path('createSchedule/', views.ScheduleCreate.as_view(), name='create-schedule'),
     path('get-balance/', views.update_balance_view.as_view(), name="view-balance"),
-    path('job-names/', views.get_unique_jobs, name='unique_job_names')
+    path('job-names/', views.get_unique_jobs, name='unique_job_names'),
+    path('update-schedule-status/<int:pk>/',views.UpdateScheduleStatus.as_view(),name='update-schedule-status'),
 ]
