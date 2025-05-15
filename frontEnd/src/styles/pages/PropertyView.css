@@ -369,7 +369,7 @@
   align-items: center;
 }
 
-.next-service-date {
+.next-service-date{
   font-size: 15px;
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
@@ -411,7 +411,7 @@
   margin-right: 6px;
 }
 
-.status-badge.active {
+.status-badge.active, .dialog-status.dialog-status-active {
   background-color: rgba(76, 175, 80, 0.15);
   color: #66bb6a;
   border: 1px solid rgba(76, 175, 80, 0.3);
@@ -422,13 +422,13 @@
   background-color: rgba(76, 175, 80, 0.25);
 }
 
-.status-badge.active::before {
+.status-badge.active::before, .dialog-status.dialog-status-active::before {
   background-color: #66bb6a;
   box-shadow: 0 0 4px rgba(102, 187, 106, 0.6);
   animation: pulse 2s infinite;
 }
 
-.status-badge.inactive {
+.status-badge.inactive, .dialog-status.dialog-status-inactive{
   background-color: rgba(244, 67, 54, 0.247);
   color: #ff7671;
   border: 1px solid rgba(244, 67, 54, 0.3);
@@ -439,10 +439,26 @@
   background-color: rgba(244, 67, 54, 0.25);
 }
 
-.status-badge.inactive::before {
+.status-badge.inactive::before, .dialog-status.dialog-status-inactive::before{
   background-color: #ff5252;
   box-shadow: 0 0 4px rgba(255, 82, 82, 0.6);
   animation: pulse 2s infinite;
+}
+
+.status-button {
+  cursor: pointer;
+  border: none; /* Remove default button border */
+  font-family: inherit; /* Keep consistent font */
+  transition: all 0.2s ease;
+}
+
+.status-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.status-button:active {
+  transform: scale(0.98);
 }
 
 @keyframes pulse {
@@ -674,4 +690,209 @@
   border-radius: 12px;
   margin: 16px;
   border: 1px dashed #3a4464;
+}
+
+/* ...existing code... */
+
+/* Dialog Styling for Status Change */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialog-container {
+  width: 90%;
+  max-width: 420px;
+  padding: 24px;
+  border-radius: 16px;
+  background: rgba(40, 40, 43, 1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  animation: dialog-fade-in 0.2s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dialog-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin: 0 0 20px 0;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.dialog-service-preview {
+  background: linear-gradient(to right, #31314e, #2d2d52);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dialog-service-info .top-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.dialog-service-icon {
+  font-size: 32px;
+  margin-right: 15px;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.dialog-service-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  flex: 1; /* This will make the name take available space */
+}
+
+.dialog-service-cost {
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: -0.5px;
+  margin-left: auto; /* This pushes the cost to the right */
+}
+
+.dialog-status-change {
+  padding: 12px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.dialog-status-change p {
+  font-size: 16px;
+  color: #b0bec5;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dialog-status {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-left: 10px;
+}
+
+.dialog-status::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.dialog-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+}
+
+.confirm-button {
+  background-color: #3f51b5;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-button:hover {
+  background-color: #303f9f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.cancel-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #b0bec5;
+}
+
+.cancel-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  color: white;
+}
+
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dialog-service-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  width: 100%;
+}
+
+.dialog-service-meta span {
+  font-size: 14px;
+  color: #81a4ff;
+  font-weight: 600;
+  background-color: rgba(79, 134, 235, 0.15);
+  border: 1px solid rgba(79, 134, 235, 0.3);
+  border-radius: 20px;
+  padding: 5px 12px;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+.dialog-next-service-date {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.dialog-next-service-date::before {
+  content: "\1F4C5"; /* calendar emoji */
+  margin-right: 6px;
+  font-size: 14px;
 }

@@ -3,6 +3,7 @@ import api from "../api";
 import { useLocation } from "react-router-dom";
 import { Property, ClientSchedule, ClientData } from "../types/interfaces";
 import "../styles/pages/PropertyView.css";
+import ConfirmationDialog  from "../components/Dialog/ConfirmationDialog";
 
 const PropertyView: React.FC = () => {
   const location = useLocation();
@@ -19,6 +20,16 @@ const PropertyView: React.FC = () => {
   const [showSchedules, setShowSchedules] = useState<boolean>(true);
   const [completedJobs, setCompletedJobs] = useState<number>(0);
   const [totalRevenue, setTotalRevenue] = useState<string>("0");
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogData, setDialogData] = useState<{
+    scheduleId?: number;
+    newStatus?: boolean;
+    serviceName?: string;
+    frequency?: string;
+    cost?: number;
+    nextDate?: string;
+  }>({});
 
   useEffect(() => {
     // Fetch schedules data
@@ -71,7 +82,7 @@ const PropertyView: React.FC = () => {
       });
   }, [property.id]);
 
-  const formatCurrency = (amount: number | string): string => {
+  const formatCurrency = (amount: number | string | undefined): string => {
     if (amount === undefined || amount === null) return "0.00";
     if (typeof amount === "number") {
       return amount.toFixed(2);
@@ -90,8 +101,8 @@ const PropertyView: React.FC = () => {
 
     const options: Intl.DateTimeFormatOptions = {
       timeZone: userTimezone,
+      year: "numeric",
       month: "short",
-      weekday: "short",
       day: "numeric",
     };
     return date.toLocaleDateString("en-US", options);
@@ -134,7 +145,7 @@ const PropertyView: React.FC = () => {
     setShowSchedules(!showSchedules);
   };
 
-  const getFrequencyLabel = (frequency: string) => {
+  const getFrequencyLabel = (frequency: string | undefined) => {
     switch (frequency?.toLowerCase()) {
       case "weekly":
         return "Every week";
@@ -157,6 +168,14 @@ const PropertyView: React.FC = () => {
       return "🛠️"; // Default icon for other services
     }
   };
+
+  const handleStatusConfirm = () => {
+  // Here you would make your API call to update the status
+  console.log(`Changing schedule ${dialogData.scheduleId} to ${dialogData.newStatus ? 'ACTIVE' : 'INACTIVE'}`);
+  
+  // Close the dialog
+  setDialogOpen(false);
+};
 
   return (
     <div className="property-view-container">
@@ -266,16 +285,27 @@ const PropertyView: React.FC = () => {
                         </div>
 
                         <div className="service-bottom-row">
-
                           <div className="left-info">
                             <div className="service-status-badge">
-                                <span
-                                  className={`status-badge ${
+                                <button
+                                  className={`status-badge status-button ${
                                     schedule.isActive ? "active" : "inactive"
                                   }`}
+                                  onClick={() => {
+                                    setDialogData({
+                                      scheduleId: schedule.id,
+                                      newStatus: !schedule.isActive,
+                                      serviceName: schedule.service,
+                                      frequency: schedule.frequency,
+                                      cost: schedule.cost,
+                                      nextDate: schedule.nextDate,
+                                    });
+                                    setDialogOpen(true);
+                                    console.log("Clicked status button", schedule.id, schedule.isActive);
+                                  }}
                                 >
                                   {schedule.isActive ? "ACTIVE" : "INACTIVE"}
-                                </span>
+                                </button>
                               </div>
                             <div className="frequency-label-container">
                               <span className="frequency-label">
@@ -283,11 +313,15 @@ const PropertyView: React.FC = () => {
                               </span>
                             </div>
                           </div>
-                          {schedule.isActive && (
+                          {schedule.isActive ? (
                             <div className="next-service-date">
                               {formatDateLocal(schedule.nextDate)}
                             </div>
-                          )}
+                          ) :
+                            <div className="next-service-date">
+                              {"Ended on " + formatDateLocal(schedule.endDate)}
+                            </div>
+                          }
                         </div>
                       </div>
                     </div>
@@ -385,6 +419,46 @@ const PropertyView: React.FC = () => {
           </div>
         </div>
       </div>
+      <ConfirmationDialog
+        open={dialogOpen}
+        title="Confirm Status Change"
+        message={
+          <>
+            <div className="dialog-service-preview">
+              <div className="dialog-service-info">
+                <div className="top-row">
+                  <div className="service-icon">
+                    {getServiceIcon(dialogData.serviceName || "")}
+                  </div>
+                  <div className="dialog-service-name">
+                    {dialogData.serviceName || "Unnamed Service"}
+                  </div>
+                  <div className="dialog-service-cost">
+                    ${formatCurrency(dialogData.cost)}
+                  </div>
+                </div>
+                
+
+                <div className="dialog-service-meta">
+                  <span>{getFrequencyLabel(dialogData.frequency)}</span>
+                  <div className="dialog-next-service-date">
+                    {dialogData.nextDate ? formatDateLocal(dialogData.nextDate) : "No date set"}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="dialog-status-change">
+              <p>Change status to:
+                <span className={`dialog-status dialog-status-${dialogData.newStatus ? 'active' : 'inactive'}`}>
+                  {dialogData.newStatus ? "ACTIVE" : "INACTIVE"}
+                </span>
+              </p>
+            </div>
+          </>
+        }
+        onConfirm={handleStatusConfirm}
+        onCancel={() => setDialogOpen(false)}
+      />
     </div>
   );
 };
