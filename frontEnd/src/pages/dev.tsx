@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../api';
 import AddSchedule from '../components/Property/AddSchedule';
 const Dev: React.FC = () => {
@@ -11,7 +11,7 @@ const Dev: React.FC = () => {
     e.preventDefault();
 
     try{
-      const response = await api.get("/api/properties-service-info/?client_id=34", {
+      const response = await api.get("/api/properties-service-info/?client_id=54", {
         
       });
       if(response.status===201){
@@ -24,6 +24,13 @@ const Dev: React.FC = () => {
         alert(`Error: ${err}`);
     }
   }
+
+  useEffect(() => {
+    const fetchBalanceHistory = async () => {
+      await api.get("/api/balance-history/44/", {});
+    };
+    fetchBalanceHistory();
+  },[]);
   
   
   return(

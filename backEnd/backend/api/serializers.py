@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule,Job,Payment,Company,Balance
+from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -149,3 +149,12 @@ class BalanceSerializer(serializers.ModelSerializer):
             "id": {"read_only": True},
             "updated_at": {"read_only": True},
         }
+
+# serializers.py
+class BalanceHistorySerializer(serializers.ModelSerializer):
+    jobs = JobSerializer(many=True)
+    payments = PaymentSerializer(many=True)
+
+    class Meta:
+        model = BalanceHistory
+        fields = ['id', 'delta', 'new_balance', 'adjustment', 'created_at', 'jobs', 'payments']
