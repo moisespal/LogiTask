@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { Property, ClientSchedule, ClientData } from "../types/interfaces";
 import "../styles/pages/PropertyView.css";
 import ConfirmationDialog  from "../components/Dialog/ConfirmationDialog";
+import AddSchedule from "../components/Property/AddSchedule";
 
 const PropertyView: React.FC = () => {
   const location = useLocation();
@@ -20,6 +21,17 @@ const PropertyView: React.FC = () => {
   const [showSchedules, setShowSchedules] = useState<boolean>(true);
   const [completedJobs, setCompletedJobs] = useState<number>(0);
   const [totalRevenue, setTotalRevenue] = useState<string>("0");
+
+  const [addScheduleOpen, setAddScheduleOpen] = useState<boolean>(false);
+  const handleAddScheduleClose = (newSchedule?: ClientSchedule) => {
+    setAddScheduleOpen(false);
+
+    if (newSchedule) {
+      console.log("New schedule added:", newSchedule);
+      setSchedules((prevSchedules) => [...prevSchedules, newSchedule]);
+    }
+
+  };  
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogData, setDialogData] = useState<{
@@ -96,8 +108,14 @@ const PropertyView: React.FC = () => {
   };
 
   const formatDateLocal = (dateString: string): string => {
+
+    if (!dateString) return "No date available";
+
     const userTimezone = localStorage.getItem("userTimeZone") || "UTC";
-    const date = new Date(dateString);
+    
+    // Parse date components
+    const [year, month, day] = dateString.split('T')[0].split('-');
+    const date = new Date(Number(year), Number(month) - 1, Number(day), 12, 0, 0);
 
     const options: Intl.DateTimeFormatOptions = {
       timeZone: userTimezone,
@@ -105,19 +123,23 @@ const PropertyView: React.FC = () => {
       month: "short",
       day: "numeric",
     };
-    return date.toLocaleDateString("en-US", options);
-  }
+  
+  return date.toLocaleDateString("en-US", options);
+}
 
   const formatDayofWeek = (dateString: string): string => {
+    if (!dateString) return "No date available";
     const userTimezone = localStorage.getItem("userTimeZone") || "UTC";
-    const date = new Date(dateString);
-
+    const [year, month, day] = dateString.split('T')[0].split('-');
+    const date = new Date(Number(year), Number(month) - 1, Number(day), 12, 0, 0);
+    
     const options: Intl.DateTimeFormatOptions = {
       timeZone: userTimezone,
       weekday: "long",
-    };
-    return date.toLocaleDateString("en-US", options);
-  }
+  };
+  
+  return date.toLocaleDateString("en-US", options);
+}
 
   const daysUntilNextService = (nextDate: string): { days: number, text: string } => {
     const today = new Date();
@@ -195,6 +217,11 @@ const PropertyView: React.FC = () => {
   setDialogOpen(false);
 };
 
+  const handleAddScheduleClick = () => {
+    setAddScheduleOpen(true);
+    console.log("Add Schedule clicked");
+  };
+
   return (
     <div className="property-view-container">
       {/* Property Header */}
@@ -247,7 +274,7 @@ const PropertyView: React.FC = () => {
         <div className="schedules-column">
           <div className="schedules-header">
             <h2>SCHEDULES</h2>
-            <button className="add-schedule-btn">+</button>
+            <button className="add-schedule-btn" onClick={handleAddScheduleClick}>+</button>
             <button
               className="toggle-dropdown-btn"
               onClick={toggleAllSchedules}
@@ -476,6 +503,11 @@ const PropertyView: React.FC = () => {
         }
         onConfirm={handleStatusConfirm}
         onCancel={() => setDialogOpen(false)}
+      />
+      <AddSchedule 
+        isOpen={addScheduleOpen}
+        onClose={handleAddScheduleClose}
+        propertyId={property.id}
       />
     </div>
   );

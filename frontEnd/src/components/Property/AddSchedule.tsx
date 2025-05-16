@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/components/AddPropertyModal.css';
 import api from '../../api';
+import { ClientSchedule } from '../../types/interfaces';
 
 interface AddPropertyModalProps {
     isOpen: boolean;
-    onClose: () => void;
+    onClose: (newSchedule?: ClientSchedule) => void;
     propertyId: number;
 }
 
@@ -83,13 +84,8 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
                 );
                 
                 // Close modal first
-                onClose();
+                onClose(propertyResponse.data);
                 
-                // This will trigger a reload of all clients in the parent component
-                // We're using a small delay to ensure the modal is fully closed first
-                setTimeout(() => {
-                    window.dispatchEvent(new CustomEvent('reload-clients'));
-                }, 100);
             } else {
                 alert("Failed to add property.");
             }
@@ -124,9 +120,9 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="property-modal-overlay" onClick={onClose}>
+        <div className="property-modal-overlay" onClick={() => onClose()}>
             <div className="property-modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="property-modal-close-btn" onClick={onClose}>
+                <button className="property-modal-close-btn" onClick={() => onClose()}>
                     <i className="fas fa-times"></i>
                 </button>
                 
@@ -201,7 +197,7 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
                 </div>
                     
                     <div className="property-form-actions">
-                        <button type="button" className="property-btn-secondary" onClick={onClose}>
+                        <button type="button" className="property-btn-secondary" onClick={() => onClose()}>
                             <i className="fas fa-times"></i> Cancel
                         </button>
                         <button type="submit" className="property-btn-primary">
