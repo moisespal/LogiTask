@@ -87,15 +87,20 @@ const Home: React.FC = () => {
       console.error('Error fetching jobs:', error);
     }
   };
-
+  function getLocalISOString() {
+    const now = new Date();
+    const tzOffset = now.getTimezoneOffset() * 60000; // offset in milliseconds
+    const localTime = new Date(now.getTime() - tzOffset);
+    return localTime.toISOString().slice(0, -1); // remove trailing 'Z'
+  }
   // Handle job completion toggle
   const handleJobComplete = async (jobId: number) => {
     try {
       const job = jobs.find(job => job.id === jobId);
       if (!job) return;
       const newStatus = job.status === 'complete' ? 'uncomplete' : 'complete';
-      
-      await api.patch(`/api/Update-Schedule/${jobId}/`, { status: newStatus })
+      const dateTime = job.status === 'complete' ? null : getLocalISOString();
+      await api.patch(`/api/Update-Schedule/${jobId}/`, { status: newStatus, complete_date:dateTime })
       setJobs(jobs.map(job => 
         job.id === jobId ? { ...job, status: newStatus } : job
       ));

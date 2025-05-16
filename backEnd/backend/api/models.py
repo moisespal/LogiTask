@@ -125,6 +125,7 @@ class Job(models.Model):
     client = models.ForeignKey(Client,on_delete=models.CASCADE)
     jobDate = models.DateField(null=False,blank=False)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='uncomplete')
+    complete_date = models.DateTimeField(null=True, blank=True)
     cost = models.DecimalField(max_digits=10,decimal_places=2)
     is_applied_to_balance = models.BooleanField(default=False)
 
@@ -132,7 +133,7 @@ class Payment(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10,decimal_places=2)
     paymentType = models.CharField(max_length=50,default='cash')
-    paymentDate = models.DateField(auto_now_add=True)
+    paymentDate = models.DateTimeField(auto_now_add=True)
     is_applied_to_balance = models.BooleanField(default=False)
 class Balance(models.Model):
     client = models.OneToOneField(Client, on_delete=models.CASCADE)
