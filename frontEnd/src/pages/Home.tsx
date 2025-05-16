@@ -38,23 +38,8 @@ const Home: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isGeneratingJobs, setIsGeneratingJobs] = useState(false);
   
-  // Load clients when component mounts
-  useEffect(() => {
-    getClients();
-  }, []);
-  
-  // Listen for reload-clients event
-  useEffect(() => {
-    const handleReloadClients = () => {
-      getClients();
-    };
-    
-    window.addEventListener('reload-clients', handleReloadClients);
-    
-    return () => {
-      window.removeEventListener('reload-clients', handleReloadClients);
-    };
-  }, []);
+ 
+ 
 
   const getClients = () => {
     api
@@ -267,6 +252,14 @@ const Home: React.FC = () => {
   const handlePropertyModalStateChange = (isOpen: boolean) => {
     setIsPropertyModalOpen(isOpen);
   };
+   
+  useEffect(()=>{
+    if (modeType==="Client"){
+      getClients();
+    }else{
+      fetchTodaysJobs();
+    }
+  }, [modeType]);
   
   return (
     <div

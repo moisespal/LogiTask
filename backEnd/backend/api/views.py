@@ -1,9 +1,9 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance
+from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory
 from rest_framework.generics import ListAPIView,UpdateAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
@@ -307,4 +307,10 @@ class UpdateScheduleStatus(UpdateAPIView):
     serializer_class = ScheduleSerializer
     queryset = Schedule.objects.all()
     
-    
+
+# views.py (DRF ViewSet or APIView)
+class ClientLedgerAPIView(APIView):
+    def get(self, request, client_id):
+        history = BalanceHistory.objects.filter(balance__client_id=client_id)
+        serializer = BalanceHistorySerializer(history, many=True)
+        return Response(serializer.data)
