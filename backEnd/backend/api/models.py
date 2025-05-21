@@ -142,23 +142,33 @@ class Balance(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def recalculate_balance(self):
-
         with transaction.atomic():
-            unapplied_jobs = Job.objects.filter(client=self.client,  is_applied_to_balance=False, status='complete')
+            unapplied_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete')
             unapplied_payments = Payment.objects.filter(client=self.client, is_applied_to_balance=False)
 
-            # Totals
             total_jobs = unapplied_jobs.aggregate(Sum("cost"))["cost__sum"] or 0
             total_payments = unapplied_payments.aggregate(Sum("amount"))["amount__sum"] or 0
 
-            #convert to decimal
             total_jobs = Decimal(total_jobs)
-            total_payments  = Decimal(total_payments)
-            # Update current balance using balance adjustment
+            total_payments = Decimal(total_payments)
             delta = total_payments - total_jobs + Decimal(self.balance_adjustment)
+
             self.current_balance += delta
 
-            # Clear the adjustment once it's applied
+            # Save current balance
+            self.save()
+
+            # Create balance history record
+            history = BalanceHistory.objects.create(
+                balance=self,
+                delta=delta,
+                new_balance=self.current_balance,
+                adjustment=self.balance_adjustment
+            )
+            history.jobs.set(unapplied_jobs)
+            history.payments.set(unapplied_payments)
+
+            # Reset adjustment
             self.balance_adjustment = 0.0
             self.save()
 
@@ -167,3 +177,17 @@ class Balance(models.Model):
             unapplied_payments.update(is_applied_to_balance=True)
 
         return self.current_balance
+
+class BalanceHistory(models.Model):
+    balance = models.ForeignKey(Balance, on_delete=models.CASCADE, related_name='history')
+    delta = models.DecimalField(max_digits=10, decimal_places=2)
+    new_balance = models.DecimalField(max_digits=10, decimal_places=2)
+    adjustment = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # Store related job/payment IDs for traceability
+    jobs = models.ManyToManyField("Job")
+    payments = models.ManyToManyField("Payment")
+
+    def __str__(self):
+        return f"Change of {self.delta} on {self.created_at.date()}"

@@ -97,7 +97,7 @@ export interface ClientSchedule {
   service: string;
   cost: number;
   nextDate: string;
-  endDate: string;
+  endDate: string | null; // Updated to allow null
   isActive: boolean;
   jobs: {
     id: number;
