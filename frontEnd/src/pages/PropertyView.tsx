@@ -154,7 +154,36 @@ const PropertyView: React.FC = () => {
     } else {
       return { days: daysUntil, text: `${daysUntil} days` };
     }
+  };
+  
+  const getTodayInUserTimezone = (): string => {
+    const userTimezone = localStorage.getItem("userTimeZone") || "CST";
+
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: userTimezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+
+    const parts = formatter.formatToParts(now);
+    const month = parts.find(part => part.type === 'month')?.value;
+    const day = parts.find(part => part.type === 'day')?.value;
+    const year = parts.find(part => part.type === 'year')?.value;
+
+    return `${year}-${month}-${day}`;
   }
+
+  const capitalizeWords = (text: string | undefined): string => {
+  if (!text) return '';
+  
+  // Split by spaces, capitalize each word, then join back
+  return text
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
 
   const toggleSchedule = (scheduleId: string) => {
     setExpandedSchedules((prev) => ({
@@ -191,27 +220,50 @@ const PropertyView: React.FC = () => {
     }
   };
 
-   
-
-  const handleStatusConfirm = async() => {
-  // Here you would make your API call to update the status
-  //console.log(`Changing schedule ${dialogData.scheduleId} to ${dialogData.newStatus ? 'ACTIVE' : 'INACTIVE'}`);
-  try{
-    console.log(dialogData.newStatus)
-    const newStatus = dialogData.newStatus
-    const response = await api.patch(`/api/update-schedule-status/${dialogData.scheduleId}/`, {isActive:newStatus})
-    if (response.status === 200){
-    setSchedules(prev =>
-      prev.map(schedule =>
-        schedule.id === dialogData.scheduleId
-          ? { ...schedule, isActive: Boolean(newStatus) }
-          : schedule
-      )
-    ); 
+const handleStatusConfirm = async() => {
+  try {
+    console.log(dialogData.newStatus);
+    const newStatus = dialogData.newStatus;
+    
+    // Create the request payload based on status
+   const payload: { isActive: boolean; endDate: string | null } = { 
+      isActive: newStatus ?? false,
+      endDate: newStatus === false ? getTodayInUserTimezone() : null
+    };
+    
+    // If setting to inactive, add today's date as the end date
+    if (newStatus === false) {
+      const today = getTodayInUserTimezone();
+      payload.endDate = today;
+      console.log("End date set to:", today);
+      console.log("Payload for deactivation:", payload);
     }
-  } catch(error){
-     console.error('Error toggling schedule status :', error);
-  }
+    
+    const response = await api.patch(
+      `/api/update-schedule-status/${dialogData.scheduleId}/`, 
+      payload
+    );
+    
+    if (response.status === 200) {
+      setSchedules(prev =>
+        prev.map(schedule =>
+          schedule.id === dialogData.scheduleId
+            ? { 
+                ...schedule, 
+                isActive: Boolean(newStatus),
+                endDate: payload.endDate
+              }
+            : schedule
+        )
+      );   
+      setExpandedSchedules(prev => ({
+        ...prev,
+        [dialogData.scheduleId!.toString()]: Boolean(newStatus),
+      }));
+    }
+  } catch(error) {
+    console.error('Error toggling schedule status:', error);
+}
   
   // Close the dialog
   setDialogOpen(false);
@@ -225,6 +277,12 @@ const PropertyView: React.FC = () => {
   return (
     <div className="property-view-container">
       {/* Property Header */}
+      <div className="return-button-container">
+        <button className="return-button" onClick={() => window.history.back()}>
+          <i className="fa-solid fa-arrow-left"></i>
+          <span>Back</span>
+        </button>
+      </div>
       <div className="property-header-card">
         <div className="property-map">
           <img
@@ -306,7 +364,7 @@ const PropertyView: React.FC = () => {
                               {getServiceIcon(schedule.service)}
                             </div>
                             <div className="service-name">
-                              {schedule.service || "Unnamed Service"}
+                              {capitalizeWords(schedule.service) || "Unnamed Service"}
                             </div>
                           </div>
 
@@ -364,7 +422,7 @@ const PropertyView: React.FC = () => {
                             </div>
                           ) :
                             <div className="next-service-date">
-                              {"Ended on " + formatDateLocal(schedule.endDate)}
+                              {"Ended on " + formatDateLocal(schedule.endDate || "")}
                             </div>
                           }
                         </div>
