@@ -18,6 +18,7 @@ interface balance {
   current_balance: string;
   id: number;
   update_at: Date;
+  estimated_balance:string;
 }
 
 const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
@@ -87,7 +88,7 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
 
     try {
         // Create the property associated with the client
-        const balanceResponse = await api.get(`/api/get-balance/?client_id=${client_id}`);
+        const balanceResponse = await api.get(`/api/get_estimated_balance/${client_id}/`);
         if (balanceResponse.status === 200) {
             // Reset form fields
             
@@ -168,11 +169,11 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
           <div className="outstanding-balance">
             <span>Outstanding Balance</span>
             <span 
-              style={{ color: balance && parseFloat(balance.current_balance) < 0 ? 'red' : 'green' }}
+              style={{ color: balance && parseFloat(balance.estimated_balance) < 0 ? 'red' : 'green' }}
             >
-                {balance && parseFloat(balance.current_balance) < 0 
-                ? `$${Math.abs(parseFloat(balance.current_balance)).toFixed(2)}` 
-                : `$${parseFloat(balance?.current_balance || '0').toFixed(2)}`}
+                {balance && parseFloat(balance.estimated_balance) < 0 
+                ? `$${Math.abs(parseFloat(balance.estimated_balance)).toFixed(2)}` 
+                : `$${parseFloat(balance?.estimated_balance || '0').toFixed(2)}`}
             </span>
           </div>
         </div>

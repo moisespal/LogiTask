@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory
+from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -144,17 +144,26 @@ class BalanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Balance
-        fields = ["id", "balance_adjustment","current_balance", "updated_at"]
+        fields = ["id","current_balance", "updated_at"]
         extra_kwargs = {
             "id": {"read_only": True},
             "updated_at": {"read_only": True},
+        }
+
+class BalanceAdjustmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BalanceAdjustment
+        fields = ["id", "balance","amount","reason","created_at"]
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "created_at": {"read_only": True},
         }
 
 # serializers.py
 class BalanceHistorySerializer(serializers.ModelSerializer):
     jobs = JobSerializer(many=True)
     payments = PaymentSerializer(many=True)
-
+    adjustments = BalanceAdjustmentSerializer(many=True)
     class Meta:
         model = BalanceHistory
-        fields = ['id', 'delta', 'new_balance', 'adjustment', 'created_at', 'jobs', 'payments']
+        fields = ['id', 'delta', 'new_balance', 'adjustment', 'created_at', 'jobs', 'payments','adjustments']

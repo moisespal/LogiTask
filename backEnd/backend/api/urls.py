@@ -23,5 +23,6 @@ urlpatterns = [
     path('get-balance/', views.update_balance_view.as_view(), name="view-balance"),
     path('job-names/', views.get_unique_jobs, name='unique_job_names'),
     path('update-schedule-status/<int:pk>/',views.UpdateScheduleStatus.as_view(),name='update-schedule-status'),
-    path('balance-history/<int:client_id>/', views.ClientLedgerAPIView.as_view(),name='client-ledger-histoy')
+    path('balance-history/<int:client_id>/', views.ClientLedgerAPIView.as_view(),name='client-ledger-histoy'),
+    path('get_estimated_balance/<int:client_id>/', views.estimated_balance_view.as_view(), name='view-estimated-balance'),
 ]

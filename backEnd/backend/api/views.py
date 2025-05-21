@@ -1,9 +1,9 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory
+from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
 from rest_framework.generics import ListAPIView,UpdateAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
@@ -314,3 +314,28 @@ class ClientLedgerAPIView(APIView):
         history = BalanceHistory.objects.filter(balance__client_id=client_id)
         serializer = BalanceHistorySerializer(history, many=True)
         return Response(serializer.data)
+
+class estimated_balance_view(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request , client_id):
+        if not client_id:
+            return Response({"error": "client_id is required"}, status=400)
+
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return Response({"error": "Client not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+        #get balance table
+        balance, _ = Balance.objects.get_or_create(client=client)
+
+        #recalculate
+        estimated_balance = balance.calculate_estimated_balace()
+       
+        
+        serializer = BalanceSerializer(balance)
+        data = serializer.data
+        data['estimated_balance'] = str(estimated_balance)  
+        return Response(data)
