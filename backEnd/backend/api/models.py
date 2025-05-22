@@ -77,41 +77,55 @@ class Schedule(models.Model):
     isActive = models.BooleanField(default=True)
     
     @classmethod
-    def generate_jobs(cls, user):
-        try:
-            profile = userProfile.objects.get(user=user)
-            user_timezone = pytz.timezone(profile.timezone)
-        except (userProfile.DoesNotExist, pytz.exceptions.UnknownTimeZoneError):
-            user_timezone = pytz.UTC
+    def generate_jobs(cls, user=None):
+        if user:
+            try:
+                profile = userProfile.objects.get(user=user)
+                user_timezone = pytz.timezone(profile.timezone)
+            except (userProfile.DoesNotExist, pytz.exceptions.UnknownTimeZoneError):
+                user_timezone = pytz.UTC
+            users = [profile]
+        else:
+            users = userProfile.objects.all()
+        
+        for profile in users:
+            try:
+                user_timezone = pytz.timezone(profile.timezone)
+            except pytz.exceptions.UnknownTimeZoneError:
+                user_timezone = pytz.UTC
 
-        # Get current UTC time and convert to user's timezone
-        utc_now = timezone.now()
-        local_now = utc_now.astimezone(user_timezone)
-        today_in_user_tz = local_now.date()
+            user = profile.user
+            local_now = timezone.now().astimezone(user_timezone)
+            today_in_user_tz = local_now.date()
 
-        schedules = cls.objects.filter(
-            nextDate=today_in_user_tz,
-            isActive=True,
-            property__client__author=user  # Only get schedules for this user
-        )
+            schedules = cls.objects.filter(
+                nextDate=today_in_user_tz,
+                isActive=True,
+                property__client__author=user
+            )
 
-        for schedule in schedules:
-            Job.objects.create(schedule=schedule, cost=schedule.cost, jobDate=schedule.nextDate, client=schedule.property.client)
-            if schedule.endDate and schedule.nextDate > schedule.endDate:
-                schedule.isActive = False
-                schedule.save()
-                continue
-            else:
-                if schedule.frequency.lower() == "daily":
-                    schedule.nextDate += timedelta(days=1)
-                elif schedule.frequency.lower() == "weekly":
-                    schedule.nextDate += timedelta(weeks=1)
-                elif schedule.frequency.lower() == "biweekly":
-                    schedule.nextDate += timedelta(weeks=2)
-                elif schedule.frequency.lower() == "once":
+            for schedule in schedules:
+                Job.objects.create(
+                    schedule=schedule,
+                    cost=schedule.cost,
+                    jobDate=schedule.nextDate,
+                    client=schedule.property.client
+                )
+
+                if schedule.endDate and schedule.nextDate > schedule.endDate:
                     schedule.isActive = False
-                    schedule.endDate = today_in_user_tz
-            schedule.save()
+                else:
+                    if schedule.frequency.lower() == "daily":
+                        schedule.nextDate += timedelta(days=1)
+                    elif schedule.frequency.lower() == "weekly":
+                        schedule.nextDate += timedelta(weeks=1)
+                    elif schedule.frequency.lower() == "biweekly":
+                        schedule.nextDate += timedelta(weeks=2)
+                    elif schedule.frequency.lower() == "once":
+                        schedule.isActive = False
+                        schedule.endDate = today_in_user_tz
+
+                schedule.save()
 
     def __str__(self):
         return f"{self.service} - {self.nextDate}"

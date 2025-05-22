@@ -100,10 +100,7 @@ const Home: React.FC = () => {
     setModeType(newMode);
     setIsModeRotated(prev => !prev);
     
-    if (newMode === 'Daily') {
-      // When switching to Daily mode, generate and fetch jobs
-      await generateTodaysJobs();
-    }
+    
     
     // Reset focused item when switching modes
     setFocusedItemId(null);
