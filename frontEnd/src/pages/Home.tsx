@@ -5,11 +5,14 @@ import ClientProperties from '../components/Client/ClientProperties';
 import TopBar from '../components/Layout/TopBar';
 import BottomBar from '../components/Layout/BottomBar';
 import AddClientModal from '../components/Client/AddClientModal';
-import DailyListItem from '../components/Daily/DailyListItem';
 import { Client, Job } from '../types/interfaces';
 import api from "../api"
 import '../styles/pages/App.css';
 
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import SortableDailyList from '../components/Daily/SortableDailyList';
+import { AnimatePresence } from 'framer-motion';
 // Utility functions
 
 const renderStars = (count: number): JSX.Element[] => (
@@ -18,6 +21,17 @@ const renderStars = (count: number): JSX.Element[] => (
 
 const getTodayDayString = (): string =>
   new Date().toLocaleDateString('en-US', { weekday: 'long' });
+
+const restrictWithinWindow = ({ transform }: { transform: { x: number; y: number; scaleX: number; scaleY: number } }) => {
+  const windowWidth = window.innerWidth;
+  const maxRightDistance = windowWidth * 0; 
+  const maxLeftDistance = windowWidth * 0.62;
+  
+  return {
+    ...transform,
+    x: Math.max(-maxLeftDistance, Math.min(maxRightDistance, transform.x)),
+  };
+};
 
 // Main Component
 const Home: React.FC = () => {
@@ -36,10 +50,8 @@ const Home: React.FC = () => {
   // New job-related states
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  const [isGeneratingJobs, setIsGeneratingJobs] = useState(false);
   
- 
- 
+  const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
 
   const getClients = () => {
     api
@@ -52,19 +64,6 @@ const Home: React.FC = () => {
         .catch((err) => alert(err));
   };
 
-  // Function to generate today's jobs
-  const generateTodaysJobs = async () => {
-    try {
-      setIsGeneratingJobs(true);
-      await api.get('/api/generateJobs/');
-      await fetchTodaysJobs(); // Fetch jobs after generation
-    } catch (error) {
-      console.error('Error generating jobs:', error);
-    } finally {
-      setIsGeneratingJobs(false);
-    }
-  };
-
   // Function to fetch today's jobs
   const fetchTodaysJobs = async () => {
     try {
@@ -74,9 +73,11 @@ const Home: React.FC = () => {
       console.error('Error fetching jobs:', error);
     }
   };
+
   function getUTCISOString() {
     return new Date().toISOString();
   }
+
   // Handle job completion toggle
   const handleJobComplete = async (jobId: number) => {
     try {
@@ -99,8 +100,6 @@ const Home: React.FC = () => {
     localStorage.setItem('mode',newMode)
     setModeType(newMode);
     setIsModeRotated(prev => !prev);
-    
-    
     
     // Reset focused item when switching modes
     setFocusedItemId(null);
@@ -141,8 +140,6 @@ const Home: React.FC = () => {
   // Keyboard Navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Create a more explicit check for modals being open
-      // and return early to prevent search from being affected
       if (isAddClientModalOpen || isPropertyModalOpen) {
         return;
       }
@@ -259,6 +256,38 @@ const Home: React.FC = () => {
       fetchTodaysJobs();
     }
   }, [modeType]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (over && active.id !== over.id) {
+      setJobs((currentJobs) => {
+        const oldIndex = currentJobs.findIndex(job => job.id === active.id);
+        const newIndex = currentJobs.findIndex(job => job.id === over.id);
+        
+        const reorderedJobs = [...currentJobs];
+        const [movedJob] = reorderedJobs.splice(oldIndex, 1);
+        reorderedJobs.splice(newIndex, 0, movedJob);
+        
+        return reorderedJobs;
+      });
+    }
+  };
+
+  const toggleDraggingEnabled = (isDisabled: boolean) => {
+  setIsDraggingDisabled(isDisabled);
+};
   
   return (
     <div
@@ -318,32 +347,44 @@ const Home: React.FC = () => {
         ) : (
           // Daily jobs list rendering
           <>
-            {isGeneratingJobs ? (
-              <div className="loading-jobs">
-                Generating today's jobs...
-              </div>
-            ) : jobs.length === 0 ? (
+            {jobs.length === 0 ? (
               <div className="no-jobs-message">
                 No jobs scheduled for today
               </div>
             ) : (
-              jobs.map((job: Job) => (
-                <div 
-                  key={job.id}
-                  className="job-wrapper"
-                  data-job-id={job.id}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+                modifiers={[restrictWithinWindow]}
+              >
+                <SortableContext
+                  items={jobs.map(job => job.id)}
+                  strategy={verticalListSortingStrategy}
                 >
-                  <DailyListItem
-                    job={job}
-                    isFocused={focusedItemId === job.id}
-                    onClick={(id) => {
-                      setFocusedItemId(id);
-                      setSelectedJob(job);
-                    }}
-                    onComplete={handleJobComplete}
-                  />
-                </div>
-              ))
+                  <AnimatePresence>
+                    {jobs.map((job: Job) => (
+                      <div 
+                        key={job.id}
+                        className="job-wrapper"
+                        data-job-id={job.id}
+                      >
+                        <SortableDailyList
+                          job={job}
+                          isFocused={focusedItemId === job.id}
+                          onClick={(id) => {
+                            setFocusedItemId(id);
+                            setSelectedJob(job);
+                          }}
+                          onComplete={handleJobComplete}
+                          isDisabled={isDraggingDisabled}
+                          onModalToggle={toggleDraggingEnabled}
+                        />
+                      </div>
+                    ))}
+                  </AnimatePresence>
+                </SortableContext>
+              </DndContext>
             )}
           </>
         )}

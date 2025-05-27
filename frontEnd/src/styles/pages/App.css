@@ -60,3 +60,9 @@ body, html, #root {
   display: flex;
   flex-direction: column;
   left: 100px;}
+
+
+.job-wrapper {
+  width: 100%;
+  overflow: visible;   /* Allow visual overflow */
+}
