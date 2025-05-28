@@ -33,6 +33,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
     useEffect(() => {
         if (!isOpen) return;
         
+        getJobsNames();
         const preventKeyboardEventPropagation = (e: KeyboardEvent) => {
             // Prevent event propagation for any keyboard events when modal is open
             e.stopPropagation();
@@ -133,9 +134,6 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
         console.error("Error getting clients:", err);
         }
     };
-    useEffect(() => {
-        getJobsNames();
-    }, []);
 
     if (!isOpen) return null;
 

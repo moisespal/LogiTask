@@ -89,7 +89,6 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
       if (res.data && res.data.length > 0) {
         // Company exists
         setHasCompany(true);
-
         // Store in localStorage
         localStorage.setItem("companyName", res.data[0].companyName);
         if (res.data[0].logo) {
