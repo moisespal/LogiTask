@@ -304,7 +304,7 @@ const Home: React.FC = () => {
       }}
     >      
       {modeType === 'Client' && selectedClient && (
-        <ClientCalendar visits={[]} client_id={1} />
+        <ClientCalendar visits={[]} client_id={focusedItemId?focusedItemId:null} />
       )}
     
       <TopBar

@@ -10,7 +10,7 @@ import api from '../../api';
 // Interface for the component props
 interface CalendarProps {
   visits: Visit[];
-  client_id: number;
+  client_id: number|null;
 }
 
 interface balance {
@@ -85,29 +85,34 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
   
   const handleClick = async (e: React.FormEvent) => {
     e.preventDefault();
+    if(client_id===null || showBalance === true){
+      return;
+    }
+    else{
+      try {
+          // Create the property associated with the client
+          const balanceResponse = await api.get(`/api/get_estimated_balance/${client_id}/`);
+          if (balanceResponse.status === 200) {
+              // Reset form fields
+              
+              setBalance(balanceResponse.data)
+                  
+          }
+          else {
+              alert("Failed to get balance.");
+          }
 
-    try {
-        // Create the property associated with the client
-        const balanceResponse = await api.get(`/api/get_estimated_balance/${client_id}/`);
-        if (balanceResponse.status === 200) {
-            // Reset form fields
-            
-            setBalance(balanceResponse.data)
-                
-        }
-        else {
-            alert("Failed to get balance.");
-        }
+      } catch (err) {
+          console.error("Error adding property:", err);
+          alert(`Error: ${err}`);
+      }   
+    }
 
-    } catch (err) {
-        console.error("Error adding property:", err);
-        alert(`Error: ${err}`);
-    }   
-
+    
+};
     useEffect(() => {
       setShowBalance(false);
     }, [client_id]);
-};
   return (
     <Draggable onStart={handleDragStart}>
       <div className="calendar-container" ref={calendarRef}>
