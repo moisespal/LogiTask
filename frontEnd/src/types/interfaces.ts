@@ -50,14 +50,6 @@ export interface Property_list {
   schedules: Schedule[];
 }
 
-export interface PropertyWithID {
-  id: number;
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  schedules: Schedule[];
-}
 export interface Job {
   id: number;
   jobDate: string;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "../../styles/components/ClientProperties.css";
 import AddPropertyModal from "../Property/AddPropertyModal";
 import { useNavigate } from "react-router-dom";
-import { ClientDataID, PropertyWithID} from "../../types/interfaces";
+import { ClientDataID} from "../../types/interfaces";
 
 interface ClientPropertiesProps {
   client: ClientDataID;
@@ -30,8 +30,17 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
     setIsModalOpen(isOpen);
   };
 
-  const handlePropertyClick = (client: ClientDataID, property: PropertyWithID) => {
-    navigate(`/property-view/${property.id}`, { state: { client, property } });
+  const handlePropertyClick = (propertyIndex: number) => {
+
+    const property = client.properties[propertyIndex];
+    const id = (property as {id?: number}).id;
+    
+    navigate(`/property-view/${id}`, {
+      state: {
+        property: property,
+        client: client,
+      }
+    });
   };
 
   return (
@@ -46,10 +55,7 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
             }}
           >
             <button
-              onClick={() => handlePropertyClick(client, {
-                ...property,
-                id: index // Add an id property to match PropertyWithID
-              } as PropertyWithID)}
+              onClick={() => handlePropertyClick(index)}
               className="property-button"
             >
               <div className="property-content">
