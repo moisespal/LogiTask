@@ -27,11 +27,10 @@ const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
     transform,
     transition,
     isDragging
-  } = useSortable({ id: job.id 
-   });
-
-  const dragAttributes = isDisabled ? {} : attributes;
-  const dragListeners = isDisabled ? {} : listeners;
+  } = useSortable({ 
+    id: job.id,
+    disabled: !isFocused || isDisabled // Disable dragging if not focused OR if explicitly disabled
+  });
 
   useEffect(() => {
     if (isDragging) {
@@ -65,35 +64,35 @@ const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
         transition,
         cursor: isDisabled ? 'default' : undefined
       }} 
-      {...dragAttributes} 
-      {...dragListeners}
+      {...attributes}
+      {...listeners}  
     >
       <motion.div 
-      className={`sortable-job-wrapper ${isDisabled ? 'disabled' : ''}`}
-      animate={isDragging ? { rotate: mouseDirection, scale:0.97 } : { rotate: 0, scale: 1 }}
-      style={{boxShadow: isDragging 
-          ? "20px 10px 25px rgba(0,0,0,0.3), 0px 4px 10px rgba(0,0,0,0.2)" 
-          : "none",
-        zIndex: isDragging ? 999 : 1
-      }}
-      transition={{
-        rotate: {
-          type: "spring",
-          stiffness: 300,    
-          damping: 25,       
-          mass: 0.6,         
-          velocity: 0        
-        },
-        scale: {
-          type: "spring",
-          stiffness: 350,
-          damping: 20
-        },
-        default: {
-          duration: 0.3
-        }
-      }}
-    >
+        className={`sortable-job-wrapper ${isDisabled ? 'disabled' : ''} ${isFocused ? 'draggable' : ''}`}
+        animate={isDragging ? { rotate: mouseDirection, scale:0.97 } : { rotate: 0, scale: 1 }}
+        style={{
+          boxShadow: isDragging 
+            ? "20px 10px 25px rgba(0,0,0,0.3), 0px 4px 10px rgba(0,0,0,0.2)" 
+            : (isFocused ? "0px 2px 5px rgba(0,0,0,0.1)" : "none")
+        }}
+        transition={{
+          rotate: {
+            type: "spring",
+            stiffness: 300,    
+            damping: 25,       
+            mass: 0.6,         
+            velocity: 0        
+          },
+          scale: {
+            type: "spring",
+            stiffness: 350,
+            damping: 20
+          },
+          default: {
+            duration: 0.3
+          }
+        }}
+      >
         <DailyListItem
           job={job}
           isFocused={isFocused}
