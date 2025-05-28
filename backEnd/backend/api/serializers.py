@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment
+from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment,userProfile
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -167,3 +167,8 @@ class BalanceHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = BalanceHistory
         fields = ['id', 'delta', 'new_balance', 'adjustment', 'created_at', 'jobs', 'payments','adjustments']
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = userProfile
+        fields = ['timezone']

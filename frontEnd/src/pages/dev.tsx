@@ -31,6 +31,13 @@ const Dev: React.FC = () => {
     };
     fetchBalanceHistory();
   },[]);
+
+    useEffect(() => {
+    const fetchUserTMZ = async () => {
+      await api.get("/api/get-user-profile/", {});
+    };
+    fetchUserTMZ();
+  },[]);
   
   
   return(
