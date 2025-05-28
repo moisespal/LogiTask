@@ -1,21 +1,4 @@
 // interfaces.ts
-
-export interface Client {
-  id: number;
-  firstName: string;
-  lastName: string;
-  address: string;
-  phoneNumber: string;
-  email: string;
-  lawnSize: string;
-  visits: Visit[];
-  image: string; // Add image property
-  selected?: string; // Change the selected property to string
-  tags: { day: string; occurrence: string }[]; // Add tags property
-  schedule?: Schedule; // Add schedule property
-  properties?: Property[];
-}
-
 export interface Property {
   id: number;
   street: string;
@@ -44,6 +27,14 @@ export interface ClientData {
   email: string;
   properties: Property_list[];
 }
+export interface ClientDataID {
+  id: number;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string;
+  properties: Property_list[];
+}
 export interface Schedule {
   frequency: string;
   nextDate: string;
@@ -59,6 +50,14 @@ export interface Property_list {
   schedules: Schedule[];
 }
 
+export interface PropertyWithID {
+  id: number;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  schedules: Schedule[];
+}
 export interface Job {
   id: number;
   jobDate: string;

@@ -2,26 +2,10 @@ import React, { useState, useEffect } from "react";
 import "../../styles/components/ClientProperties.css";
 import AddPropertyModal from "../Property/AddPropertyModal";
 import { useNavigate } from "react-router-dom";
-
-interface Property {
-  id: number;
-  street: string;
-  city: string;
-  state: string;
-  zipCode: string;
-}
-
-interface Client {
-  id: number;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  email: string;
-  properties: Property[];
-}
+import { ClientDataID, PropertyWithID} from "../../types/interfaces";
 
 interface ClientPropertiesProps {
-  client: Client;
+  client: ClientDataID;
   visible: boolean;
   onPropertyModalStateChange?: (isOpen: boolean) => void;
 }
@@ -46,23 +30,26 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
     setIsModalOpen(isOpen);
   };
 
-  const handlePropertyClick = (client: Client, property: Property) => {
+  const handlePropertyClick = (client: ClientDataID, property: PropertyWithID) => {
     navigate(`/property-view/${property.id}`, { state: { client, property } });
   };
 
   return (
     <div className="properties-container">
       {client.properties && client.properties.length > 0 ? (
-        client.properties.map((property: Property, index: number) => (
+        client.properties.map((property, index: number) => (
           <div
-            key={property.id}
+            key={index}
             className="property-item"
             style={{
               animationDelay: `${100 + index * 100}ms`,
             }}
           >
             <button
-              onClick={() => handlePropertyClick(client, property)}
+              onClick={() => handlePropertyClick(client, {
+                ...property,
+                id: index // Add an id property to match PropertyWithID
+              } as PropertyWithID)}
               className="property-button"
             >
               <div className="property-content">

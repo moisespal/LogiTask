@@ -1,10 +1,10 @@
 import React from 'react';
-import { Client, Job } from '../../types/interfaces';
+import { ClientDataID, Job } from '../../types/interfaces';
 import '../../styles/components/TopBar.css';
 
 interface TopBarProps {
   focusedItemId: number | null;
-  selectedClient: Client | null;
+  selectedClient: ClientDataID | null;
   selectedJob: Job | null;
   mode: 'Client' | 'Daily';
   sortOption: string;
@@ -86,7 +86,8 @@ const TopBar: React.FC<TopBarProps> = ({
         <div className="sort-dropdown">
           <button onClick={() => handleSortChange('none')}>None</button>
           <button onClick={() => handleSortChange('firstName')}>First Name</button>
-          <button onClick={() => handleSortChange('lawnSize')}>Lawn Size</button>
+          <button onClick={() => handleSortChange('lastName')}>Last Name</button>
+          <button onClick={() => handleSortChange('phoneNumber')}>Phone Number</button>
         </div>
       </div>
     </div>

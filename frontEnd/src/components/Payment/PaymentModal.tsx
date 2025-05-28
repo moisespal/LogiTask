@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Job, Client } from '../../types/interfaces';
+import { Job, ClientDataID } from '../../types/interfaces';
 import '../../styles/components/PaymentModal.css';
 import api from '../../api';
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   job?: Job;
-  client?: Client;
+  client?: ClientDataID;
   onPaymentSubmit: (amount: string, method: string) => void;
 }
 

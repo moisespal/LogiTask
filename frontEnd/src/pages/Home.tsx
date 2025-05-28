@@ -5,7 +5,7 @@ import ClientProperties from '../components/Client/ClientProperties';
 import TopBar from '../components/Layout/TopBar';
 import BottomBar from '../components/Layout/BottomBar';
 import AddClientModal from '../components/Client/AddClientModal';
-import { Client, Job } from '../types/interfaces';
+import { ClientDataID, Job } from '../types/interfaces';
 import api from "../api"
 import '../styles/pages/App.css';
 
@@ -18,9 +18,6 @@ import { AnimatePresence } from 'framer-motion';
 const renderStars = (count: number): JSX.Element[] => (
   Array.from({ length: count }, (_, i) => <span key={i} className="star">★</span>)
 );
-
-const getTodayDayString = (): string =>
-  new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
 const restrictWithinWindow = ({ transform }: { transform: { x: number; y: number; scaleX: number; scaleY: number } }) => {
   const windowWidth = window.innerWidth;
@@ -44,7 +41,7 @@ const Home: React.FC = () => {
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
-  const [customers, setCustomer] = useState<Client[]>([]);
+  const [customers, setCustomer] = useState<ClientDataID[]>([]);
   const focusedElementRef = useRef<HTMLDivElement | null>(null);
   
   // New job-related states
@@ -100,10 +97,6 @@ const Home: React.FC = () => {
     localStorage.setItem('mode',newMode)
     setModeType(newMode);
     setIsModeRotated(prev => !prev);
-    
-    // Reset focused item when switching modes
-    setFocusedItemId(null);
-    setSelectedJob(null);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
@@ -111,26 +104,30 @@ const Home: React.FC = () => {
   const handleSortChange = (option: string) => setSortOption(option);
 
   // Filtering and Sorting
-  const filterClientsByMode = (clients: Client[]): Client[] => {
-    if (modeType === 'Daily') {
-      const todayDayString = getTodayDayString();
-      return clients.filter(client =>(client.tags ?? []).some(tag => tag.day === todayDayString));
-    }
+  const filterClientsByMode = (clients: ClientDataID[]): ClientDataID[] => {
     return clients;
   };
 
-  const filterClientsBySearch = (clients: Client[]): Client[] => 
+  const filterClientsBySearch = (clients: ClientDataID[]): ClientDataID[] => 
     clients.filter(client =>
-      [client.firstName, client.lastName, client.address, client.phoneNumber, client.email, client.lawnSize]
+      [client.firstName, client.lastName, client.phoneNumber, client.email, client.properties?.[0]?.street, client.properties?.[0]?.zipCode]
         .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
-  const sortClients = (clients: Client[]): Client[] =>
+  const filterJobsBySearch = (jobs: Job[]): Job[] =>
+    jobs.filter(job =>
+      [job.client.firstName, job.client.lastName, job.property.street, job.client.phoneNumber, job.client.email, job.property.zipCode]
+        .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+
+  const filteredJobs = filterJobsBySearch(jobs);
+
+  const sortClients = (clients: ClientDataID[]): ClientDataID[] =>
     [...clients].sort((a, b) => {
       switch (sortOption) {
         case 'firstName': return a.firstName.localeCompare(b.firstName);
-        case 'address': return a.address.localeCompare(b.address);
-        case 'lawnSize': return parseInt(a.lawnSize) - parseInt(b.lawnSize);
+        case 'lastName': return a.lastName.localeCompare(b.lastName);
+        case 'phoneNumber': return a.phoneNumber.localeCompare(b.phoneNumber);
         default: return 0;
       }
     });
@@ -186,11 +183,11 @@ const Home: React.FC = () => {
       });
     } else {
       // Daily mode - navigate through jobs
-      if (jobs.length === 0) return;
+      if (filteredJobs.length === 0) return;
       
-      const currentJobIndex = jobs.findIndex(job => job.id === focusedItemId);
-      const newJobIndex = Math.min(Math.max(currentJobIndex + direction, 0), jobs.length - 1);
-      const selectedJob = jobs[newJobIndex];
+      const currentJobIndex = filteredJobs.findIndex(job => job.id === focusedItemId);
+      const newJobIndex = Math.min(Math.max(currentJobIndex + direction, 0), filteredJobs.length - 1);
+      const selectedJob = filteredJobs[newJobIndex];
       
       if (selectedJob) {
         setFocusedItemId(selectedJob.id);
@@ -207,13 +204,23 @@ const Home: React.FC = () => {
         setFocusedItemId(null);
       }
     } else {
-      // Auto-focus first job in Daily mode when jobs change
-      if (jobs.length > 0 && (!focusedItemId || !jobs.some(job => job.id === focusedItemId))) {
-        setFocusedItemId(jobs[0].id);
-        setSelectedJob(jobs[0]);
-      }
+        // Daily mode - use filteredJobs instead of jobs
+        if (filteredJobs.length === 1) {
+          // Auto-focus when exactly one job matches the search
+          setFocusedItemId(filteredJobs[0].id);
+          setSelectedJob(filteredJobs[0]);
+        } 
+        else if (filteredJobs.length > 1 && (!focusedItemId || !filteredJobs.some(job => job.id === focusedItemId))) {
+          setFocusedItemId(filteredJobs[0].id);
+          setSelectedJob(filteredJobs[0]);
+        }
+        else if (filteredJobs.length === 0) {
+          // If no jobs match, clear the selection
+          setFocusedItemId(null);
+          setSelectedJob(null);
+        }
     }
-  }, [filteredClients, jobs, focusedItemId, modeType]);
+}, [filteredClients, filteredJobs, focusedItemId, modeType]);
 
   // This effect runs whenever focusedItemId changes
   useEffect(() => {
@@ -237,7 +244,7 @@ const Home: React.FC = () => {
     }
   }, [focusedItemId, modeType]);
 
-  const selectedClient = focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) : null;
+  const selectedClient = focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) ?? null : null;
 
   // Modify your client click handler
   const handleClientClick = (id: number) => {
@@ -293,16 +300,16 @@ const Home: React.FC = () => {
     <div
       className="app-container" 
       style={{
-        backgroundImage: `url(${selectedClient?.image || 'https://oldschoolgrappling.com/wp-content/uploads/2018/08/Background-opera-speeddials-community-web-simple-backgrounds.jpg'})`
+        backgroundImage: `url('https://oldschoolgrappling.com/wp-content/uploads/2018/08/Background-opera-speeddials-community-web-simple-backgrounds.jpg')`
       }}
     >      
       {modeType === 'Client' && selectedClient && (
-        <ClientCalendar visits={selectedClient?.visits ?? []} client_id={selectedClient?.id} />
+        <ClientCalendar visits={[]} client_id={1} />
       )}
     
       <TopBar
         focusedItemId={focusedItemId}
-        selectedClient={selectedClient || null}
+        selectedClient={selectedClient}
         selectedJob={selectedJob}
         mode={modeType as 'Client' | 'Daily'}
         sortOption={sortOption}
@@ -320,7 +327,7 @@ const Home: React.FC = () => {
       <ul className="right-aligned-list">
         {modeType === 'Client' ? (
           // Client list rendering
-          filteredClients.map((client: Client) => (
+          filteredClients.map((client: ClientDataID) => (
             <div 
               key={client.id} 
               className="client-wrapper"
@@ -347,9 +354,9 @@ const Home: React.FC = () => {
         ) : (
           // Daily jobs list rendering
           <>
-            {jobs.length === 0 ? (
+            {filteredJobs.length === 0 ? (
               <div className="no-jobs-message">
-                No jobs scheduled for today
+                {jobs.length === 0 ? "No jobs scheduled for today" : "No jobs match your search"}
               </div>
             ) : (
               <DndContext
@@ -359,11 +366,11 @@ const Home: React.FC = () => {
                 modifiers={[restrictWithinWindow]}
               >
                 <SortableContext
-                  items={jobs.map(job => job.id)}
+                  items={filteredJobs.map(job => job.id)}
                   strategy={verticalListSortingStrategy}
                 >
                   <AnimatePresence>
-                    {jobs.map((job: Job) => (
+                    {filteredJobs.map((job: Job) => (
                       <div 
                         key={job.id}
                         className="job-wrapper"
