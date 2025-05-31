@@ -95,19 +95,6 @@
   color: var(--color-complete);
 }
 
-/* Enhanced styles for status states */
-.daily-icon.status-pending {
-  /* Styles removed */
-}
-
-.daily-icon.status-focused {
-  /* Styles removed */
-}
-
-.daily-icon.status-complete {
-  /* Styles removed */
-}
-
 /* Daily content styles */
 .daily-content {
   display: flex;
@@ -182,7 +169,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 99999;
+  z-index: 9999;
 }
 
 .payment-modal-container {

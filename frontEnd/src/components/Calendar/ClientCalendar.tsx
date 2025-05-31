@@ -1,19 +1,29 @@
 // Calendar.tsx
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect} from 'react';
 import Draggable from 'react-draggable';
 import '../../styles/components/ClientCalendar.css';
 import { Visit } from '../../types/interfaces'; // Import Visit interface
 import { FaDollarSign } from 'react-icons/fa';
-
+import api from '../../api';
 // Interface for the Visit object
 
 // Interface for the component props
 interface CalendarProps {
   visits: Visit[];
+  client_id: number|null;
 }
 
-const ClientCalendar: React.FC<CalendarProps> = ({ visits }) => {
+interface balance {
+  balance_adjustment: string;
+  current_balance: string;
+  id: number;
+  update_at: Date;
+  estimated_balance:string;
+}
+
+const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
   const [showBalance, setShowBalance] = useState(false);
+  const [balance, setBalance] = useState<balance>();
   const today = new Date();
 
   // Ref to access the calendar container
@@ -28,10 +38,7 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits }) => {
   };
 
   // Calculate the total amount owed
-  const totalAmountOwed = visits
-    .filter(visit => visit.complete && !visit.paid)
-    .reduce((sum, visit) => sum + visit.charge, 0);
-
+ 
   // Generate the last 30 days, oldest to today
   const last30Days = Array.from({ length: 30 }, (_, i) => {
     const date = new Date();
@@ -75,7 +82,37 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits }) => {
 
   // Create an array of blanks for padding
   const paddedDays = Array(firstDay).fill(null).concat(last30Days);
+  
+  const handleClick = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if(client_id===null || showBalance === true){
+      return;
+    }
+    else{
+      try {
+          // Create the property associated with the client
+          const balanceResponse = await api.get(`/api/get_estimated_balance/${client_id}/`);
+          if (balanceResponse.status === 200) {
+              // Reset form fields
+              
+              setBalance(balanceResponse.data)
+                  
+          }
+          else {
+              alert("Failed to get balance.");
+          }
 
+      } catch (err) {
+          console.error("Error adding property:", err);
+          alert(`Error: ${err}`);
+      }   
+    }
+
+    
+};
+    useEffect(() => {
+      setShowBalance(false);
+    }, [client_id]);
   return (
     <Draggable onStart={handleDragStart}>
       <div className="calendar-container" ref={calendarRef}>
@@ -85,7 +122,13 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits }) => {
           </h2>
           <button 
             className={`balance-toggle ${showBalance ? 'active' : ''}`} 
-            onClick={() => setShowBalance(!showBalance)}
+            onClick={() => {
+              handleClick(new MouseEvent('click') as unknown as React.FormEvent)
+              setShowBalance(!showBalance)
+
+            }
+            
+            }
             title={showBalance ? "Hide Balance" : "Show Balance"}
           >
             <FaDollarSign />
@@ -130,7 +173,13 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits }) => {
         <div className={`balance-info ${showBalance ? 'show' : ''}`}>
           <div className="outstanding-balance">
             <span>Outstanding Balance</span>
-            <span className="amount">${totalAmountOwed.toFixed(2)}</span>
+            <span 
+              style={{ color: balance && parseFloat(balance.estimated_balance) < 0 ? 'red' : 'green' }}
+            >
+                {balance && parseFloat(balance.estimated_balance) < 0 
+                ? `$${Math.abs(parseFloat(balance.estimated_balance)).toFixed(2)}` 
+                : `$${parseFloat(balance?.estimated_balance || '0').toFixed(2)}`}
+            </span>
           </div>
         </div>
       </div>

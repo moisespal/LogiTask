@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Client } from '../../types/interfaces';
+import { ClientDataID } from '../../types/interfaces';
 import PaymentModal from '../Payment/PaymentModal';
 import '../../styles/components/ClientListItem.css';
 
 interface ClientListItemProps {
-    client: Client;
+    client: ClientDataID;
     isFocused: boolean;
     onClick: (id: number) => void;
     renderStars: (count: number) => JSX.Element[];
@@ -32,7 +32,7 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onCl
                 <div className="list-item-header">
                     <div className="profile-pic-container">
                         <img
-                        src={client.image || 'https://i.pinimg.com/736x/c0/74/9b/c0749b7cc401421662ae901ec8f9f660.jpg'}
+                        src={'https://i.pinimg.com/736x/c0/74/9b/c0749b7cc401421662ae901ec8f9f660.jpg'}
                         alt={`${client.firstName} ${client.lastName}`}
                         className="profile-pic"
                         />

@@ -9,9 +9,10 @@ interface DailyListItemProps {
   isFocused: boolean;
   onClick: (id: number) => void;
   onComplete?: (id: number) => void;
+  onModalToggle?: (isOpen: boolean) => void;
 }
 
-const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, onComplete }) => {
+const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, onComplete, onModalToggle }) => {
   const isComplete = job.status === 'complete';
   const [isHovered, setIsHovered] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -29,10 +30,17 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
     e.stopPropagation();
     e.preventDefault();
     setShowPaymentModal(true);
+    if (onModalToggle) {
+      onModalToggle(true);
+    } 
+  };
+
+  const closePaymentModal = () => {
+    setShowPaymentModal(false);
+    if (onModalToggle) onModalToggle(false); // Re-enable dragging
   };
 
   const handlePaymentSubmit = (amount: string, method: string) => {
-    // Here you would call your API to record the payment
     console.log(`Payment recorded for ${job.property.street}: $${amount} via ${method}`);
   };
 
@@ -78,7 +86,7 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
       
       <PaymentModal 
         isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
+        onClose={closePaymentModal}
         job={job}
         onPaymentSubmit={handlePaymentSubmit}
       />

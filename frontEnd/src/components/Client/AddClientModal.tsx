@@ -3,6 +3,7 @@ import '../../styles/components/AddClientModal.css';
 import api from '../../api';
 import { ClientData, Property_list, Schedule } from '../../types/interfaces';
 
+
 interface AddClientModelProps {
   isOpen: boolean;
   onClose: () => void;
@@ -13,7 +14,7 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
   //multiple files logic 
   const [file,setFile] = useState<File|null>(null)
   const [uploading, setUploading] = useState<boolean>(false);
-  
+  const [jobList, setJobList] = useState<string[]>(["mow"]);
   
   const [clientData, setClientData] = useState<ClientData>({
     firstName: "",
@@ -122,6 +123,30 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
     }
   };
 
+   const getJobsNames = async () =>{
+    
+    try {
+      // First, create the client
+      const jobList = await api.get("/api/job-names/", {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (jobList.status === 200) {
+        setJobList(jobList.data)
+      }
+    }
+    catch(err){
+      console.error("Error getting clients:", err);
+    }
+  };
+
+  
+  
+  
+  
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     // Handle file upload logic here
     if (event.target.files && event.target.files.length > 0) {
@@ -170,7 +195,10 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
     <div className="mode-selection">
       <h2>Add New Client(s)</h2>
       <div className="mode-buttons">
-        <button className="btn-mode" onClick={() => setMode('single')}>
+        <button className="btn-mode" onClick={async () => {
+          setMode('single');
+          await getJobsNames();
+        }}>
           <i className="fas fa-user-plus"></i>
           <span>Add One Client</span>
         </button>
@@ -291,18 +319,20 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
               <div className="section-title">Service Information</div>
               <div className="form-row">
                 <div className="form-group">
-                  <select 
+                  <input
+                    list="service-options"
                     name="service"
                     value={prop.schedules[0].service}
-                    onChange={(e) => updateSchedule(index,0, "service", e.target.value)}
+                    onChange={(e) => updateSchedule(index, 0, "service", e.target.value)}
+                    placeholder="Service Type"
                     required
-                  >
-                    <option value="" disabled>
-                      Service Type
-                    </option>
-                    <option value="Mowing">Mowing</option>
-                    <option value="Other">Other</option>
-                  </select>
+                  />
+                    
+                    <datalist id="service-options">
+                      {jobList.map((service, i) => (
+                          <option key={i} value={service} />
+                        ))}
+                    </datalist>
                 </div>
                 <div className="form-group">
                   <div className="cost-input-container">
