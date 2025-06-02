@@ -62,7 +62,3 @@ body, html, #root {
   left: 100px;}
 
 
-.job-wrapper {
-  width: 100%;
-  overflow: visible;   /* Allow visual overflow */
-}

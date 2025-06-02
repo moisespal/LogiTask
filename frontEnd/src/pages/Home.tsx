@@ -5,11 +5,12 @@ import ClientProperties from '../components/Client/ClientProperties';
 import TopBar from '../components/Layout/TopBar';
 import BottomBar from '../components/Layout/BottomBar';
 import AddClientModal from '../components/Client/AddClientModal';
+import DailyReschedule from '../components/Daily/DailyReschedule';
 import { ClientDataID, Job } from '../types/interfaces';
 import api from "../api"
 import '../styles/pages/App.css';
 
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import { DndContext, pointerWithin, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableDailyList from '../components/Daily/SortableDailyList';
 import { AnimatePresence } from 'framer-motion';
@@ -21,12 +22,12 @@ const renderStars = (count: number): JSX.Element[] => (
 
 const restrictWithinWindow = ({ transform }: { transform: { x: number; y: number; scaleX: number; scaleY: number } }) => {
   const windowWidth = window.innerWidth;
-  const maxRightDistance = windowWidth * 0; 
-  const maxLeftDistance = windowWidth * 0.62;
+  const maxRightDistance  = 0.2 * windowWidth;
+  const maxLeftDistance = windowWidth * 0.66;
   
   return {
     ...transform,
-    x: Math.max(-maxLeftDistance, Math.min(maxRightDistance, transform.x)),
+    x: Math.max(-maxLeftDistance, Math.min(maxRightDistance, transform.x))
   };
 };
 
@@ -49,6 +50,8 @@ const Home: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   
   const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
+
+  const [activeJobId, setActiveJobId] = useState<number | null>(null);
 
   const getClients = () => {
     api
@@ -275,9 +278,37 @@ const Home: React.FC = () => {
     })
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
-    
+    setActiveJobId(null);
+
+    if (!over) return;
+  
+    if (over.id.toString().includes('droppable-')) {
+      
+      const dayIndex = parseInt(over.id.toString().split('-')[1]);
+      const draggedJob = jobs.find(job => job.id === active.id);
+      if (!draggedJob) return;
+      
+      try {
+        // Calculate new date (current date + dayIndex days)
+        const newDate = new Date();
+        newDate.setDate(newDate.getDate() + dayIndex);
+        const formattedDate = newDate.toISOString().split('T')[0]; 
+        
+        await api.patch(`/api/Update-Schedule/${draggedJob.id}/`, {
+          jobDate: formattedDate,
+        });
+        
+        setJobs(jobs.filter(job => job.id !== draggedJob.id));
+        
+        alert(`Job rescheduled to ${formattedDate}`);
+      } catch (error) {
+        console.error('Error rescheduling job:', error);
+        alert('Failed to reschedule job');
+      }
+    }
+
     if (over && active.id !== over.id) {
       setJobs((currentJobs) => {
         const oldIndex = currentJobs.findIndex(job => job.id === active.id);
@@ -291,6 +322,11 @@ const Home: React.FC = () => {
       });
     }
   };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    setActiveJobId(active.id as number)
+  }
 
   const toggleDraggingEnabled = (isDisabled: boolean) => {
   setIsDraggingDisabled(isDisabled);
@@ -361,10 +397,12 @@ const Home: React.FC = () => {
             ) : (
               <DndContext
                 sensors={sensors}
-                collisionDetection={closestCenter}
+                collisionDetection={pointerWithin}
                 onDragEnd={handleDragEnd}
+                onDragStart={handleDragStart}
                 modifiers={[restrictWithinWindow]}
               >
+
                 <SortableContext
                   items={filteredJobs.map(job => job.id)}
                   strategy={verticalListSortingStrategy}
@@ -391,6 +429,28 @@ const Home: React.FC = () => {
                     ))}
                   </AnimatePresence>
                 </SortableContext>
+                <DragOverlay dropAnimation={null} style={{zIndex: 5}}>
+                  {activeJobId ? (
+                    <div 
+                      key={activeJobId}
+                      className="job-wrapper"
+                      style={{ width: '100%'}}
+                    >
+                      <SortableDailyList
+                        job={jobs.find(job => job.id === activeJobId)!}
+                        isFocused={focusedItemId === activeJobId}
+                        onClick={() => {}}
+                        onComplete={handleJobComplete}
+                        isDisabled={false}
+                        isDragging={true}
+                        onModalToggle={toggleDraggingEnabled}
+                      />
+                    </div>
+                  ) : null}
+                </DragOverlay>
+                <DailyReschedule 
+                  isDragging={activeJobId !== null && jobs.find(job => job.id === activeJobId)?.status !== 'complete'} 
+                />
               </DndContext>
             )}
           </>

@@ -1,0 +1,4 @@
+.hidden-during-drag {
+  opacity: 0;
+  visibility: hidden;
+}

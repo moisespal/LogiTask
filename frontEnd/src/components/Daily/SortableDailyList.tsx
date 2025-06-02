@@ -17,7 +17,7 @@ interface SortableDailyListItemProps {
 }
 
 const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
-  const { job, isFocused, onClick, onComplete, isDisabled = false, onModalToggle } = props;
+  const { job, isFocused, onClick, onComplete, isDisabled = false, isDragging: externalIsDragging = false, onModalToggle } = props;
   const [mouseDirection, setMouseDirection] = useState(0);
 
   const {
@@ -26,14 +26,16 @@ const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
     setNodeRef,
     transform,
     transition,
-    isDragging
+    isDragging: internalIsDragging = false,
   } = useSortable({ 
     id: job.id,
-    disabled: !isFocused || isDisabled // Disable dragging if not focused OR if explicitly disabled
+    disabled: !isFocused || isDisabled 
   });
 
+  const effectiveIsDragging = externalIsDragging || internalIsDragging;
+
   useEffect(() => {
-    if (isDragging) {
+    if (externalIsDragging) {
         const recentMovements = [0, 0, 0];
         
         const handleMouseMove = (e: MouseEvent) => {
@@ -45,7 +47,7 @@ const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
                                 recentMovements[2] * 0.5;
             
             const sensitivity = 1.2;
-            const maxRotation = 5;
+            const maxRotation = 6;
             const rotation = Math.max(-maxRotation, Math.min(maxRotation, weightedSum * sensitivity));
             
             setMouseDirection(rotation);
@@ -54,7 +56,7 @@ const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }
-}, [isDragging]);
+}, [externalIsDragging]);
 
   return (
     <div 
@@ -63,15 +65,16 @@ const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
         transform: CSS.Transform.toString(transform), 
         transition,
         cursor: isDisabled ? 'default' : undefined
-      }} 
+      }}
+      className={internalIsDragging ? "hidden-during-drag" : ""}
       {...attributes}
       {...listeners}  
     >
       <motion.div 
         className={`sortable-job-wrapper ${isDisabled ? 'disabled' : ''} ${isFocused ? 'draggable' : ''}`}
-        animate={isDragging ? { rotate: mouseDirection, scale:0.97 } : { rotate: 0, scale: 1 }}
+        animate={effectiveIsDragging ? { rotate: mouseDirection} : { rotate: 0, scale: 1 }}
         style={{
-          boxShadow: isDragging 
+          boxShadow: effectiveIsDragging 
             ? "20px 10px 25px rgba(0,0,0,0.3), 0px 4px 10px rgba(0,0,0,0.2)" 
             : (isFocused ? "0px 2px 5px rgba(0,0,0,0.1)" : "none")
         }}
@@ -81,7 +84,7 @@ const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
             stiffness: 300,    
             damping: 25,       
             mass: 0.6,         
-            velocity: 0        
+            velocity: 1       
           },
           scale: {
             type: "spring",
