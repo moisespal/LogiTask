@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
-import AddSchedule from '../components/Property/AddSchedule';
+
 const Dev: React.FC = () => {
-  const [isopen, setOpen ] = useState<boolean>(true)
-  const onClose = (): void => {
-    setOpen((prevState: boolean | undefined) => !prevState);
-  }
+  
+  
 
   const handlesubmit = async (e:React.FormEvent) =>{
     e.preventDefault();
@@ -29,22 +27,25 @@ const Dev: React.FC = () => {
     const fetchBalanceHistory = async () => {
       await api.get("/api/balance-history/44/", {});
     };
-    fetchBalanceHistory();
+    const deleteJob = async () => {
+      await api.delete("/api/job/delete/5/", {})
+    };
+
+  
+    //fetchBalanceHistory();
+    //deleteJob();
   },[]);
 
-    useEffect(() => {
-    const fetchUserTMZ = async () => {
-      await api.get("/api/get-user-profile/", {});
+     const generateJobs = async () => {
+      await api.get("/api/generateJobs/", {});
     };
-    fetchUserTMZ();
-  },[]);
   
   
   return(
   <>
     <div>Dev</div>;
-    <button onClick={handlesubmit}> TRY ME</button>
-    <AddSchedule isOpen={isopen} onClose={onClose} propertyId={38}/>
+    <button onClick={generateJobs}> TRY ME</button>
+    
   </>
   )
   
