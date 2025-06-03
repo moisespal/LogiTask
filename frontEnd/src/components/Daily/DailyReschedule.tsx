@@ -7,43 +7,43 @@ interface DailyRescheduleProps {
 }
 
 const DailyReschedule: React.FC<DailyRescheduleProps> = ({ isDragging }) => {
-  const userTimeZone = useMemo(() => {
-    return localStorage.getItem("userTimeZone") || "America/Chicago";
-  }, []);
-  
-  const nextSixDays = useMemo(() => {
-    const days = [];
-    const today = new Date();
-    
-    for (let i = 1; i <= 6; i++) {
-      const date = new Date();
-      date.setDate(today.getDate() + i);
-      
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        timeZone: userTimeZone
-      });
-      
-      days.push({
-        dayNum: i,
-        date: date,
-        formatted: formatter.format(date)
-      });
-    }
-    
-    return days;
-  }, [userTimeZone]);
+  const userTimeZone = useMemo(
+  () => localStorage.getItem("userTimeZone") ?? "America/Chicago",
+  []
+);
+
+const nextSixDays = useMemo(() => {
+  const todayInUserTZ = new Date(
+    new Date().toLocaleString("en-US", { timeZone: userTimeZone })
+  );
+
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    timeZone: userTimeZone,
+  });
+
+  return Array.from({ length: 6 }, (_, idx) => {
+    const date = new Date(todayInUserTZ);        
+    date.setDate(date.getDate() + (idx + 1));        
+
+    return {
+      dayNum: idx + 1,
+      date,
+      formatted: fmt.format(date),
+    };
+  });
+}, [userTimeZone]);
 
   // Create the droppable areas
   const droppables = [
+    useDroppable({ id: "droppable-0" }),
     useDroppable({ id: "droppable-1" }),
     useDroppable({ id: "droppable-2" }),
     useDroppable({ id: "droppable-3" }),
     useDroppable({ id: "droppable-4" }),
-    useDroppable({ id: "droppable-5" }),
-    useDroppable({ id: "droppable-6" })
+    useDroppable({ id: "droppable-5" })
   ];
 
   const deleteJob = useDroppable({ id: "delete-job" });
