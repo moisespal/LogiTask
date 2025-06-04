@@ -114,7 +114,7 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
       setShowBalance(false);
     }, [client_id]);
   return (
-    <Draggable >
+    <Draggable onStart={handleDragStart}>
       <div className="calendar-container" ref={calendarRef}>
         <div className="calendar-header">
           <h2>
