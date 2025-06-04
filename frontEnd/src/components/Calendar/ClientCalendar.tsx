@@ -122,13 +122,10 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
           </h2>
           <button 
             className={`balance-toggle ${showBalance ? 'active' : ''}`} 
-            onClick={() => {
-              handleClick(new MouseEvent('click') as unknown as React.FormEvent)
-              setShowBalance(!showBalance)
-
-            }
-            
-            }
+            onClick={(e) => {
+              handleClick(e);
+              setShowBalance(!showBalance);
+            }}
             title={showBalance ? "Hide Balance" : "Show Balance"}
           >
             <FaDollarSign />
