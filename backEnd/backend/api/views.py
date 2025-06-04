@@ -351,3 +351,12 @@ class GetUserProfile(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except userProfile.DoesNotExist:
             return Response({"detail": "User profile not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class JobDelete(generics.DestroyAPIView):
+    serializer_class = JobSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Job.objects.filter(client__author=user)

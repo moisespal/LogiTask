@@ -26,4 +26,5 @@ urlpatterns = [
     path('balance-history/<int:client_id>/', views.ClientLedgerAPIView.as_view(),name='client-ledger-histoy'),
     path('get_estimated_balance/<int:client_id>/', views.estimated_balance_view.as_view(), name='view-estimated-balance'),
     path('get-user-profile/', views.GetUserProfile.as_view(), name='get-user-profile'),
+    path("job/delete/<int:pk>/", views.JobDelete.as_view(),name="job-delete")
 ]
