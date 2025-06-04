@@ -38,12 +38,12 @@ const nextSixDays = useMemo(() => {
 
   // Create the droppable areas
   const droppables = [
-    useDroppable({ id: "droppable-0" }),
     useDroppable({ id: "droppable-1" }),
     useDroppable({ id: "droppable-2" }),
     useDroppable({ id: "droppable-3" }),
     useDroppable({ id: "droppable-4" }),
-    useDroppable({ id: "droppable-5" })
+    useDroppable({ id: "droppable-5" }),
+    useDroppable({ id: "droppable-6" })
   ];
 
   const deleteJob = useDroppable({ id: "delete-job" });

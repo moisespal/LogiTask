@@ -61,4 +61,28 @@ body, html, #root {
   flex-direction: column;
   left: 100px;}
 
+.no-jobs-message {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(226, 219, 219, 0.445);
+  border-radius: 8px;
+  max-width: 80%;
+  z-index: 10;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  user-select: none;
+}
+
+.no-jobs-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #4caf50;
+}
 

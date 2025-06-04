@@ -1,10 +1,9 @@
 .daily-reschedule-strip-container {
   position: fixed;
   left: 5%;
-  bottom: 60%;
+  bottom: 65%;
   transform: translateX(-50%);
   padding: 1rem 1.5rem;
-  
   z-index: 100;
   opacity: 0;
   animation: fadeIn 0.3s ease-in-out forwards;
@@ -62,8 +61,6 @@
   font-size: 0.8rem;
   color: #5d6b8a;
   text-align: center;
-  background: #f0f4ff;
-  padding: 0.2rem 0.5rem;
   border-radius: 4px;
   margin-top: 0.3rem;
 }
@@ -85,14 +82,14 @@
 .box:hover {
   border-color: #b8d3ff;
   background: #f8fbff;
-  transform: translateY(-2px);
+  transform: translateY(29px);
 }
 
 
 .box.is-over {
   background: #e6f4ff;
   border-color: #00aaff;
-  transform: scale(1.05);
+  transform: scale(1.50);
   box-shadow: 0 5px 15px rgba(0,120,255,0.25);
   z-index: 1000;
 }
@@ -142,7 +139,7 @@
 @keyframes fadeInBox {
   from {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;

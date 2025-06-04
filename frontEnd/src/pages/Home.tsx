@@ -13,7 +13,6 @@ import '../styles/pages/App.css';
 import { DndContext, pointerWithin, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableDailyList from '../components/Daily/SortableDailyList';
-import { AnimatePresence } from 'framer-motion';
 // Utility functions
 
 const renderStars = (count: number): JSX.Element[] => (
@@ -287,22 +286,31 @@ const Home: React.FC = () => {
     if (over.id.toString().includes('droppable-')) {
       
       const dayIndex = parseInt(over.id.toString().split('-')[1]);
+      console.log('Dropping job on day index:', dayIndex);
       const draggedJob = jobs.find(job => job.id === active.id);
       if (!draggedJob) return;
       
       try {
-        // Calculate new date (current date + dayIndex days)
-        const newDate = new Date();
-        newDate.setDate(newDate.getDate() + dayIndex);
-        const formattedDate = newDate.toISOString().split('T')[0]; 
+        const tz = localStorage.getItem("userTimeZone") || "America/Chicago";
+        const target = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+        target.setDate(target.getDate() + dayIndex);
+
+        const formattedDate = target.toISOString().slice(0, 10);
+
+        setJobs(prevJobs => {
+          const updatedJobs = prevJobs.filter(job => job.id !== draggedJob.id);
+          if (updatedJobs.length === 0) {
+            fetchTodaysJobs(); 
+          }
+          return updatedJobs;
+        });
         
         await api.patch(`/api/Update-Schedule/${draggedJob.id}/`, {
           jobDate: formattedDate,
         });
-        
-        setJobs(jobs.filter(job => job.id !== draggedJob.id));
-        
+
         alert(`Job rescheduled to ${formattedDate}`);
+        
       } catch (error) {
         console.error('Error rescheduling job:', error);
         alert('Failed to reschedule job');
@@ -392,9 +400,17 @@ const Home: React.FC = () => {
           <>
             {filteredJobs.length === 0 ? (
               <div className="no-jobs-message">
-                {jobs.length === 0 ? "No jobs scheduled for today" : "No jobs match your search"}
+                {jobs.length === 0 ? (
+                  <>
+                    <div className="no-jobs-icon">✓</div>
+                    <h3>All Done for Today!</h3>
+                    <p>All jobs have been completed or rescheduled</p>
+                  </>
+                ) : (
+                  "No jobs match your search"
+                )}
               </div>
-            ) : (
+            )  : (
               <DndContext
                 sensors={sensors}
                 collisionDetection={pointerWithin}
@@ -407,7 +423,6 @@ const Home: React.FC = () => {
                   items={filteredJobs.map(job => job.id)}
                   strategy={verticalListSortingStrategy}
                 >
-                  <AnimatePresence>
                     {filteredJobs.map((job: Job) => (
                       <div 
                         key={job.id}
@@ -426,8 +441,7 @@ const Home: React.FC = () => {
                           onModalToggle={toggleDraggingEnabled}
                         />
                       </div>
-                    ))}
-                  </AnimatePresence>
+                    ))}  
                 </SortableContext>
                 <DragOverlay dropAnimation={null} style={{zIndex: 5}}>
                   {activeJobId ? (
