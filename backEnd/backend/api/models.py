@@ -14,6 +14,7 @@ from decimal import Decimal
 class userProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = models.CharField(max_length=100, default='UTC')
+    
 class Company(models.Model):
     companyName = models.CharField(max_length=100)
     logo = models.ImageField(upload_to='company_logos/', null=True, blank=True)
