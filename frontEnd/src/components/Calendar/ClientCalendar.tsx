@@ -114,7 +114,7 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
       setShowBalance(false);
     }, [client_id]);
   return (
-    <Draggable onStart={handleDragStart}>
+    <Draggable >
       <div className="calendar-container" ref={calendarRef}>
         <div className="calendar-header">
           <h2>
@@ -122,7 +122,7 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
           </h2>
           <button 
             className={`balance-toggle ${showBalance ? 'active' : ''}`} 
-            onClick={(e) => {
+            onPointerDown={(e) => {
               handleClick(e);
               setShowBalance(!showBalance);
             }}
