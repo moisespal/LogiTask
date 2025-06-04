@@ -117,9 +117,10 @@ const Home: React.FC = () => {
     );
 
   const filterJobsBySearch = (jobs: Job[]): Job[] =>
-    jobs.filter(job =>
+    jobs.filter(job => job ?
       [job.client.firstName, job.client.lastName, job.property.street, job.client.phoneNumber, job.client.email, job.property.zipCode]
         .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()))
+        : false
     );
 
   const filteredJobs = filterJobsBySearch(jobs);
@@ -278,43 +279,67 @@ const Home: React.FC = () => {
   );
 
   const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveJobId(null);
-
+    const { active, over } = event; // active is the item being dragged, over is the item being hovered over
+    setActiveJobId(null); // used to reset UI state after drag ends
+    console.log('Drag Ended:', active.id, 'over:', over?.id);
     if (!over) return;
+    if (active.id === over.id) {
+      console.log('Dropped on itself, no action taken');
+      return;
+    }
   
     if (over.id.toString().includes('droppable-')) {
-      
-      const dayIndex = parseInt(over.id.toString().split('-')[1]);
-      console.log('Dropping job on day index:', dayIndex);
-      const draggedJob = jobs.find(job => job.id === active.id);
-      if (!draggedJob) return;
-      
+      const dayIndex = parseInt(over.id.toString().split('-')[1]); // uses the droppable id to determine how many days to shift the job
+
       try {
         const tz = localStorage.getItem("userTimeZone") || "America/Chicago";
         const target = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
-        target.setDate(target.getDate() + dayIndex);
+        target.setDate(target.getDate() + dayIndex); // applies that shift to the current date
 
         const formattedDate = target.toISOString().slice(0, 10);
 
-        setJobs(prevJobs => {
-          const updatedJobs = prevJobs.filter(job => job.id !== draggedJob.id);
-          if (updatedJobs.length === 0) {
-            fetchTodaysJobs(); 
-          }
-          return updatedJobs;
-        });
-        
-        await api.patch(`/api/Update-Schedule/${draggedJob.id}/`, {
-          jobDate: formattedDate,
-        });
+        const rescheduleJob = async () => {
+            const response = await api.patch(`/api/Update-Schedule/${active.id}/`, {
+              jobDate: formattedDate,
+            });
+            if (response.status === 200) {
+              setJobs(prevJobs => {
+                const updatedJobs = prevJobs.filter(job => job.id !== active.id);
+                if (updatedJobs.length === 0) {
+                  setSelectedJob(null);
+                }
+                return updatedJobs;
+              });
+            }
+        };
+        rescheduleJob();
 
-        alert(`Job rescheduled to ${formattedDate}`);
-        
       } catch (error) {
         console.error('Error rescheduling job:', error);
         alert('Failed to reschedule job');
       }
+    }
+
+    if (over.id == 'delete-job') {
+      const deleteJob = async () => {
+        try {
+          const response = await api.delete(`/api/job/delete/${active.id}/`, {});
+          if (response.status === 204) {
+            setJobs(prevJobs => {
+              const updatedJobs = prevJobs.filter(job => job.id !== active.id);
+              if (updatedJobs.length === 0) {
+                setSelectedJob(null);
+              }
+              return updatedJobs;
+            });
+            
+          }
+        } catch (error) {
+          console.error('Error deleting job:', error);
+          alert('Failed to delete job');
+        }
+      };
+      deleteJob();
     }
 
     if (over && active.id !== over.id) {
@@ -398,17 +423,13 @@ const Home: React.FC = () => {
         ) : (
           // Daily jobs list rendering
           <>
-            {filteredJobs.length === 0 ? (
+            {jobs.length === 0 ? (
               <div className="no-jobs-message">
-                {jobs.length === 0 ? (
                   <>
-                    <div className="no-jobs-icon">✓</div>
+                    <div className="no-jobs-icon">🎉</div>
                     <h3>All Done for Today!</h3>
-                    <p>All jobs have been completed or rescheduled</p>
-                  </>
-                ) : (
-                  "No jobs match your search"
-                )}
+                    <p>Check back tomorrow for new tasks</p>
+                  </> 
               </div>
             )  : (
               <DndContext
