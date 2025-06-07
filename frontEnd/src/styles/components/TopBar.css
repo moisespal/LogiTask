@@ -1,17 +1,23 @@
-/* TopBar.css */
+/**
+ * TopBar Component Styles
+ * 
+ * This file contains styles for the TopBar component which displays at the top of the application.
+ * The component supports both Client and Daily job view modes.
+ */
 
-/* Main TopBar container */
+/* Base Layout & Structure
+------------------------------------------*/
 .top-bar {
   position: fixed;
-  top: 0;
+  top: 0px;
   left: 0;
   width: 100%;
   height: 70px;
   color: white;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  z-index: 10;
+  align-items: flex-start;
+  z-index: 1000;
 }
 
 .top-menu-shape {
@@ -24,71 +30,282 @@
   z-index: -1;
 }
 
-/* Client Info Section */
+.info-container {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease-out;
+  margin-top: 20px;
+  max-width: 600px;
+}
+
+.info-container.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Client Info - Complete rewrite */
 .client-info {
-  padding: 10px 20px;
-  font-size: 20px;
-  line-height: 1.5;
-  letter-spacing: 1.1px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  margin-top: 80px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0px;
+  padding: 0 15px;
 }
 
-.sort-button-container {
-  position: relative;
-  right: 15px; 
-  top: 30px;  
+/* Make all client-items flex containers with proper spacing */
+.client-info .client-item {
+  display: flex;
   align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-.sort-button {
-  background-color: rgb(33, 33, 36);
-  padding: 10px 15px;
-  font-size: 15px;
-  cursor: pointer;
-  border-radius: 10px;
-  min-width: 100px;
+/* Name styling */
+.client-info .client-item:first-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.client-info .client-item:first-child span {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.client-info .client-item:first-child i {
+  color: #64b5f6;
+  font-size: 16px;
+}
+
+/* Contact items */
+.client-info .client-item:not(:first-child) {
+  opacity: 0.85;
+}
+
+/* Phone icon */
+.client-info .client-item:nth-child(2) i {
+  color: #4CAF50;
+}
+
+/* Email icon */
+.client-info .client-item:nth-child(3) i {
+  color: #ffffff;
+}
+
+/* All icons alignment */
+.client-info .client-item i {
   text-align: center;
 }
 
-.sort-button:hover{
-  transform: scale(1.03);
+/* Job Info Styles (Daily View)
+------------------------------------------*/
+.job-info {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 5px 20px;
+}
+
+/* Common icon styles */
+.job-info i {
+  width: 18px;
+  text-align: center;
+  font-size: 15px;
+  color: #64b5f6;
+}
+
+/* Property Section */
+.job-info .property {
+  margin-left:  8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.job-info .property .address {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.job-info .property .address i {
+  color: #fc574ed4; /* Orange for location */
+  font-size: 16px;
+}
+
+/* Contact Section */
+.job-info .contact {
+  display: flex;
+  margin-left:  8px;
+  gap: 20px;
+  font-size: 13.5px;
+  padding-top: 6px;
+  opacity: 0.85;
+}
+
+.job-info .contact > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.job-info .contact .phone i {
+  color: #4CAF50; /* Green for phone (matching client view) */
+}
+
+/* Service Tags Section */
+.job-info .service-tags {
+  display: flex;
+  gap: 10px;
+  align-self: flex-start;
+  margin-top: 8px;
+  margin-left:  -3px;
+}
+
+/* Common Pill Styles */
+.job-info .service-pill,
+.job-info .frequency-pill {
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.job-info .service-pill:hover,
+.job-info .frequency-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.job-info .service-pill i,
+.job-info .frequency-pill i {
+  font-size: 14px;
+}
+
+/* Service Pill - Orange Theme */
+.job-info .service-pill {
+  background: rgba(255, 152, 0, 0.15);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  color: #ffd9a8;
+}
+
+.job-info .service-pill:hover {
+  background: rgba(255, 152, 0, 0.25);
+}
+
+.job-info .service-pill i {
+  color: #ffb74d;
+}
+
+/* Frequency Pill - Purple Theme */
+.job-info .frequency-pill {
+  background: rgba(169, 107, 181, 0.15);
+  border: 1px solid rgba(169, 107, 181, 0.3);
+  color: #d8c1de;
+}
+
+.job-info .frequency-pill:hover {
+  background: rgba(169, 107, 181, 0.25);
+}
+
+.job-info .frequency-pill i {
+  color: #c48fd0;
+}
+
+/* Cost Pill - Special styling */
+.job-info .cost-pill {
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  align-items: center;
+  gap: 0px; /* Reduced gap between icon and text */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
+  font-weight: 500;
+  letter-spacing: 0;  /* Removed letter spacing for tighter text */
+  background: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #c8e6c9;
+}
+
+.job-info .cost-pill i {
+  color: #81c784;
+  font-size: 14px;
+  margin-right: -1px; /* Pull the text slightly closer to the icon */
+}
+
+.job-info .cost-pill:hover {
+  background: rgba(76, 175, 80, 0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(76, 175, 80, 0.2);
+}
+
+/* Sort Controls
+------------------------------------------*/
+.sort-button-container {
+  position: absolute;
+  right: 25px;
+  top: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.sort-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.sort-button:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .sort-dropdown {
-  display: none;
   position: absolute;
-  background-color: rgba(0, 0, 0, 0.194);
-  margin-top: -8px;
-  width: 150px;
-  box-shadow: 10px 10px 10px 0px rgba(0, 0, 0, 0.2);
-  z-index: 70;
-  top: 50px;
+  top: 100%;
   right: 0;
-  border-radius: 5px;
-}
-
-.sort-dropdown button {
-  background-color: rgba(82, 82, 82, 0.64);
-  color: rgb(197, 197, 197);
-  padding: 10px;
-  text-align: left;
-  border: none;
-  width: 100%;
-  box-sizing: border-box;
-  cursor: pointer;
+  background: rgba(45, 45, 48, 0.95);
+  border-radius: 6px;
+  overflow: hidden;
+  display: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
 }
 
 .sort-button-container:hover .sort-dropdown {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
-.client-email {
-  color: rgb(84, 155, 255);
+.sort-dropdown button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: left;
   cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s ease;
+  white-space: nowrap;
 }
 
-.client-email:hover {
-  color: rgb(69, 153, 255);
-  text-decoration: underline;
+.sort-dropdown button:hover {
+  background: rgba(255, 255, 255, 0.1);
 }

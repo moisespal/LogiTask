@@ -1,0 +1,160 @@
+/* Shared list item styles used by both ClientListItem and DailyListItem */
+
+/* Base list item */
+.list-item {
+  position: relative;
+  font-family: Inter;
+  background: rgba(3, 3, 3, 0.212);
+  backdrop-filter: blur(25px);
+  color: white;
+  padding: 10px 20px;
+  margin: 5px 0;
+  border-radius: 10px 0 0 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+  z-index: 10;
+  min-width: 100%;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-left: 3px solid rgba(70, 130, 220, 0.4);
+  transition: all 0.2s ease-out;
+}
+
+/* Hover state */
+.list-item:hover {
+  transform: scale(1.02);
+  z-index: 2;
+  border-left-color: rgba(70, 130, 220, 0.6);
+}
+
+/* Focus state */
+.list-item.focused {
+  transform: scale(1.01);
+  background: rgba(30, 30, 40, 0.5);
+  z-index: 5;
+  position: relative;
+  overflow: hidden;
+  border-left: 6px solid rgba(70, 130, 220, 0.8);
+  animation: focusPulse 0.3s ease-out;
+}
+
+/* Focus pulse animation */
+@keyframes focusPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(70, 130, 220, 0.4);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 10px rgba(70, 130, 220, 0);
+  }
+  100% {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 0 rgba(70, 130, 220, 0);
+  }
+}
+
+/* Header layout */
+.list-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Item name */
+.list-item-name {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Action buttons container */
+.client-action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Payment button */
+.client-payment-button {
+  background-color: rgba(40, 120, 40, 0.7);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.client-payment-button:hover {
+  background-color: rgba(45, 130, 45, 0.8);
+}
+
+.client-payment-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.client-payment-button i {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+}
+
+/* Gear button */
+.gear-button {
+  background-color: rgba(50, 50, 55, 0.7);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.gear-button:hover {
+  background-color: rgba(60, 60, 65, 0.8);
+}
+
+.gear-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.gear-button i {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+}
+
+.list-item-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.list-item-base.focused .list-item-icon {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.list-item-text {
+  font-size: 15px;
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+.list-item-base.focused .list-item-text {
+  color: #ffffff;
+} 

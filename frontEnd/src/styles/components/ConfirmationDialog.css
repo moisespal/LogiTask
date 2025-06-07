@@ -1,0 +1,65 @@
+/* Core Dialog Structure */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialog-container {
+  width: 90%;
+  max-width: 400px;
+  padding: 24px;
+  border-radius: 12px;
+  animation: dialog-fade-in 0.2s ease-out;
+  user-select: none;
+}
+
+.dialog-title {
+  margin: 0 0 16px 0;
+}
+
+.dialog-message {
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.dialog-button {
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dialog-service-details {
+  margin: 12px 0;
+  padding: 12px 16px;
+}
+
+.dialog-service-details p {
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

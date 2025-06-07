@@ -1,39 +1,69 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import Home from "./pages/Home";
 import ErrorPage from "./pages/ErrorPage";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import Dev from "./pages/dev";
+import { CompanySetUp } from "./pages/CompanySetUp";
+import PropertyView from "./pages/PropertyView";
 
-const Logout: React.FC = () =>{
-  localStorage.clear()
-  return <Navigate to="/login" />
-}
+const Logout: React.FC = () => {
+  localStorage.clear();
+  return <Navigate to="/login" />;
+};
 
-const RegisterAndLogout: React.FC = () =>{
-  localStorage.clear()
-  return <RegisterPage />
-}
-
+const RegisterAndLogout: React.FC = () => {
+  localStorage.clear();
+  return <RegisterPage />;
+};
 
 const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={
-          <ProtectedRoute>
-            <Home/>
-          </ProtectedRoute>
-        }
+        {/* Protected Home Route */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
         />
+
+        {/* Protected Company Setup Route */}
+        <Route
+          path="/company-setup"
+          element={
+            <ProtectedRoute>
+              <CompanySetUp />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected Property View Route */}
+        <Route
+          path="/property-view/:propertyId"
+          element={
+            <ProtectedRoute>
+              <PropertyView />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/logout" element={<Logout/>} />
+        <Route path="/logout" element={<Logout />} />
         <Route path="/register" element={<RegisterAndLogout />} />
         <Route path="/dev" element={<Dev />} />
         <Route path="*" element={<ErrorPage />} />
-
       </Routes>
     </Router>
   );

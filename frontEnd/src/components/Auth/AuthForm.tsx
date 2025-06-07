@@ -13,18 +13,17 @@ interface FormProps {
 function AuthForm({ route, method }: FormProps) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const name = method === "login" ? "Login" : "Register";
 
     const handleSubmit = async (event: React.FormEvent) => {
-        setLoading(true);
 
         event.preventDefault();
         try {
             const res = await api.post(route, { username, password });
             if (method === "login") {
+                localStorage.clear();
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
                 navigate("/");
@@ -33,8 +32,6 @@ function AuthForm({ route, method }: FormProps) {
             }
         } catch (error) {
             alert(error);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -66,6 +63,12 @@ function AuthForm({ route, method }: FormProps) {
                 <button type="submit" className="auth-btn">
                     {name}
                 </button>
+                {name === "Login" && (
+                    <button type="button" className="auth-btn" onClick={() => navigate('/register')}>
+                        Register
+                    </button>
+                )}
+             
             </div>
         </form>
     );

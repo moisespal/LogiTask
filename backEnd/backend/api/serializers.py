@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule
+from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment,userProfile
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,7 +30,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ["id", "frequency","nextDate","service","cost"]
+        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive"]
 
 class PropertyAndSchedule(serializers.ModelSerializer):
     schedules = ScheduleSerializer(many=True)
@@ -62,3 +62,113 @@ class ClientPropertySetUpSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(f"Error Creating Property or Schedule")
         
         return client
+
+class OnlyClientSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Client
+        fields = ["id", "firstName", "lastName", "phoneNumber", "email"]
+        extra_kwargs = {
+            "created_at": {"read_only":True}
+        }
+
+
+class JobSerializer(serializers.ModelSerializer):
+    property = serializers.SerializerMethodField()
+    schedule = ScheduleSerializer()
+    client = OnlyClientSerializer()
+
+    class Meta:
+        model = Job
+        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule', 'client']
+        
+    def get_property(self, obj):
+        property_obj = obj.schedule.property
+        return PropertySerializer(property_obj).data
+
+
+
+class PropertyAndScheduleSetUp(serializers.ModelSerializer):
+    schedules = ScheduleSerializer(many=True)
+    clientId = serializers.IntegerField(write_only=True)
+    class Meta:
+        model = Property
+        fields = ["id","street", "city", "state","zipCode","clientId","schedules"]
+    
+    def create(self, validated_data):
+        schedules_data = validated_data.pop('schedules', [])
+        client_id = validated_data.pop('clientId')
+        
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            raise serializers.ValidationError({"client_id": "Invalid client ID"})
+        
+        property_instance = Property.objects.create(client=client,**validated_data)
+        
+        for schedule_data in schedules_data:
+            Schedule.objects.create(property=property_instance, **schedule_data)
+        return property_instance
+
+class PaymentSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model=Payment
+        fields = ["id","amount","paymentType","paymentDate"]
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ['id','companyName','logo']
+
+class JobOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = ['id', 'jobDate', 'status', 'cost','complete_date']
+
+class ScheduleJobsSerializer(serializers.ModelSerializer):
+    jobs = JobOnlySerializer(source='job_set',many=True,read_only=True)
+
+    class Meta:
+        model = Schedule
+        fields = fields = ["id", "frequency","service","cost","nextDate","endDate","isActive","jobs"]
+
+class PropertyServiceInfoSerializer(serializers.ModelSerializer):
+    schedules = ScheduleJobsSerializer(many=True,read_only=True)
+    
+    class Meta:
+        model = Property
+        fields = ["id", "street", "city", "state", "zipCode", 'schedules']
+        
+class BalanceSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Balance
+        fields = ["id","current_balance", "updated_at"]
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "updated_at": {"read_only": True},
+        }
+
+class BalanceAdjustmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BalanceAdjustment
+        fields = ["id", "balance","amount","reason","created_at"]
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "created_at": {"read_only": True},
+        }
+
+# serializers.py
+class BalanceHistorySerializer(serializers.ModelSerializer):
+    jobs = JobSerializer(many=True)
+    payments = PaymentSerializer(many=True)
+    adjustments = BalanceAdjustmentSerializer(many=True)
+    class Meta:
+        model = BalanceHistory
+        fields = ['id', 'delta', 'new_balance', 'adjustment', 'created_at', 'jobs', 'payments','adjustments']
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = userProfile
+        fields = ['timezone']

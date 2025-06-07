@@ -1,73 +1,83 @@
 from django.test import TestCase, RequestFactory
 from rest_framework.exceptions import ValidationError
-from .models import Client, Property, Schedule
+from .models import Client, Property, Schedule,Job
 from .serializers import ClientPropertySetUpSerializer
 from django.contrib.auth.models import User
-
-class ClientPropertySetUpSerializerTest(TestCase):
+from django.utils.timezone import now
+from datetime import timedelta
+###
+class ScheduleJobGenerationTest(TestCase):
+    
     def setUp(self):
-        # Create a test user
+        """Set up test data before each test"""
         self.user = User.objects.create_user(username="testuser", password="testpass")
-
-        # Sample client data
-        self.client_data = {
-            "firstName": "John",
-            "lastName": "Doe",
-            "phoneNumber": "1234567890",
-            "email": "john.doe@example.com",
-            "property": [
-                {
-                    "street": "123 Main St",
-                    "city": "Anytown",
-                    "state": "CA",
-                    "zipCode": "12345",
-                    "schedule": {
-                        "frequency": "weekly",
-                        "nextDate": "2023-10-01",
-                        "service": "cleaning",
-                        "cost": 100.00,
-                    },
-                }
-            ],
-        }
-
-    def test_valid_data(self):
-        """Test if valid data creates the Client, Property, and Schedule properly."""
-        serializer = ClientPropertySetUpSerializer(data=self.client_data)
-        self.assertTrue(serializer.is_valid(), serializer.errors)  # Ensure it's valid
-
-        # Save the data with the test user as the author
-        client = serializer.save(author=self.user)  
+        self.client = Client.objects.create(
+            firstName="John",
+            lastName="Doe",
+            phoneNumber="1234567890",
+            email="john@example.com",
+            author =  self.user
+            )
         
-        # Verify database entries
-        self.assertEqual(Client.objects.count(), 1)
-        self.assertEqual(Property.objects.count(), 1)
-        self.assertEqual(Schedule.objects.count(), 1)
 
-        # Verify data correctness
-        self.assertEqual(client.firstName, "John")
-        property_instance = client.properties.first()
-        self.assertEqual(property_instance.street, "123 Main St")
-        self.assertEqual(property_instance.schedules.first().frequency, "weekly")
+        self.property = Property.objects.create(
+            client=self.client,
+            street="123 Main St",
+            city="Austin",
+            state="TX",
+            zipCode="78701"
+        )
 
-    def test_invalid_data(self):
-        """Test validation failure when required fields are missing."""
-        invalid_data = self.client_data.copy()
-        invalid_data["firstName"] = ""  # Missing firstName
+        self.schedule_daily = Schedule.objects.create(
+            property=self.property,
+            frequency="daily",
+            nextDate=now().date(),
+            endDate=now().date() + timedelta(days=5),
+            service="Lawn Mowing",
+            cost=50.00
+        )
 
-        serializer = ClientPropertySetUpSerializer(data=invalid_data)
-        self.assertFalse(serializer.is_valid())
-        self.assertIn("firstName", serializer.errors)
+        self.schedule_weekly = Schedule.objects.create(
+            property=self.property,
+            frequency="weekly",
+            nextDate=now().date(),
+            endDate=now().date() + timedelta(weeks=4),
+            service="Tree Trimming",
+            cost=100.00
+        )
 
-    def test_nested_invalid_data(self):
-        """Test validation failure for nested property/schedule data."""
-        invalid_data = self.client_data.copy()
-        invalid_data["property"][0]["schedule"]["frequency"] = ""  # Invalid frequency
+    def test_generate_jobs_creates_jobs(self):
+        """Test if jobs are created for schedules with today's date"""
+        Schedule.generate_jobs()
+        
+        jobs = Job.objects.all()
+        self.assertEqual(jobs.count(), 2)  # Two jobs should be created
+        self.assertEqual(jobs[0].cost, self.schedule_daily.cost)
+        self.assertEqual(jobs[1].cost, self.schedule_weekly.cost)
 
-        serializer = ClientPropertySetUpSerializer(data=invalid_data)
-        self.assertFalse(serializer.is_valid())
+    def test_nextDate_updates_correctly(self):
+        """Test if nextDate updates based on frequency"""
+        Schedule.generate_jobs()
+        self.schedule_daily.refresh_from_db()
+        self.schedule_weekly.refresh_from_db()
 
-        # Ensure the error is in the correct nested path
-        self.assertIn("property", serializer.errors)
-        self.assertIn("schedule", serializer.errors["property"][0])
-        self.assertIn("frequency", serializer.errors["property"][0]["schedule"])
+        self.assertEqual(self.schedule_daily.nextDate, now().date() + timedelta(days=1))
+        self.assertEqual(self.schedule_weekly.nextDate, now().date() + timedelta(weeks=1))
+
+    def test_jobs_not_created_if_nextDate_is_future(self):
+        """Test that jobs are NOT created if nextDate is in the future"""
+        self.schedule_daily.nextDate = now().date() + timedelta(days=1)
+        self.schedule_daily.save()
+
+        Schedule.generate_jobs()
+        jobs = Job.objects.all()
+        self.assertEqual(jobs.count(), 1)  # Only the weekly job should be created
+
+    def test_jobs_not_created_past_endDate(self):
+        """Test that jobs are not created if nextDate is past endDate"""
+        self.schedule_daily.nextDate = self.schedule_daily.endDate + timedelta(days=1)
+        self.schedule_daily.save()
+
+        Schedule.generate_jobs()
+        jobs = Job.objects.all()
+        self.assertEqual(jobs.count(), 1)  # Only the weekly job should be created

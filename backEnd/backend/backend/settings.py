@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-m@f*u%cn(okby3)-%=&(yig*pavqa^e%x)6y)*ktbne_74m-id
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["logi-task-cebedxdwg2b2a7bc.centralus-01.azurewebsites.net",'localhost','127.0.0.1']
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -57,6 +57,8 @@ INSTALLED_APPS = [
     "api",
     "rest_framework",
     "corsheaders",
+    'background_task',
+    'whitenoise'
 ]
 
 MIDDLEWARE = [
@@ -135,8 +137,11 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
-
+STATIC_ROOT =  os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = 'static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
