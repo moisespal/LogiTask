@@ -14,7 +14,7 @@ interface ConfirmationDialogProps {
         <div className="dialog-overlay">
             <div className="dialog-container">
                 <h3 className="dialog-title">{title}</h3>
-                <p className="dialog-message">{message}</p>
+                <div className="dialog-message">{message}</div>
                 <div className="dialog-buttons">
                     <button className="dialog-button cancel-button" onClick={onCancel}>
                         Cancel

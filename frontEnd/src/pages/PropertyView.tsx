@@ -5,6 +5,7 @@ import { Property, ClientSchedule, ClientData } from "../types/interfaces";
 import "../styles/pages/PropertyView.css";
 import ConfirmationDialog  from "../components/Dialog/ConfirmationDialog";
 import AddSchedule from "../components/Property/AddSchedule";
+import SelectButtons from "../components/Dialog/SelectButtons";
 
 const PropertyView: React.FC = () => {
   const location = useLocation();
@@ -34,6 +35,7 @@ const PropertyView: React.FC = () => {
   };  
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpenFrequency, setDialogOpenFrequency] = useState(false);
   const [dialogData, setDialogData] = useState<{
     scheduleId?: number;
     newStatus?: boolean;
@@ -43,6 +45,9 @@ const PropertyView: React.FC = () => {
     nextDate?: string;
   }>({});
 
+  const [selected, setSelected] = useState<number | null>(null);
+  const buttons = ['Once', 'Weekly', 'Biweekly', 'Monthly'];
+  
   useEffect(() => {
     // Fetch schedules data
     api
@@ -269,9 +274,39 @@ const handleStatusConfirm = async() => {
   setDialogOpen(false);
 };
 
+  const handleFrequencyConfirm = async() => {
+    if (selected === null) {
+      console.warn("No frequency selected");
+      return;
+    }
+
+    const newFrequency = buttons[selected];
+
+     const response = await api.patch(
+      `/api/update-schedule-status/${dialogData.scheduleId}/`,
+      { frequency: newFrequency }
+    );
+
+    if (response.status === 200) {
+      setSchedules(prev =>
+        prev.map(schedule =>
+          schedule.id === dialogData.scheduleId
+            ? { 
+                ...schedule, 
+                frequency: newFrequency,
+              }
+            : schedule
+        )
+      );
+      setDialogOpenFrequency(false);
+      setSelected(null);
+    } else {  
+      console.error("Failed to update frequency:", response.statusText);
+    }
+  }
+
   const handleAddScheduleClick = () => {
     setAddScheduleOpen(true);
-    console.log("Add Schedule clicked");
   };
 
   return (
@@ -404,16 +439,25 @@ const handleStatusConfirm = async() => {
                                       nextDate: schedule.nextDate,
                                     });
                                     setDialogOpen(true);
-                                    console.log("Clicked status button", schedule.id, schedule.isActive);
                                   }}
                                 >
                                   {schedule.isActive ? "ACTIVE" : "INACTIVE"}
                                 </button>
                               </div>
                             <div className="frequency-label-container">
-                              <span className="frequency-label">
+                              <button className="frequency-label"
+                                onClick={() => {
+                                  setDialogData({
+                                      scheduleId: schedule.id,
+                                      frequency: schedule.frequency,
+                                    });
+                                    const currentIndex = buttons.findIndex(b => b.toLowerCase() === schedule.frequency?.toLowerCase());
+                                    setDialogOpenFrequency(true);
+                                    setSelected(currentIndex !== -1 ? currentIndex : null);
+                                }}
+                              >
                                 {getFrequencyLabel(schedule.frequency)}
-                              </span>
+                              </button>
                             </div>
                           </div>
                           {schedule.isActive ? (
@@ -562,7 +606,23 @@ const handleStatusConfirm = async() => {
         onConfirm={handleStatusConfirm}
         onCancel={() => setDialogOpen(false)}
       />
-      <AddSchedule 
+      <ConfirmationDialog
+        open={dialogOpenFrequency}
+        title="Confirm Frequency Change"
+        message={
+            <SelectButtons
+              selected={selected}
+              setSelected={setSelected}
+              buttons={buttons}
+            />
+        }
+        onConfirm={handleFrequencyConfirm}
+        onCancel={() => {
+          setDialogOpenFrequency(false);
+          setSelected(null);
+        }}
+      />
+      <AddSchedule
         isOpen={addScheduleOpen}
         onClose={handleAddScheduleClose}
         propertyId={property.id}
