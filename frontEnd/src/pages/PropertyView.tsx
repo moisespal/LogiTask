@@ -519,6 +519,7 @@ const handleNextDateConfirm = async() => {
                                 setDialogOpenNextDate(true);
                               }}
                             >
+                              Next:{" "}
                               {formatDateLocal(schedule.nextDate)}
                             </button>
                           ) :
@@ -543,7 +544,7 @@ const handleNextDateConfirm = async() => {
 
                             <div className="job-history-list">
                               {schedule.jobs && schedule.jobs.length > 0 ? (
-                                schedule.jobs.map((job, jobIndex) => (
+                                [...schedule.jobs].reverse().map((job, jobIndex) => (
                                   <div
                                     key={job.id || jobIndex}
                                     className="job-item"
