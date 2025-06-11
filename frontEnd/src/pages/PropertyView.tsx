@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import api from "../api";
 import { useLocation } from "react-router-dom";
 import { Property, ClientSchedule, ClientData } from "../types/interfaces";
@@ -36,6 +36,8 @@ const PropertyView: React.FC = () => {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogOpenFrequency, setDialogOpenFrequency] = useState(false);
+  const [dialogOpenNextDate, setDialogOpenNextDate] = useState(false);
+
   const [dialogData, setDialogData] = useState<{
     scheduleId?: number;
     newStatus?: boolean;
@@ -43,10 +45,20 @@ const PropertyView: React.FC = () => {
     frequency?: string;
     cost?: number;
     nextDate?: string;
+    endDate?: string;
   }>({});
 
   const [selected, setSelected] = useState<number | null>(null);
   const buttons = ['Once', 'Weekly', 'Biweekly', 'Monthly'];
+
+  const nextRef = useRef<HTMLInputElement>(null);
+  const endRef = useRef<HTMLInputElement>(null);
+
+
+  const openPicker = (ref: React.RefObject<HTMLInputElement>) => {
+    if (ref.current?.showPicker) ref.current.showPicker();
+    else ref.current?.click();
+  };
   
   useEffect(() => {
     // Fetch schedules data
@@ -147,12 +159,14 @@ const PropertyView: React.FC = () => {
 }
 
   const daysUntilNextService = (nextDate: string): { days: number, text: string } => {
-    const today = new Date();
+
     const nextServiceDate = new Date(nextDate);
+    const todayString = getTodayInUserTimezone();
+    const today = new Date(todayString);
 
     const daysDiff = nextServiceDate.getTime() - today.getTime();
     const daysUntil = Math.ceil(daysDiff / (1000 * 3600 * 24));
-
+    
     // Return both the numeric value and formatted text
     if (daysUntil === 1) {
       return { days: 1, text: "Tomorrow" };
@@ -160,7 +174,7 @@ const PropertyView: React.FC = () => {
       return { days: daysUntil, text: `${daysUntil} days` };
     }
   };
-  
+
   const getTodayInUserTimezone = (): string => {
     const userTimezone = localStorage.getItem("userTimeZone") || "CST";
 
@@ -304,6 +318,40 @@ const handleStatusConfirm = async() => {
       console.error("Failed to update frequency:", response.statusText);
     }
   }
+
+const handleNextDateConfirm = async() => {
+  if (!dialogData.nextDate) {
+    console.warn("No next date set");
+    return;
+  }
+
+  const response = await api.patch(
+    `/api/update-schedule-status/${dialogData.scheduleId}/`,
+    { nextDate: dialogData.nextDate 
+      , endDate: dialogData.endDate || null
+    }
+  );
+
+  if (response.status === 200) {
+      setSchedules(prev =>
+        prev.map(schedule =>
+          schedule.id === dialogData.scheduleId
+            ? { 
+                ...schedule, 
+                nextDate: dialogData.nextDate || schedule.nextDate,
+                endDate: dialogData.endDate || null,
+              }
+            : schedule
+        )
+      );
+    console.log("Next date updated successfully:", dialogData.nextDate);
+    setDialogOpenNextDate(false);
+    } 
+  else {
+    console.error("Failed to update next date:", response.statusText);
+  }
+};
+
 
   const handleAddScheduleClick = () => {
     setAddScheduleOpen(true);
@@ -461,12 +509,22 @@ const handleStatusConfirm = async() => {
                             </div>
                           </div>
                           {schedule.isActive ? (
-                            <div className="next-service-date">
+                            <button className="next-service-date"
+                              onClick={() => {
+                                setDialogData({
+                                  scheduleId: schedule.id,
+                                  nextDate: schedule.nextDate,
+                                  endDate: schedule.endDate || "",
+                                });
+                                setDialogOpenNextDate(true);
+                              }}
+                            >
                               {formatDateLocal(schedule.nextDate)}
-                            </div>
+                            </button>
                           ) :
-                            <div className="next-service-date">
-                              {"Ended on " + formatDateLocal(schedule.endDate || "")}
+                            
+                            <div className="ended-service-date">
+                              {"Ended: " + formatDateLocal(schedule.endDate || "")}
                             </div>
                           }
                         </div>
@@ -621,6 +679,66 @@ const handleStatusConfirm = async() => {
           setDialogOpenFrequency(false);
           setSelected(null);
         }}
+      />
+      <ConfirmationDialog
+        open={dialogOpenNextDate}
+        title="Confirm Next Service Date"
+        message={
+          <div className="date-card">
+            {/* ---------- NEXT DATE ---------- */}
+
+            <div className="date-item">
+              <button
+                type="button"
+                className="date-btn next"
+                aria-label="Pick next service date"
+                onClick={() => openPicker(nextRef)}
+              >
+                <i className="fa-regular fa-calendar"></i>
+                <span>Next</span>
+              </button>
+
+              {/* hidden native input */}
+              <input
+                ref={nextRef}
+                type="date"
+                value={dialogData.nextDate}
+                onChange={(e) =>
+                  setDialogData({ ...dialogData, nextDate: e.target.value })
+                }
+                className="sr-only"
+              />
+
+              <div className="date-readout">{dialogData.nextDate ? formatDateLocal(dialogData.nextDate) : 'None Set'}</div>
+            </div>
+
+            {/* ---------- END DATE ---------- */}
+            <div className="date-item">
+              <button
+                type="button"
+                className="date-btn end"
+                aria-label="Pick end date"
+                onClick={() => openPicker(endRef)}
+              >
+                <i className="fa-regular fa-calendar-xmark"></i>
+                <span>End</span>
+              </button>
+
+              <input
+                ref={endRef}
+                type="date"
+                value={dialogData.endDate}
+                onChange={(e) =>
+                  setDialogData({ ...dialogData, endDate: e.target.value })
+                }
+                className="sr-only"
+              />
+
+              <div className="date-readout">{dialogData.endDate ? formatDateLocal(dialogData.endDate) : 'Not Set'}</div>
+            </div>
+          </div>}
+        onConfirm={handleNextDateConfirm}
+        onCancel={() => setDialogOpenNextDate(false)}
       />
       <AddSchedule
         isOpen={addScheduleOpen}

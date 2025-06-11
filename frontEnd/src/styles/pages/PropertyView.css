@@ -351,18 +351,49 @@
 }
 
 .next-service-date{
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.9);
+  padding: 5px 10px;
+  background: #505089f9;
+  color:  #e9e9fe;
+  border: 1px solid #e9e9fe;
+  border-radius: 20px;
+  font-size: 14px;
   font-weight: 500;
   display: flex;
   align-items: center;
-  padding-right: 30px;
+  transition: all 0.2s ease;
 }
 
 .next-service-date::before {
-  content: "\1F4C5"; /* calendar emoji */
+  font-size: 14px;
+}
+
+.next-service-date:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  background-color: #55558cf9;
+}
+
+.ended-service-date {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  background-color: rgba(244, 67, 54, 0.247);
+  color: #ff7671;
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.ended-service-date::before {
+  font-family: "Font Awesome 5 Free";
   margin-right: 6px;
   font-size: 14px;
+}
+
+.ended-service-date:hover {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Status Badge */
@@ -950,4 +981,77 @@
   color: #81a4ff;
   border: 1px solid rgba(79, 134, 235, 0.3);
   opacity: 1;
+}
+
+.date-card {
+  display: flex;
+  flex-wrap: nowrap;            
+  justify-content: center;
+  padding: .5rem;   
+}
+
+
+.date-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-width: 150px;
+}
+
+
+.date-btn {
+  --size: 80px;
+  width: var(--size);
+  height: var(--size);;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  font-size: 2.5rem;
+  color: #ffffff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.date-btn span {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.date-btn.next { 
+  background: linear-gradient(135deg, #ff5b79, #eb3557);
+  color: white;
+  border: 2px solid #ff5b79;
+}
+
+.date-btn.end { 
+  background: linear-gradient(135deg, #2196f3, #0d75c5);
+  color: white;
+  border: 2px solid #2196f3;
+}
+
+.date-btn:hover,
+.date-btn:focus-visible {
+  transform: translateY(-3px);
+  filter: brightness(1.1);
+}
+
+.date-btn:active {
+  transform: translateY(5px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.date-readout {
+  padding: 0.40rem 1rem;
+  border-radius: 20px;
+  text-align: center;          
+}
+
+
+.date-readout:not(:empty):not(:has(:empty)) {
+  color: #bcb8b8;
+  background-color: rgba(59, 58, 58, 0.969);
 }
