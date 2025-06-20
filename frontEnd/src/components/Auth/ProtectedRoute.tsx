@@ -12,6 +12,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [companyChecked, setCompanyChecked] = useState(false);
   const [hasCompany, setHasCompany] = useState(false);
+  const [tzChecked, setTzChecked] = useState(false);
   const location = useLocation();
   const isCompanySetupRoute = location.pathname === "/company-setup";
 
@@ -29,6 +30,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
       } else {
         // Use a simpler company check
         checkCompanyStatus();
+        checkUserTimeZone();
       }
     }
   }, [isAuthorized, isCompanySetupRoute]);
@@ -44,6 +46,26 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
     } else {
       // No company in localStorage, check API
       checkCompanyFromAPI();
+    }
+  };
+
+  const checkUserTimeZone = async () => {
+    const cachedTZ = localStorage.getItem("userTimeZone");
+
+    if (cachedTZ) {
+      setTzChecked(true);
+      return;
+    } 
+    try {
+      const res = await api.get("/api/get-user-profile/");
+      if (res.data.timezone) {
+        localStorage.setItem("userTimeZone", res.data.timezone);
+      }
+    } catch (error) {
+      console.error("Error checking user time zone:", error);
+    }
+    finally {
+      setTzChecked(true);
     }
   };
 
@@ -131,7 +153,9 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   // All checks passed, render children
-  return <>{children}</>;
+  if (tzChecked && companyChecked) {
+    return <>{children}</>;
+  }
 }
 
 export default ProtectedRoute;

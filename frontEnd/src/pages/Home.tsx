@@ -294,6 +294,7 @@ const Home: React.FC = () => {
       try {
         const tz = localStorage.getItem("userTimeZone") || "America/Chicago";
         const target = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
+        target.setHours(0, 0, 0, 0); // resets the time to midnight
         target.setDate(target.getDate() + dayIndex); // applies that shift to the current date
 
         const formattedDate = target.toISOString().slice(0, 10);

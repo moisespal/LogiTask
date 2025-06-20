@@ -16,7 +16,7 @@ const nextSixDays = useMemo(() => {
   const todayInUserTZ = new Date(
     new Date().toLocaleString("en-US", { timeZone: userTimeZone })
   );
-
+  todayInUserTZ.setHours(0, 0, 0, 0);
   const fmt = new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     month: "short",

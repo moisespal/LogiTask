@@ -1,12 +1,6 @@
 import api from '../api';
 
 const Dev: React.FC = () => {
-  
-  
-
- 
-
-  ;
 
      const generateJobs = async () => {
       await api.get("/api/generateJobs/", {});
