@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import Dev from "./pages/dev";
 import { CompanySetUp } from "./pages/CompanySetUp";
 import PropertyView from "./pages/PropertyView";
+import ClientView from "./pages/ClientView";
 
 const Logout: React.FC = () => {
   localStorage.clear();
@@ -50,10 +51,19 @@ const App: React.FC = () => {
 
         {/* Protected Property View Route */}
         <Route
-          path="/property-view/:propertyId"
+          path="/property-view/"
           element={
             <ProtectedRoute>
               <PropertyView />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/client-view/"
+          element={
+            <ProtectedRoute>
+              <ClientView />
             </ProtectedRoute>
           }
         />

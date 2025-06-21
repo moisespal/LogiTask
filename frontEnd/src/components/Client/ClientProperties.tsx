@@ -30,12 +30,11 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
     setIsModalOpen(isOpen);
   };
 
-  const handlePropertyClick = (propertyIndex: number) => {
+   const handlePropertyClick = (propertyIndex: number) => {
 
     const property = client.properties[propertyIndex];
-    const id = (property as {id?: number}).id;
     
-    navigate(`/property-view/${id}`, {
+    navigate(`/property-view/`, {
       state: {
         property: property,
         client: client,
