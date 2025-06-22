@@ -32,34 +32,31 @@ const ClientView: React.FC = () => {
                 }
 
                 const allJobs = [];
+                let jobCost = 0;
                 for (const dataItem of response.data) {
                     if (dataItem.jobs && Array.isArray(dataItem.jobs)) {
+                        
                         for (const job of dataItem.jobs) {
                             allJobs.push(job);
+                            jobCost += parseFloat(job.cost);
 
-                            const jobCost = parseFloat(job.cost);
-                            if (!isNaN(jobCost)) {
-                                setJobAmount(prevAmount => prevAmount + jobCost);
-                            }
                         }
+                        setJobAmount(jobCost);
                     }
                 }
+                console.log(jobCost);
                 setAllJobs(allJobs);
 
                 // Set the payments state
                 const allPayments = [];
+                let totalPaymentAmount = 0;
                 for (const dataItem of response.data) {
                     if (dataItem.payments && Array.isArray(dataItem.payments)) {
                         for (const payment of dataItem.payments) {
-
                             allPayments.push(payment);
-
-                            // Calculate total amount for payments
-                            const amount = parseFloat(payment.amount);
-                            if (!isNaN(amount)) {
-                                setTotalAmount(prevTotal => prevTotal + amount);
-                            }
+                            totalPaymentAmount += parseFloat(payment.amount);
                         }
+                        setTotalAmount(totalPaymentAmount);
                     }
                 }
                 setAllPayments(allPayments);
@@ -70,9 +67,8 @@ const ClientView: React.FC = () => {
 
     }, [client.id]);
 
-    // Dummy data for layout purposes
-    const dummyPaymentPercentage = (totalAmount > 0) ? (totalAmount / jobAmount) * 100 : 0;
-    console.log(dummyPaymentPercentage); 
+    const percentagePaid = (totalAmount > 0) ? (totalAmount / jobAmount) * 100 : 100;
+
     let balanceColor = "#4CAF50";  // Default green
     let progressGradient = "linear-gradient(90deg, #4CAF50, #8BC34A)";  // Default green gradient
 
@@ -131,7 +127,7 @@ const ClientView: React.FC = () => {
                         <div 
                             className="progress-fill" 
                             style={{ 
-                                width: `${dummyPaymentPercentage}%`,
+                                width: `${percentagePaid}%`,
                                 background: progressGradient
                             }}
                         >
