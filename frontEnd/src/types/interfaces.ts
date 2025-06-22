@@ -98,3 +98,19 @@ export interface ClientSchedule {
   }[];
 }
 [];
+
+export interface Payment {
+  id: number;
+  amount: string;
+  paymentType: string;
+  paymentDate: string;
+}
+
+export interface clientViewJob {
+  client: ClientDataID;
+  complete_date: string;
+  cost: number;
+  id: number;
+  property: Property;
+  schedule: Schedule;
+}

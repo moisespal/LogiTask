@@ -1,42 +1,87 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import api from "../api";
 import { useLocation } from "react-router-dom";
-import { ClientDataID } from "../types/interfaces";
+import { ClientDataID, clientViewJob, Payment } from "../types/interfaces";
 import "../styles/pages/ClientView.css";
+import { formatPhoneNumber, formatUTCtoLocal }  from "../utils/format";
 
 const ClientView: React.FC = () => {
     const location = useLocation();
     const { client } = location.state as {
         client: ClientDataID;
     };
+    const [allJobs, setAllJobs] = useState<clientViewJob[]>([]);
+    const [allPayments, setAllPayments] = useState<Payment[]>([]);
+    const [newBalance, setNewBalance] = useState<number>(0);
+    const [jobAmount, setJobAmount] = useState<number>(0);
+    const [totalAmount, setTotalAmount] = useState<number>(0);
+
+    const timezone = localStorage.getItem("userTimeZone") || "UTC";
 
     useEffect(() => {
-       // fetch balance and client data
          api
-            .get(`/api/balance-history/${client.id}`)
+            .get(`/api/balance-history/${client.id}/`)
             .then(response => {
-                // Handle the response data
                 console.log('Balance history:', response.data);
+
+                const balanceData = response.data[0].new_balance;
+                if (balanceData !== undefined) {
+                    setNewBalance(balanceData);
+                } else {
+                    setNewBalance(0);
+                }
+
+                const allJobs = [];
+                for (const dataItem of response.data) {
+                    if (dataItem.jobs && Array.isArray(dataItem.jobs)) {
+                        for (const job of dataItem.jobs) {
+                            allJobs.push(job);
+
+                            const jobCost = parseFloat(job.cost);
+                            if (!isNaN(jobCost)) {
+                                setJobAmount(prevAmount => prevAmount + jobCost);
+                            }
+                        }
+                    }
+                }
+                setAllJobs(allJobs);
+
+                // Set the payments state
+                const allPayments = [];
+                for (const dataItem of response.data) {
+                    if (dataItem.payments && Array.isArray(dataItem.payments)) {
+                        for (const payment of dataItem.payments) {
+
+                            allPayments.push(payment);
+
+                            // Calculate total amount for payments
+                            const amount = parseFloat(payment.amount);
+                            if (!isNaN(amount)) {
+                                setTotalAmount(prevTotal => prevTotal + amount);
+                            }
+                        }
+                    }
+                }
+                setAllPayments(allPayments);
             })
             .catch(error => {
                 console.error('Error fetching balance history:', error);
             });
-    }, [client.id]); // TODO: FIX THE BALANCE HISTORY API CALL
+
+    }, [client.id]);
 
     // Dummy data for layout purposes
-    const dummyBalance = 130;
-    const dummyPaymentPercentage = 45; // For progress bar width
-    const dummyServices = [
-        { address: "4572 Dog St", service: "St mowed", date: "05/11/25", amount: 50 },
-        { address: "2112 Bone Ln", service: "Ln mowed", date: "05/01/12", amount: 50 },
-        { address: "4572 Dog St", service: "Ln mowed", date: "04/18/25", amount: 50 },
-        { address: "2112 Bone Ln", service: "St mowed", date: "03/18/25", amount: 50 },
-    ];
-    const dummyPayments = [
-        { date: "05/01/25", method: "Check", amount: 50 },
-        { date: "04/24/25", method: "Cash", amount: 20 },
-    ];
-    
+    const dummyPaymentPercentage = (totalAmount > 0) ? (totalAmount / jobAmount) * 100 : 0;
+    console.log(dummyPaymentPercentage); 
+    let balanceColor = "#4CAF50";  // Default green
+    let progressGradient = "linear-gradient(90deg, #4CAF50, #8BC34A)";  // Default green gradient
+
+    if (newBalance < 0) {
+        // Negative balance - red
+        balanceColor = "#f44336";
+        progressGradient = "linear-gradient(90deg, #f44336, #FF5722)";
+    }   // For progress bar width
+
     return (
         <div className="client-view-container">
             {/* Top Section */}
@@ -56,7 +101,7 @@ const ClientView: React.FC = () => {
                         <div className="client-contact">
                             <div className="contact-item">
                                 <i className="fa-solid fa-phone"></i>
-                                <span>{client.phoneNumber}</span>
+                                <span>{formatPhoneNumber(client.phoneNumber)}</span>
                             </div>
                             <div className="contact-item">
                                 <i className="fa-solid fa-envelope"></i>
@@ -70,7 +115,7 @@ const ClientView: React.FC = () => {
                 <div className="client-balance-card">
                     <div className="balance-header">
                         <div className="balance-text">
-                            <span>Balance Due:</span> <span className="balance-amount">${dummyBalance}</span>
+                            <span>Balance Due:</span> <span className="balance-amount" style={{ color: balanceColor }}>${Math.abs(newBalance)}</span>
                         </div>
                         <div className="header-buttons">
                             <button className="payment-button-secondary">
@@ -85,8 +130,12 @@ const ClientView: React.FC = () => {
                     <div className="balance-progress-bar">
                         <div 
                             className="progress-fill" 
-                            style={{ width: `${dummyPaymentPercentage}%` }}
-                        ></div>
+                            style={{ 
+                                width: `${dummyPaymentPercentage}%`,
+                                background: progressGradient
+                            }}
+                        >
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,7 +156,7 @@ const ClientView: React.FC = () => {
                 
                 {/* Services */}
                 <div className="client-panel services-panel">
-                    <h3 className="panel-header">Completed Jobs<span className="total-amount">$200</span></h3>
+                    <h3 className="panel-header">Completed Jobs<span className="total-amount">${jobAmount}</span></h3>
                     <div className="table-container">
                         <table className="data-table">
                             <thead>
@@ -115,16 +164,16 @@ const ClientView: React.FC = () => {
                                     <th>Address</th>
                                     <th>Service</th>
                                     <th>Date</th>
-                                    <th>$$$</th>
+                                    <th>Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {dummyServices.map((service, i) => (
+                                {allJobs.map((job, i) => (
                                     <tr key={i}>
-                                        <td>{service.address}</td>
-                                        <td>{service.service}</td>
-                                        <td>{service.date}</td>
-                                        <td>${service.amount}</td>
+                                        <td>{job.property.street}</td>
+                                        <td>{job.schedule.service}</td>
+                                        <td>{formatUTCtoLocal(job.complete_date, timezone)}</td>
+                                        <td>${job.cost}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -134,7 +183,7 @@ const ClientView: React.FC = () => {
                 
                 {/* Payments */}
                 <div className="client-panel payments-panel">
-                    <h3 className="panel-header">Payments<span className="total-amount">$70</span></h3>
+                    <h3 className="panel-header">Payments<span className="total-amount">${totalAmount}</span></h3>
                     <div className="table-container">
                         <table className="data-table">
                             <thead>
@@ -145,10 +194,10 @@ const ClientView: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {dummyPayments.map((payment, i) => (
+                                {allPayments.map((payment, i) => (
                                     <tr key={i}>
-                                        <td>{payment.date}</td>
-                                        <td>{payment.method}</td>
+                                        <td>{formatUTCtoLocal(payment.paymentDate, timezone)}</td>
+                                        <td>{payment.paymentType}</td>
                                         <td>${payment.amount}</td>
                                     </tr>
                                 ))}
