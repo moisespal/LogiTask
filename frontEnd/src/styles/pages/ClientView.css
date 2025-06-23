@@ -122,7 +122,8 @@
     margin-left: 10px;
     font-weight: bold;
     font-family: 'arial';
-    color: #4CAF50; /* Green color for balance amount */
+    color: transparent;
+    background-clip: text;
 }
 
 .balance-progress-bar {
@@ -135,7 +136,6 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4CAF50, #8BC34A);
     border-radius: 6px;
 }
 

@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { ClientDataID, clientViewJob, Payment } from "../types/interfaces";
 import "../styles/pages/ClientView.css";
 import { formatPhoneNumber, formatUTCtoLocal }  from "../utils/format";
+import PaymentModal from '../components/Payment/PaymentModal';
 
 const ClientView: React.FC = () => {
     const location = useLocation();
@@ -15,6 +16,7 @@ const ClientView: React.FC = () => {
     const [newBalance, setNewBalance] = useState<number>(0);
     const [jobAmount, setJobAmount] = useState<number>(0);
     const [totalAmount, setTotalAmount] = useState<number>(0);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
 
     const timezone = localStorage.getItem("userTimeZone") || "UTC";
 
@@ -24,7 +26,7 @@ const ClientView: React.FC = () => {
             .then(response => {
                 console.log('Balance history:', response.data);
 
-                const balanceData = response.data[0].new_balance;
+                const balanceData = response.data[response.data.length - 1].new_balance;
                 if (balanceData !== undefined) {
                     setNewBalance(balanceData);
                 } else {
@@ -67,16 +69,27 @@ const ClientView: React.FC = () => {
 
     }, [client.id]);
 
-    const percentagePaid = (totalAmount > 0) ? (totalAmount / jobAmount) * 100 : 100;
+    const getGradientFromBalance = (newBalance: number): [string, number] => {
 
-    let balanceColor = "#4CAF50";  // Default green
-    let progressGradient = "linear-gradient(90deg, #4CAF50, #8BC34A)";  // Default green gradient
+        if (newBalance >= 0 || jobAmount === 0) {
+            const fullGreen = "linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%)";
+            return [fullGreen, 100];
+        }
 
-    if (newBalance < 0) {
-        // Negative balance - red
-        balanceColor = "#f44336";
-        progressGradient = "linear-gradient(90deg, #f44336, #FF5722)";
-    }   // For progress bar width
+        const paid = Math.max(0, totalAmount);                 // never negative
+        const percentPaid = Math.min(100, (paid / jobAmount) * 100);
+
+        const eased = Math.pow(percentPaid / 100, 0.85);    
+        const hue = eased * 80;                                                    
+
+        const start = `hsl(${hue}, 100%, 40%)`          
+        const end   = `hsl(${hue}, 100%, 50%)`;
+
+        return [`linear-gradient(90deg,${start} 0%,${end} 100%)`, percentPaid];
+    }
+
+    const gradientAndPercentage = getGradientFromBalance(newBalance);
+
 
     return (
         <div className="client-view-container">
@@ -111,10 +124,20 @@ const ClientView: React.FC = () => {
                 <div className="client-balance-card">
                     <div className="balance-header">
                         <div className="balance-text">
-                            <span>Balance Due:</span> <span className="balance-amount" style={{ color: balanceColor }}>${Math.abs(newBalance)}</span>
+                            {newBalance >= 0 ? (
+                                <span className="balance-status">Credit: <span className="balance-amount" style={{  backgroundImage: gradientAndPercentage[0]}}>${(newBalance)}  </span></span>
+                            ) : (
+                                <>
+                                    <span>Balance Due:</span> <span className="balance-amount" style={{  backgroundImage: gradientAndPercentage[0]}}>${Math.abs(newBalance)}</span>
+                                </>
+                            )}
                         </div>
                         <div className="header-buttons">
-                            <button className="payment-button-secondary">
+                            <button 
+                                className="payment-button-secondary" 
+                                onClick={() => setShowPaymentModal(true)}
+                                title="Record Payment"
+                            >
                                 <i className="fa-solid fa-money-bill-wave"></i> 
                             </button>
                             <button className="balance-adjustment-button">
@@ -127,8 +150,8 @@ const ClientView: React.FC = () => {
                         <div 
                             className="progress-fill" 
                             style={{ 
-                                width: `${percentagePaid}%`,
-                                background: progressGradient
+                                width: `${gradientAndPercentage[1]}%`,
+                                background: gradientAndPercentage[0]
                             }}
                         >
                         </div>
@@ -202,6 +225,12 @@ const ClientView: React.FC = () => {
                     </div>
                 </div>
             </div>
+            <PaymentModal 
+                isOpen={showPaymentModal}
+                onClose={() => setShowPaymentModal(false)}
+                client={client}
+                onPaymentSubmit={() => setShowPaymentModal(false)}
+            />
         </div>
     );
 };
