@@ -51,6 +51,9 @@ class ClientPropertySetUpSerializer(serializers.ModelSerializer):
         author = validated_data.pop('author', None)
         client = Client.objects.create(author=author,**validated_data)
         
+         # Create the Balance record
+        Balance.objects.create(client=client)
+        
         for property_data in properties_data:
             try:
                 schedules_data = property_data.pop('schedules', [])

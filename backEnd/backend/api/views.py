@@ -282,7 +282,7 @@ class update_balance_view(ListAPIView):
 
 
         #get balance table
-        balance, _ = Balance.objects.get_or_create(client=client)
+        balance= Balance.objects.get(client=client)
 
         #recalculate
         balance.recalculate_balance()
