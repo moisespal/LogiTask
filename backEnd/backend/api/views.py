@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -18,6 +18,7 @@ from django.db.models import Prefetch
 from django.db.models.functions import Lower
 from django.db.models import Sum
 from decimal import Decimal
+from collections import defaultdict
 
 
 
@@ -366,7 +367,7 @@ class GetUnappliedObjects(APIView):
         except Client.DoesNotExist:
             return Response({"error": "Client not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        unapplied_jobs = Job.objects.filter(client=client, is_applied_to_balance=False, status='complete')
+        unapplied_jobs = Job.objects.filter(client=client, is_applied_to_balance=False, status='complete').select_related('schedule__property')
         unapplied_payments = Payment.objects.filter(client=client, is_applied_to_balance=False)
         unapplied_adjustments = BalanceAdjustment.objects.filter(client=client, is_applied_to_balance=False)
 
@@ -380,12 +381,37 @@ class GetUnappliedObjects(APIView):
 
         delta = total_payments - total_jobs + total_adjustments
 
-        jobs_data = JobInfoSerializer(unapplied_jobs,many=True).data
+
+        grouped = defaultdict(lambda: defaultdict(list))  # {property: {schedule: [jobs]}}
+
+        for job in unapplied_jobs:
+            prop = job.schedule.property
+            sched = job.schedule
+            grouped[prop][sched].append(job)
+
+        final_data = []
+
+        for prop, schedules_dict in grouped.items():
+            property_data = PropertySerializer(prop).data
+            schedules_data = []
+
+            for schedule, jobs in schedules_dict.items():
+                schedule_data = ScheduleSerializer(schedule).data
+                schedule_data['jobs'] = JobOnlySerializer(jobs, many=True).data
+                schedules_data.append(schedule_data)
+
+            final_data.append({
+                'property': property_data,
+                'schedules': schedules_data
+            })
+
+
+        #jobs_data = JobInfoSerializer(unapplied_jobs,many=True).data
         payments_data =  PaymentSerializer(unapplied_payments,many=True).data
         adjustments_data = BalanceAdjustmentSerializer(unapplied_adjustments, many=True).data
 
         return Response({
-            "unapplied_jobs": jobs_data,
+            "unapplied_jobs": final_data,
             "unapplied_payments": payments_data,
             "unapplied_adjustments": adjustments_data,
             "delta": str(delta)  # Use str to avoid JSON serialization errors with Decimal
