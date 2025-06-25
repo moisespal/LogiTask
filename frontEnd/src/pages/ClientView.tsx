@@ -34,31 +34,31 @@ const ClientView: React.FC = () => {
                 }
 
                 const allJobs = [];
-                let jobCost = 0;
+                let totalJobCents = 0;
                 for (const dataItem of response.data) {
                     if (dataItem.jobs && Array.isArray(dataItem.jobs)) {
                         
                         for (const job of dataItem.jobs) {
                             allJobs.push(job);
-                            jobCost += parseFloat(job.cost);
+                            totalJobCents += Math.round(parseFloat(job.cost) * 100);
 
                         }
-                        setJobAmount(jobCost);
+                        setJobAmount(totalJobCents / 100);
                     }
                 }
-                console.log(jobCost);
                 setAllJobs(allJobs);
 
                 // Set the payments state
                 const allPayments = [];
-                let totalPaymentAmount = 0;
+                let totalPaymentCents = 0;
+
                 for (const dataItem of response.data) {
                     if (dataItem.payments && Array.isArray(dataItem.payments)) {
                         for (const payment of dataItem.payments) {
                             allPayments.push(payment);
-                            totalPaymentAmount += parseFloat(payment.amount);
+                            totalPaymentCents += Math.round(parseFloat(payment.amount) * 100);
                         }
-                        setTotalAmount(totalPaymentAmount);
+                        setTotalAmount(totalPaymentCents / 100);
                     }
                 }
                 setAllPayments(allPayments);
