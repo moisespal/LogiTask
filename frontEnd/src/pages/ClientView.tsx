@@ -21,7 +21,9 @@ const ClientView: React.FC = () => {
     const timezone = localStorage.getItem("userTimeZone") || "UTC";
 
     useEffect(() => {
-         api
+        api
+            .get(`/api/client/${client.id}/unapplied/`) 
+        api
             .get(`/api/balance-history/${client.id}/`)
             .then(response => {
                 console.log('Balance history:', response.data);
