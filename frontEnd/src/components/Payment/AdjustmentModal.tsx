@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from "react";
 import { ClientDataID } from "../../types/interfaces";
 import "../../styles/components/AdjustmentModal.css";
+import api from "../../api";
 
 interface AdjustmentModalProps {
     isOpen: boolean;
@@ -21,6 +22,30 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
             textarea.style.height = `${textarea.scrollHeight}px`;
         }
     };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const clientId = client?.id;
+            if (adjustmentMethod === 'Charge') {
+                setValue(`-${value}`);
+            }
+            const adjustmentResponse = await api.post(`/api/client/${clientId}/adjustments/`, {
+                amount: value,
+                reason: notes
+            }, { headers: {
+                'Content-Type': 'application/json'
+            }});
+            if (adjustmentResponse.status === 201) {
+                alert("Adjustment received")
+            }
+        }catch (err) {
+            console.error("Error adding Adjustment:", err);
+            alert(`Error: ${err}`);
+        }   
+        
+  };
+
 
     const handleAdjustmentMethodSelect = (method: string) => {
         setAdjustmentMethod(method);
@@ -43,10 +68,6 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
             setTimeout(autoResizeTextarea, 0);
         }
     }, [isOpen, notes]);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-    }
 
     const handleDisabledSubmit = () => {
         if (!adjustmentMethod || value === '0' || value === '') {
@@ -119,14 +140,14 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
                     <div className="payment-method-options" role="radiogroup">
                         <button
                             type="button"
-                            className={`payment-method-pill ${adjustmentMethod === 'bonus' ? 'active' : ''}`}
+                            className={`payment-method-pill ${adjustmentMethod === 'credit' ? 'active' : ''}`}
                             onClick={(e) => {
                             e.stopPropagation();
-                                handleAdjustmentMethodSelect('bonus');
+                                handleAdjustmentMethodSelect('credit');
                             }}
-                                aria-pressed={adjustmentMethod === 'bonus'}
+                                aria-pressed={adjustmentMethod === 'credit'}
                         >
-                            <i className="fa-solid fa-arrow-up"></i> <span>Bonus</span>
+                            <i className="fa-solid fa-arrow-up"></i> <span>Credit</span>
                         </button>
 
                         <button
