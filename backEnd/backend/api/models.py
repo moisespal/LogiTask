@@ -179,12 +179,19 @@ class Balance(models.Model):
             # Save current balance
             self.save()
 
+            #calculate invoice month and year
+            base_date = timezone.now()
+            prev_month = base_date.replace(day=1) - timedelta(days=1)
+            
             # Create balance history record
             history = BalanceHistory.objects.create(
                 balance=self,
                 delta=delta,
                 new_balance=self.current_balance,
-                adjustment=total_adjustments
+                adjustment=total_adjustments,
+                service_month=prev_month.month,
+                service_year = prev_month.year
+
             )
             history.jobs.set(unapplied_jobs)
             history.payments.set(unapplied_payments)
@@ -231,8 +238,8 @@ class BalanceHistory(models.Model):
     new_balance = models.DecimalField(max_digits=10, decimal_places=2)
     adjustment = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
-    service_month = models.PositiveSmallIntegerField()
-    service_year = models.PositiveSmallIntegerField()
+    service_month = models.PositiveSmallIntegerField(null=True,blank=True)
+    service_year = models.PositiveSmallIntegerField(null=True,blank=True)
 
     # Store related job/payment IDs for traceability
     jobs = models.ManyToManyField("Job")

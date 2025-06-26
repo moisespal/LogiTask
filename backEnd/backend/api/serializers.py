@@ -220,15 +220,7 @@ class BalanceHistorySerializer(serializers.ModelSerializer):
 
    
 
-    def create(self, validated_data):
-        # Only set if not provided (optional)
-        if 'service_month' not in validated_data or 'service_year' not in validated_data:
-            base_date = timezone.now()
-            prev_month = base_date.replace(day=1) - timedelta(days=1)
-            validated_data['service_month'] = prev_month.month
-            validated_data['service_year'] = prev_month.year
-
-        return super().create(validated_data)
+    
 
 
 
