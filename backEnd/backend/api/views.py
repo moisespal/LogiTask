@@ -382,36 +382,15 @@ class GetUnappliedObjects(APIView):
         delta = total_payments - total_jobs + total_adjustments
 
 
-        grouped = defaultdict(lambda: defaultdict(list))  # {property: {schedule: [jobs]}}
-
-        for job in unapplied_jobs:
-            prop = job.schedule.property
-            sched = job.schedule
-            grouped[prop][sched].append(job)
-
-        final_data = []
-
-        for prop, schedules_dict in grouped.items():
-            property_data = PropertySerializer(prop).data
-            schedules_data = []
-
-            for schedule, jobs in schedules_dict.items():
-                schedule_data = ScheduleSerializer(schedule).data
-                schedule_data['jobs'] = JobOnlySerializer(jobs, many=True).data
-                schedules_data.append(schedule_data)
-
-            final_data.append({
-                'property': property_data,
-                'schedules': schedules_data
-            })
 
 
         #jobs_data = JobInfoSerializer(unapplied_jobs,many=True).data
+        job_data = JobInfoSerializer(unapplied_jobs,many=True).data
         payments_data =  PaymentSerializer(unapplied_payments,many=True).data
         adjustments_data = BalanceAdjustmentSerializer(unapplied_adjustments, many=True).data
 
         return Response({
-            "unapplied_jobs": final_data,
+            "unapplied_jobs": job_data,
             "unapplied_payments": payments_data,
             "unapplied_adjustments": adjustments_data,
             "delta": str(delta)  # Use str to avoid JSON serialization errors with Decimal

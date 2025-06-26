@@ -196,28 +196,29 @@ class PropertyNestedSerializer(serializers.ModelSerializer):
             many=True,
             context={'jobs_for_schedule': schedule_map}
         ).data
+    
+class JobInfoSerializer(serializers.ModelSerializer):
+    property = serializers.SerializerMethodField()
+    schedule = ScheduleSerializer()
+
+    class Meta:
+        model = Job
+        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule']
+        
+    def get_property(self, obj):
+        property_obj = obj.schedule.property
+        return PropertySerializer(property_obj).data
 class BalanceHistorySerializer(serializers.ModelSerializer):
-    nested_jobs = serializers.SerializerMethodField()
+    jobs = JobInfoSerializer(many=True)
     payments = PaymentSerializer(many=True)
     adjustments = BalanceAdjustmentSerializer(many=True)
 
     class Meta:
         model = BalanceHistory
         fields = ['id', 'delta', 'new_balance', 'adjustment', 'created_at','service_month','service_year',
-                  'nested_jobs', 'payments', 'adjustments']
+                  'jobs', 'payments', 'adjustments']
 
-    def get_nested_jobs(self, obj):
-        jobs = obj.jobs.select_related('schedule__property').all()
-
-        # Collect unique properties from jobs
-        property_ids = {job.schedule.property_id for job in jobs if job.schedule and job.schedule.property}
-        properties = Property.objects.filter(id__in=property_ids).prefetch_related('schedules')
-
-        return PropertyNestedSerializer(
-            properties,
-            many=True,
-            context={'jobs_queryset': jobs}
-        ).data
+   
 
     def create(self, validated_data):
         # Only set if not provided (optional)
@@ -236,14 +237,3 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = userProfile
         fields = ['timezone']
 
-class JobInfoSerializer(serializers.ModelSerializer):
-    property = serializers.SerializerMethodField()
-    schedule = ScheduleSerializer()
-
-    class Meta:
-        model = Job
-        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule']
-        
-    def get_property(self, obj):
-        property_obj = obj.schedule.property
-        return PropertySerializer(property_obj).data
