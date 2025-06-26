@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -16,6 +16,9 @@ import pytz
 from django.utils import timezone
 from django.db.models import Prefetch
 from django.db.models.functions import Lower
+from django.db.models import Sum
+from decimal import Decimal
+from collections import defaultdict
 
 
 
@@ -351,7 +354,47 @@ class GetUserProfile(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except userProfile.DoesNotExist:
             return Response({"detail": "User profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+class GetUnappliedObjects(APIView):
+    permission_classes = [IsAuthenticated]
         
+    def get(self,request, client_id):
+        if not client_id:
+            return Response({"error": "client_id is required"}, status=400)
+
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return Response({"error": "Client not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        unapplied_jobs = Job.objects.filter(client=client, is_applied_to_balance=False, status='complete').select_related('schedule__property')
+        unapplied_payments = Payment.objects.filter(client=client, is_applied_to_balance=False)
+        unapplied_adjustments = BalanceAdjustment.objects.filter(client=client, is_applied_to_balance=False)
+
+        total_jobs = unapplied_jobs.aggregate(Sum("cost"))["cost__sum"] or 0
+        total_payments = unapplied_payments.aggregate(Sum("amount"))["amount__sum"] or 0
+        total_adjustments = unapplied_adjustments.aggregate(Sum("amount"))["amount__sum"] or 0
+            
+        total_jobs = Decimal(total_jobs)
+        total_payments = Decimal(total_payments)
+        total_adjustments= Decimal(total_adjustments)
+
+        delta = total_payments - total_jobs + total_adjustments
+
+
+
+
+        #jobs_data = JobInfoSerializer(unapplied_jobs,many=True).data
+        job_data = JobInfoSerializer(unapplied_jobs,many=True).data
+        payments_data =  PaymentSerializer(unapplied_payments,many=True).data
+        adjustments_data = BalanceAdjustmentSerializer(unapplied_adjustments, many=True).data
+
+        return Response({
+            "unapplied_jobs": job_data,
+            "unapplied_payments": payments_data,
+            "unapplied_adjustments": adjustments_data,
+            "delta": str(delta)  # Use str to avoid JSON serialization errors with Decimal
+        })
 
 class JobDelete(generics.DestroyAPIView):
     serializer_class = JobSerializer

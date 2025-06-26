@@ -1,6 +1,8 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment,userProfile
+from django.utils import timezone
+from datetime import timedelta
 
 class userSerializer(serializers.ModelSerializer):
     class Meta:
@@ -163,15 +165,67 @@ class BalanceAdjustmentSerializer(serializers.ModelSerializer):
         }
 
 # serializers.py
+class ScheduleNestedSerializer(serializers.ModelSerializer):
+    jobs = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Schedule
+        fields = ['id', 'service', 'nextDate', 'jobs']
+
+    def get_jobs(self, schedule):
+        jobs = self.context.get('jobs_for_schedule', {}).get(schedule.id, [])
+        return JobOnlySerializer(jobs, many=True).data
+class PropertyNestedSerializer(serializers.ModelSerializer):
+    schedules = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Property
+        fields = ['id', 'street', 'city', 'state', 'zipCode', 'schedules']
+
+    def get_schedules(self, property_obj):
+        all_jobs = self.context.get('jobs_queryset', [])
+        schedule_map = {}
+
+        for job in all_jobs:
+            if job.schedule and job.schedule.property_id == property_obj.id:
+                schedule_map.setdefault(job.schedule.id, []).append(job)
+
+        schedules = property_obj.schedules.filter(id__in=schedule_map.keys())
+        return ScheduleNestedSerializer(
+            schedules,
+            many=True,
+            context={'jobs_for_schedule': schedule_map}
+        ).data
+    
+class JobInfoSerializer(serializers.ModelSerializer):
+    property = serializers.SerializerMethodField()
+    schedule = ScheduleSerializer()
+
+    class Meta:
+        model = Job
+        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule']
+        
+    def get_property(self, obj):
+        property_obj = obj.schedule.property
+        return PropertySerializer(property_obj).data
 class BalanceHistorySerializer(serializers.ModelSerializer):
-    jobs = JobSerializer(many=True)
+    jobs = JobInfoSerializer(many=True)
     payments = PaymentSerializer(many=True)
     adjustments = BalanceAdjustmentSerializer(many=True)
+
     class Meta:
         model = BalanceHistory
-        fields = ['id', 'delta', 'new_balance', 'adjustment', 'created_at', 'jobs', 'payments','adjustments']
+        fields = ['id', 'delta', 'new_balance', 'adjustment', 'created_at','service_month','service_year',
+                  'jobs', 'payments', 'adjustments']
+
+   
+
+    
+
+
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = userProfile
         fields = ['timezone']
+
