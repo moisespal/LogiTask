@@ -11,75 +11,92 @@ const ClientView: React.FC = () => {
     const { client } = location.state as {
         client: ClientDataID;
     };
-    const [allJobs, setAllJobs] = useState<clientViewJob[]>([]);
-    const [allPayments, setAllPayments] = useState<Payment[]>([]);
+
     const [newBalance, setNewBalance] = useState<number>(0);
-    const [jobAmount, setJobAmount] = useState<number>(0);
-    const [totalAmount, setTotalAmount] = useState<number>(0);
+    const [allPayments, setTotalPayments] = useState<(Payment & { invoiced: boolean })[]>([]);
+    const [allPaymentsTotal, setAllPaymentsTotal] = useState<number>(0);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [allJobsCompleted, setAllJobsCompleted] = useState<(clientViewJob & { invoiced: boolean })[]>([]);
+    const [allJobsTotal, setAllJobsTotal] = useState<number>(0);
 
     const timezone = localStorage.getItem("userTimeZone") || "UTC";
 
     useEffect(() => {
-        api
-            .get(`/api/client/${client.id}/unapplied/`) 
-        api
-            .get(`/api/balance-history/${client.id}/`)
+        const combinedJobs: (clientViewJob & { invoiced: boolean })[] = [];
+        let combinedJobTotalCents = 0;
+
+        const combinedPayments: (Payment & { invoiced: boolean })[] = [];
+        let combinedPaymentsTotalCents = 0;
+
+        let combinedBalance = 0;
+
+        api.get(`/api/client/${client.id}/unapplied/`)
             .then(response => {
-                console.log('Balance history:', response.data);
+            combinedBalance += parseFloat(response.data.delta);
 
-                const balanceData = response.data[response.data.length - 1].new_balance;
-                if (balanceData !== undefined) {
-                    setNewBalance(balanceData);
-                } else {
-                    setNewBalance(0);
+            const unapplied = response.data.unapplied_jobs;
+            if (Array.isArray(unapplied)) {
+                for (const job of unapplied.reverse()) {
+                    combinedJobs.push({ ...job, invoiced: false });
+                    combinedJobTotalCents += parseFloat(job.cost) * 100;
+                    console.log("Unapplied Job:", job);
                 }
+            }
 
-                const allJobs = [];
-                let totalJobCents = 0;
+            const unappliedPayments = response.data.unapplied_payments;
+            if (Array.isArray(unappliedPayments)) {
+                for (const payment of unappliedPayments.reverse()) {
+                    combinedPayments.push({ ...payment, invoiced: false });
+                    combinedPaymentsTotalCents += parseFloat(payment.amount) * 100; 
+                }
+            }
+
+            return api.get(`/api/balance-history/${client.id}/`);
+            })
+            .then(response => {
+                combinedBalance += parseFloat(response.data[response.data.length - 1].new_balance);
                 for (const dataItem of response.data) {
-                    if (dataItem.jobs && Array.isArray(dataItem.jobs)) {
-                        
-                        for (const job of dataItem.jobs) {
-                            allJobs.push(job);
-                            totalJobCents += Math.round(parseFloat(job.cost) * 100);
-
+                    if (Array.isArray(dataItem.jobs)) {
+                        for (const job of dataItem.jobs.reverse()) {
+                            combinedJobs.push({ ...job, invoiced: true });
+                            combinedJobTotalCents += parseFloat(job.cost) * 100;
+                            console.log("Invoiced Job:", job);
                         }
-                        setJobAmount(totalJobCents / 100);
                     }
                 }
-                setAllJobs(allJobs);
 
-                // Set the payments state
-                const allPayments = [];
-                let totalPaymentCents = 0;
+                setAllJobsCompleted(combinedJobs);
+                setAllJobsTotal(combinedJobTotalCents / 100); 
 
                 for (const dataItem of response.data) {
-                    if (dataItem.payments && Array.isArray(dataItem.payments)) {
-                        for (const payment of dataItem.payments) {
-                            allPayments.push(payment);
-                            totalPaymentCents += Math.round(parseFloat(payment.amount) * 100);
+                    if (Array.isArray(dataItem.payments)) {
+                        for (const payment of dataItem.payments.reverse()) {
+                            combinedPayments.push({ ...payment, invoiced: true });
+                            combinedPaymentsTotalCents += parseFloat(payment.amount) * 100; 
                         }
-                        setTotalAmount(totalPaymentCents / 100);
                     }
                 }
-                setAllPayments(allPayments);
+
+                setTotalPayments(combinedPayments);
+                setAllPaymentsTotal(combinedPaymentsTotalCents / 100);
+
+                setNewBalance(combinedBalance);
+
             })
             .catch(error => {
-                console.error('Error fetching balance history:', error);
+                console.error('Error fetching jobs:', error);
             });
-
     }, [client.id]);
 
     const getGradientFromBalance = (newBalance: number): [string, number] => {
 
-        if (newBalance >= 0 || jobAmount === 0) {
+        if (newBalance >= 0 || allJobsTotal === 0) {
             const fullGreen = "linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%)";
             return [fullGreen, 100];
         }
 
-        const paid = Math.max(0, totalAmount);                 // never negative
-        const percentPaid = Math.min(100, (paid / jobAmount) * 100);
+        const paid = Math.max(0, allPaymentsTotal);                 // never negative
+        const percentPaid = Math.min(100, (paid / allJobsTotal) * 100);
 
         const eased = Math.pow(percentPaid / 100, 0.85);    
         const hue = eased * 80;                                                    
@@ -177,7 +194,7 @@ const ClientView: React.FC = () => {
                 
                 {/* Services */}
                 <div className="client-panel services-panel">
-                    <h3 className="panel-header">Completed Jobs<span className="total-amount">${jobAmount}</span></h3>
+                    <h3 className="panel-header">Completed Jobs<span className="total-amount">${allJobsTotal}</span></h3>
                     <div className="table-container">
                         <table className="data-table">
                             <thead>
@@ -189,8 +206,8 @@ const ClientView: React.FC = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {allJobs.map((job, i) => (
-                                    <tr key={i}>
+                                {allJobsCompleted.map((job, i) => (
+                                    <tr className={job.invoiced ? "invoiced-job" : "unapplied-job"} key={i}>
                                         <td>{job.property.street}</td>
                                         <td>{job.schedule.service}</td>
                                         <td>{formatUTCtoLocal(job.complete_date, timezone)}</td>
@@ -204,7 +221,7 @@ const ClientView: React.FC = () => {
                 
                 {/* Payments */}
                 <div className="client-panel payments-panel">
-                    <h3 className="panel-header">Payments<span className="total-amount">${totalAmount}</span></h3>
+                    <h3 className="panel-header">Payments<span className="total-amount">${allPaymentsTotal}</span></h3>
                     <div className="table-container">
                         <table className="data-table">
                             <thead>
@@ -216,7 +233,7 @@ const ClientView: React.FC = () => {
                             </thead>
                             <tbody>
                                 {allPayments.map((payment, i) => (
-                                    <tr key={i}>
+                                    <tr className={payment.invoiced ? "invoiced-payment" : "unapplied-payment"} key={i}>
                                         <td>{formatUTCtoLocal(payment.paymentDate, timezone)}</td>
                                         <td>{payment.paymentType}</td>
                                         <td>${payment.amount}</td>

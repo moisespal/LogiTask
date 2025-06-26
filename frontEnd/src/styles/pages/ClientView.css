@@ -250,6 +250,14 @@
     color: #fdfdfd;
 }
 
+.unapplied-job, .unapplied-payment {
+    border-left: 1px solid #f5c720;
+}
+
+.invoiced-job, .invoiced-payment {
+    border-left: 1px solid #92f58d;
+}
+
 .data-table th {
     text-align: left;
     padding: 12px 15px;
