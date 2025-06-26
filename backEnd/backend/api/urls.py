@@ -27,5 +27,6 @@ urlpatterns = [
     path('get_estimated_balance/<int:client_id>/', views.estimated_balance_view.as_view(), name='view-estimated-balance'),
     path('get-user-profile/', views.GetUserProfile.as_view(), name='get-user-profile'),
     path("job/delete/<int:pk>/", views.JobDelete.as_view(),name="job-delete"),
-    path('client/<int:client_id>/unapplied/', views.GetUnappliedObjects.as_view(), name='get-unapplied-objects')
+    path('client/<int:client_id>/unapplied/', views.GetUnappliedObjects.as_view(), name='get-unapplied-objects'),
+    path('client/<int:client_id>/adjustments/', views.AdjustmentCreate.as_view(), name='create-adjustment')
 ]

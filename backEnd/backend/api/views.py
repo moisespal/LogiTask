@@ -403,3 +403,13 @@ class JobDelete(generics.DestroyAPIView):
     def get_queryset(self):
         user = self.request.user
         return Job.objects.filter(client__author=user)
+class AdjustmentCreate(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self,request, client_id):  
+        client = get_object_or_404(Client, id=client_id)
+        serializer = BalanceAdjustmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(client=client)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
