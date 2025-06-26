@@ -224,11 +224,23 @@ class Balance(models.Model):
         return self.current_balance + delta
         
 class BalanceAdjustment(models.Model):
+    ADJUSTMENT_TYPE = (
+    ('credit', 'Credit'),
+    ('debit', 'Debit'),
+    )   
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='adjustments')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     reason = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_applied_to_balance = models.BooleanField(default=False)
+    adjustment_type = models.CharField(max_length=6, choices=ADJUSTMENT_TYPE,default='credit')
+    
+    def save(self, *args, **kwargs):
+        if self.adjustment_type == 'debit':
+            self.amount = abs(self.amount) * -1
+        else:
+            self.amount = abs(self.amount)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Adjustment of {self.amount} on {self.created_at.date()}"

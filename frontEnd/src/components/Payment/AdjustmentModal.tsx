@@ -27,12 +27,10 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
         e.preventDefault();
         try {
             const clientId = client?.id;
-            if (adjustmentMethod === 'Charge') {
-                setValue(`-${value}`);
-            }
             const adjustmentResponse = await api.post(`/api/client/${clientId}/adjustments/`, {
                 amount: value,
-                reason: notes
+                reason: notes,
+                adjustment_type:adjustmentMethod
             }, { headers: {
                 'Content-Type': 'application/json'
             }});
@@ -152,14 +150,14 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
 
                         <button
                             type="button"
-                            className={`payment-method-pill ${adjustmentMethod === 'charge' ? 'active' : ''}`}
+                            className={`payment-method-pill ${adjustmentMethod === 'debit' ? 'active' : ''}`}
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleAdjustmentMethodSelect('charge');
+                                handleAdjustmentMethodSelect('debit');
                             }}
-                            aria-pressed={adjustmentMethod === 'charge'}
+                            aria-pressed={adjustmentMethod === 'debit'}
                         >
-                            <i className="fa-solid fa-arrow-down"></i> <span>Charge</span>
+                            <i className="fa-solid fa-arrow-down"></i> <span>Debit</span>
                         </button>
                     </div>
 

@@ -158,7 +158,7 @@ class BalanceSerializer(serializers.ModelSerializer):
 class BalanceAdjustmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = BalanceAdjustment
-        fields = ["id", "balance","amount","reason","created_at"]
+        fields = ["id","amount","reason","created_at",'adjustment_type']
         extra_kwargs = {
             "id": {"read_only": True},
             "created_at": {"read_only": True},
