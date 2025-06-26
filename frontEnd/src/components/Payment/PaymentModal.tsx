@@ -144,11 +144,11 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                   <input
                     id="payment-amount"
                     name="payment-amount"
-                    type="float"
+                    type="number"
                     value={paymentAmount}
                     onChange={(e) => setPaymentAmount(e.target.value)}
                     min="0"
-                    step="1"
+                    step="0.01"
                     required
                     onClick={(e) => e.stopPropagation()}
                     placeholder="Amount"

@@ -5,6 +5,7 @@ import { ClientDataID, clientViewJob, Payment } from "../types/interfaces";
 import "../styles/pages/ClientView.css";
 import { formatPhoneNumber, formatUTCtoLocal }  from "../utils/format";
 import PaymentModal from '../components/Payment/PaymentModal';
+import AdjustmentModal from '../components/Payment/AdjustmentModal';
 
 const ClientView: React.FC = () => {
     const location = useLocation();
@@ -16,6 +17,7 @@ const ClientView: React.FC = () => {
     const [allPayments, setTotalPayments] = useState<(Payment & { invoiced: boolean })[]>([]);
     const [allPaymentsTotal, setAllPaymentsTotal] = useState<number>(0);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
     const [allJobsCompleted, setAllJobsCompleted] = useState<(clientViewJob & { invoiced: boolean })[]>([]);
     const [allJobsTotal, setAllJobsTotal] = useState<number>(0);
 
@@ -159,7 +161,11 @@ const ClientView: React.FC = () => {
                             >
                                 <i className="fa-solid fa-money-bill-wave"></i> 
                             </button>
-                            <button className="balance-adjustment-button">
+                            <button 
+                                className="balance-adjustment-button"
+                                onClick={() => setShowAdjustmentModal(true)}
+                                title="Adjust Balance"
+                            >
                                 <i className="fa-solid fa-wrench"></i>
                             </button>
                         </div>
@@ -249,6 +255,11 @@ const ClientView: React.FC = () => {
                 onClose={() => setShowPaymentModal(false)}
                 client={client}
                 onPaymentSubmit={() => setShowPaymentModal(false)}
+            />
+            <AdjustmentModal
+                isOpen={showAdjustmentModal}
+                client={client}
+                onClose={() => setShowAdjustmentModal(false)}
             />
         </div>
     );
