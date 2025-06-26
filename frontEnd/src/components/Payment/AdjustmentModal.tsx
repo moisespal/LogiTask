@@ -40,8 +40,8 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
         }catch (err) {
             console.error("Error adding Adjustment:", err);
             alert(`Error: ${err}`);
-        }   
-        
+        }
+        onClose();
   };
 
 
