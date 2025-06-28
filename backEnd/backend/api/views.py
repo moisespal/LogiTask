@@ -31,13 +31,13 @@ class ClientListCreate(generics.ListCreateAPIView):
 
     #retrive notes
     def get_queryset(self):
-        user = self.request.user
-        return Client.objects.filter(author=user)
+        company = self.request.user.userprofile.company
+        return Client.objects.filter(company=company)
     
     #creating note
     def perform_create(self, serializer):
         if serializer.is_valid():
-            serializer.save(author=self.request.user)
+            serializer.save(author=self.request.user,company = self.request.user.userprofile.company)
         else:
             print(serializer.errors)
     
@@ -61,12 +61,12 @@ class PropertyListCreate(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Property.objects.filter(client__author=self.request.user)
+        return Property.objects.filter(client__company=self.request.user.userprofile.company)
         
     def perform_create(self, serializer):
         client_id = self.request.data.get("clientId")
         if serializer.is_valid ():
-            client = Client.objects.get(id=client_id,author=self.request.user)
+            client = Client.objects.get(id=client_id,author=self.request.user,company = self.request.user.userprofile.company)
             serializer.save(client=client)
         else:
             print(serializer.errors)
@@ -80,7 +80,7 @@ class ClientScheduleSetUp(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         
         if serializer.is_valid():
-            serializer.save(author=self.request.user)
+            serializer.save(author=self.request.user,company = self.request.user.userprofile.company)
         else:
             print(serializer)
 
@@ -109,7 +109,7 @@ class GetTodaysJobs(ListAPIView):
         
         return Job.objects.filter(
             jobDate=today_in_user_tz,
-            client__author=self.request.user
+            client__company=self.request.user.userprofile.company
         )
 
 class PropertyListCreateView(generics.ListCreateAPIView):
@@ -143,7 +143,8 @@ class UploadExcelView(APIView):
                     lastName=row['lastName'],  # Change column names based on Excel file
                     email=row['email'],
                     phoneNumber=row['phoneNumber'],
-                    author=self.request.user
+                    author=self.request.user,
+                    company = self.request.user.userprofile.company
                 )
                 property_obj = Property.objects.create(
                     street=row['street'],
@@ -191,7 +192,7 @@ class CompanyListCreate(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         if serializer.is_valid():
-            serializer.save(user=self.request.user)
+            serializer.save()
         else:
             print(serializer)
     

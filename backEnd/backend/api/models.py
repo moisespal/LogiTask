@@ -11,9 +11,7 @@ from decimal import Decimal
 
 
 # Create your models here.
-class userProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    timezone = models.CharField(max_length=100, default='UTC')
+
     
 class Company(models.Model):
     companyName = models.CharField(max_length=100)
@@ -33,6 +31,11 @@ class Company(models.Model):
                 print("error processing image", e)
         super().save(*args, **kwargs)
 
+
+class userProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    timezone = models.CharField(max_length=100, default='UTC')
+    company = models.OneToOneField(Company, on_delete=models.CASCADE,null=True,blank=True)
 class Client(models.Model):
     firstName = models.CharField(max_length=100)
     lastName = models.CharField(max_length=100)
@@ -40,6 +43,7 @@ class Client(models.Model):
     email = models.EmailField(max_length=254, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     author  = models.ForeignKey(User, on_delete=models.CASCADE, related_name="clients")
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
 
     def __str__(self):
         return self.firstName

@@ -12,6 +12,7 @@ class userSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
+        userProfile.objects.create(user=user)
         return user
 
 class PropertySerializer(serializers.ModelSerializer):
@@ -51,7 +52,8 @@ class ClientPropertySetUpSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         properties_data = validated_data.pop('properties',[])
         author = validated_data.pop('author', None)
-        client = Client.objects.create(author=author,**validated_data)
+        company = validated_data.pop('company', None)
+        client = Client.objects.create(author=author,company=company,**validated_data)
         
          # Create the Balance record
         Balance.objects.create(client=client)
@@ -126,6 +128,16 @@ class CompanySerializer(serializers.ModelSerializer):
         model = Company
         fields = ['id','companyName','logo']
 
+    def create(self, validated_data):
+        user = self.context['request'].user
+        company = Company.objects.create(user=user, **validated_data)
+
+        # Update the user's profile with the new company
+        profile = user.userprofile
+        profile.company = company
+        profile.save()
+
+        return company
 class JobOnlySerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
