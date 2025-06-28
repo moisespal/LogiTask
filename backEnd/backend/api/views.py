@@ -19,6 +19,7 @@ from django.db.models.functions import Lower
 from django.db.models import Sum
 from decimal import Decimal
 from collections import defaultdict
+from django.db import transaction
 
 
 
@@ -197,7 +198,8 @@ class CompanyListCreate(generics.ListCreateAPIView):
             print(serializer)
     
     def get_queryset(self):
-        return Company.objects.filter(user=self.request.user)
+        return Company.objects.filter(id=self.request.user.userprofile.company.id)
+    
 
 class CompanyUpdateView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
@@ -414,3 +416,21 @@ class AdjustmentCreate(APIView):
             serializer.save(client=client)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def create_worker(request):
+    user = request.user
+    if not hasattr(user, 'userprofile') or not user.userprofile.company:
+        return Response({"error": "User profile or company not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    company = user.userprofile.company
+
+    try:
+        with transaction.atomic():
+            user = User.objects.create_user(password='123', username='worker3@gmail.com')
+            userProfile.objects.create(user=user, company=company)
+        return Response({"message": "Worker created successfully"})
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

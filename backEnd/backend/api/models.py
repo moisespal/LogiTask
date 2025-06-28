@@ -35,7 +35,7 @@ class Company(models.Model):
 class userProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = models.CharField(max_length=100, default='UTC')
-    company = models.OneToOneField(Company, on_delete=models.CASCADE,null=True,blank=True)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE,null=True,blank=True)
 class Client(models.Model):
     firstName = models.CharField(max_length=100)
     lastName = models.CharField(max_length=100)
