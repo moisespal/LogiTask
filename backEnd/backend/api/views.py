@@ -122,7 +122,7 @@ class PropertyListCreateView(generics.ListCreateAPIView):
 
 class UpdateSchedule(UpdateAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = JobSerializer
+    serializer_class = JobOnlySerializer
     queryset = Job.objects.all()
     
     def patch(self, request, *args, **kwargs):
