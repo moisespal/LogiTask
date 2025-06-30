@@ -87,7 +87,7 @@ class JobSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Job
-        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule', 'client']
+        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule', 'client','order']
         
     def get_property(self, obj):
         property_obj = obj.schedule.property
@@ -141,7 +141,7 @@ class CompanySerializer(serializers.ModelSerializer):
 class JobOnlySerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
-        fields = ['id', 'jobDate', 'status', 'cost','complete_date']
+        fields = ['id', 'jobDate', 'status', 'cost','complete_date','order']
 
 class ScheduleJobsSerializer(serializers.ModelSerializer):
     jobs = JobOnlySerializer(source='job_set',many=True,read_only=True)
@@ -239,5 +239,5 @@ class BalanceHistorySerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = userProfile
-        fields = ['timezone']
+        fields = ['timezone','role']
 
