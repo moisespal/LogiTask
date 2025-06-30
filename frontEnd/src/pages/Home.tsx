@@ -222,7 +222,8 @@ const Home: React.FC = () => {
 
   // This effect runs whenever focusedItemId changes
   useEffect(() => {
-  if (focusedItemId === null || customers.length === 0 || jobs.length === 0) return;
+  if (modeType === 'Client' && customers.length === 0) return;
+  if (modeType === 'Daily' && jobs.length === 0) return;
 
   const selector = modeType === 'Client'
     ? `[data-client-id="${focusedItemId}"]`
