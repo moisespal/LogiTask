@@ -17,11 +17,13 @@ import ClientView from "./pages/ClientView";
 
 const Logout: React.FC = () => {
   localStorage.clear();
+  sessionStorage.clear();
   return <Navigate to="/login" />;
 };
 
 const RegisterAndLogout: React.FC = () => {
   localStorage.clear();
+  sessionStorage.clear();
   return <RegisterPage />;
 };
 

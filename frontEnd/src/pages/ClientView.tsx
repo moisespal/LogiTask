@@ -56,38 +56,35 @@ const ClientView: React.FC = () => {
             return api.get(`/api/balance-history/${client.id}/`);
             })
             .then(response => {
-                combinedBalance += parseFloat(response.data[response.data.length - 1].new_balance);
-                for (const dataItem of response.data) {
-                    if (Array.isArray(dataItem.jobs)) {
-                        for (const job of dataItem.jobs.reverse()) {
-                            combinedJobs.push({ ...job, invoiced: true });
-                            combinedJobTotalCents += parseFloat(job.cost) * 100;
-                            console.log("Invoiced Job:", job);
+                if (response.data && response.data.length > 0) {
+                    combinedBalance += parseFloat(response.data[response.data.length - 1].new_balance);
+                    
+                    for (const dataItem of response.data) {
+                        if (Array.isArray(dataItem.jobs)) {
+                            for (const job of dataItem.jobs.reverse()) {
+                                combinedJobs.push({ ...job, invoiced: true });
+                                combinedJobTotalCents += parseFloat(job.cost) * 100;
+                                console.log("Invoiced Job:", job);
+                            }
+                        }
+                        
+                        if (Array.isArray(dataItem.payments)) {
+                            for (const payment of dataItem.payments.reverse()) {
+                                combinedPayments.push({ ...payment, invoiced: true });
+                                combinedPaymentsTotalCents += parseFloat(payment.amount) * 100; 
+                            }
                         }
                     }
                 }
-
                 setAllJobsCompleted(combinedJobs);
-                setAllJobsTotal(combinedJobTotalCents / 100); 
-
-                for (const dataItem of response.data) {
-                    if (Array.isArray(dataItem.payments)) {
-                        for (const payment of dataItem.payments.reverse()) {
-                            combinedPayments.push({ ...payment, invoiced: true });
-                            combinedPaymentsTotalCents += parseFloat(payment.amount) * 100; 
-                        }
-                    }
-                }
-
+                setAllJobsTotal(combinedJobTotalCents / 100);
                 setTotalPayments(combinedPayments);
                 setAllPaymentsTotal(combinedPaymentsTotalCents / 100);
-
                 setNewBalance(combinedBalance);
-
             })
-            .catch(error => {
-                console.error('Error fetching jobs:', error);
-            });
+        .catch(error => {
+            console.error('Error fetching jobs:', error);
+        });
     }, [client.id]);
 
     const getGradientFromBalance = (newBalance: number): [string, number] => {

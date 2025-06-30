@@ -214,11 +214,6 @@ const Home: React.FC = () => {
           setSelectedJob(filteredJobs[0]);
         } 
         else if (filteredJobs.length > 1 && (!focusedItemId || !filteredJobs.some(job => job.id === focusedItemId))) {
-          setFocusedItemId(filteredJobs[0].id);
-          setSelectedJob(filteredJobs[0]);
-        }
-        else if (filteredJobs.length === 0) {
-          // If no jobs match, clear the selection
           setFocusedItemId(null);
           setSelectedJob(null);
         }
@@ -227,31 +222,33 @@ const Home: React.FC = () => {
 
   // This effect runs whenever focusedItemId changes
   useEffect(() => {
-    if (focusedItemId === null) return;
-    
-    // Find the element with the matching data attribute
-    const selector = modeType === 'Client' 
-      ? `[data-client-id="${focusedItemId}"]` 
-      : `[data-job-id="${focusedItemId}"]`;
-    
-    const focusedElement = document.querySelector(selector);
-    if (focusedElement) {
-      // Store reference to focused element
-      focusedElementRef.current = focusedElement as HTMLDivElement;
-      
-      // Scroll into view with smooth behavior
-      focusedElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    }
-  }, [focusedItemId, modeType]);
+  if (focusedItemId === null || customers.length === 0 || jobs.length === 0) return;
+
+  const selector = modeType === 'Client'
+    ? `[data-client-id="${focusedItemId}"]`
+    : `[data-job-id="${focusedItemId}"]`;
+  
+  const focusedElement = document.querySelector(selector);
+  if (focusedElement) {
+    focusedElementRef.current = focusedElement as HTMLDivElement;
+    focusedElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+  }
+}, [focusedItemId, modeType, customers, searchTerm, jobs]);
 
   const selectedClient = focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) ?? null : null;
 
-  // Modify your client click handler
   const handleClientClick = (id: number) => {
     setFocusedItemId(id);
+    sessionStorage.setItem('lastFocusedClientId', id.toString());
+  };
+
+  const handleJobClick = (id: number, job: Job) => {
+    setFocusedItemId(id);
+    setSelectedJob(job);
+    sessionStorage.setItem('lastFocusedJobId', id.toString());
   };
 
   // Handle property modal state changes
@@ -259,13 +256,30 @@ const Home: React.FC = () => {
     setIsPropertyModalOpen(isOpen);
   };
    
-  useEffect(()=>{
-    if (modeType==="Client"){
+  useEffect(() => {
+    if (modeType === "Client") {
       getClients();
-    }else{
+      const savedFocusedId = sessionStorage.getItem('lastFocusedClientId');
+      if (savedFocusedId) {
+        setFocusedItemId(parseInt(savedFocusedId));
+      }
+    } else {
       fetchTodaysJobs();
+      const savedFocusedId = sessionStorage.getItem('lastFocusedJobId');
+      if (savedFocusedId) {
+        setFocusedItemId(parseInt(savedFocusedId));
+      }
     }
   }, [modeType]);
+
+  useEffect(() => {
+  if (modeType === 'Daily' && focusedItemId && jobs.length > 0) {
+    const job = jobs.find(job => job.id === focusedItemId);
+    if (job) {
+      setSelectedJob(job);
+    }
+  }
+}, [focusedItemId, jobs, modeType]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -455,8 +469,7 @@ const Home: React.FC = () => {
                           job={job}
                           isFocused={focusedItemId === job.id}
                           onClick={(id) => {
-                            setFocusedItemId(id);
-                            setSelectedJob(job);
+                            handleJobClick(id, job);
                           }}
                           onComplete={handleJobComplete}
                           isDisabled={isDraggingDisabled}
