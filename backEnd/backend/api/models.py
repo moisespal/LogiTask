@@ -33,9 +33,16 @@ class Company(models.Model):
 
 
 class userProfile(models.Model):
+    ROLE_CHOICES = [
+        ('BOSS', 'Boss'),
+        ('WORKER', 'Worker'),
+        ('VIEWER','VIEWER')
+    ]
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     timezone = models.CharField(max_length=100, default='UTC')
     company = models.ForeignKey(Company, on_delete=models.CASCADE,null=True,blank=True)
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='BOSS')
 class Client(models.Model):
     firstName = models.CharField(max_length=100)
     lastName = models.CharField(max_length=100)

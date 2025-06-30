@@ -239,5 +239,5 @@ class BalanceHistorySerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = userProfile
-        fields = ['timezone']
+        fields = ['timezone','role']
 
