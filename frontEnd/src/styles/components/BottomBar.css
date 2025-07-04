@@ -1,7 +1,7 @@
 .bottom-menu {
     position: fixed;
     padding: 0 20px;
-    font-family: Inter;
+    font-family: "Outfit", sans-serif;
     bottom: 0;
     left: 0;
     width: 100%;
@@ -50,6 +50,7 @@
 }
 
 .action-button:hover {
+    border-radius: 20px;
     transform: scale(1.05);
     background-color: rgb(45, 45, 48);
 }

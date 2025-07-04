@@ -5,17 +5,18 @@
   --item-bg: rgba(40, 40, 50, 0.6);
   --item-bg-focused: rgba(50, 50, 65, 0.8);
   --item-bg-complete: rgba(52, 168, 83, 0.4);
-  --item-bg-complete-focused: rgba(52, 168, 83, 0.6);
-  
+  --item-bg-complete-focused: rgba(53, 155, 80, 0.57);
+
   /* Status Colors - Clear and intuitive */
   --color-pending: #90caf9; 
   --color-focused: #ffca28;
   --color-complete: #4CAF50;
-  --color-complete-focused: #4CAF50;
+  --color-complete-focused: #0a8a0f;
   
   /* Text Colors */
   --text-primary: rgba(255, 255, 255, 0.95);
   --text-secondary: rgba(255, 255, 255, 0.85);
+  --text-muted: rgba(53, 133, 66, 0.798);
   
   /* Payment Colors */
   --color-payment: #4CAF50;
@@ -24,7 +25,7 @@
 
 /* Container */
 .job-wrapper {
-  width: 60%;
+  width: 42vw;
   display: flex;
   flex-direction: column;
 }
@@ -61,12 +62,14 @@
 .daily-item.daily-complete {
   background-color: var(--item-bg-complete);
   border-left-color: var(--color-complete);
+  color: var(--text-muted);
 }
 
 /* Complete + focused */
 .daily-item.daily-complete.focused {
   background-color: var(--item-bg-complete-focused);
   border-left-color: var(--color-complete-focused);
+  color: var(--text-primary);
 }
 
 /* Icon styles */

@@ -3,7 +3,7 @@
 /* Base list item */
 .list-item {
   position: relative;
-  font-family: Inter;
+  font-family: "Outfit", sans-serif;
   background: rgba(3, 3, 3, 0.212);
   backdrop-filter: blur(25px);
   color: white;

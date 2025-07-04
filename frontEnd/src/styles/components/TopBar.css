@@ -12,6 +12,7 @@
   top: 0px;
   left: 0;
   width: 100%;
+  min-height: 70px;
   height: 70px;
   color: white;
   display: flex;
@@ -26,16 +27,37 @@
   width: 100%;
   height: 520px;
   background: rgba(40, 40, 43, 1);
-  clip-path: polygon(40% 30%, 50% 20%, 100% 20%, 100% 0, 0 0, 0 30%);
+  clip-path: polygon(
+    clamp(30%, 40%, 60%) 30%, 
+    clamp(40%, 50%, 70%) 20%, 
+    100% 20%, 
+    100% 0, 
+    0 0, 
+    0 30%
+  );
   z-index: -1;
+}
+
+/* CHANGED: Added media queries for clip-path responsiveness */
+@media (max-width: 768px) {
+  .top-menu-shape {
+    clip-path: polygon(55% 30%, 65% 20%, 100% 20%, 100% 0, 0 0, 0 30%);
+  }
+}
+
+
+@media (max-width: 480px) {
+  .top-menu-shape {
+    clip-path: polygon(65% 30%, 75% 20%, 100% 20%, 100% 0, 0 0, 0 30%);
+  }
 }
 
 .info-container {
   opacity: 0;
   transform: translateY(-10px);
   transition: all 0.3s ease-out;
-  margin-top: 20px;
-  max-width: 600px;
+  max-width: clamp(280px, 70vw, 700px);
+  margin-top: clamp(15px, 18px, 20px);
 }
 
 .info-container.visible {
@@ -48,16 +70,24 @@
   color: white;
   display: flex;
   flex-direction: column;
-  margin-top: 0px;
-  padding: 0 15px;
+  padding: 0 clamp(8px, 2vw, 15px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Make all client-items flex containers with proper spacing */
 .client-info .client-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: clamp(4px, 1vw, 8px);
   margin-bottom: 10px;
+}
+
+.client-info, .job-info {
+  font-family: 'Outfit', sans-serif;
+  font-size: clamp(14px, 2.5vw, 16px); /* Was: font-size: 16px */
+  font-weight: 600;
+  letter-spacing: 0.2px;
 }
 
 /* Name styling */
@@ -95,6 +125,7 @@
 /* All icons alignment */
 .client-info .client-item i {
   text-align: center;
+  flex-shrink: 0;
 }
 
 /* Job Info Styles (Daily View)
@@ -103,8 +134,8 @@
   color: white;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 5px 20px;
+  gap: clamp(4px, 1vw, 10px);
+  padding: 5px clamp(8px, 3vw, 20px);
 }
 
 /* Common icon styles */
@@ -117,18 +148,20 @@
 
 /* Property Section */
 .job-info .property {
-  margin-left:  8px;
+  margin-left: clamp(4px, 1vw, 8px);
   padding-bottom: 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
 }
 
 .job-info .property .address {
-  font-size: 16px;
+  font-size: clamp(14px, 2.5vw, 16px); /* Was: font-size: 16px */
   font-weight: 600;
   letter-spacing: 0.2px;
   display: flex;
   align-items: center;
   gap: 8px;
+  overflow: hidden;
 }
 
 .job-info .property .address i {
@@ -144,6 +177,7 @@
   font-size: 13.5px;
   padding-top: 6px;
   opacity: 0.85;
+  white-space: nowrap;
 }
 
 .job-info .contact > div {
@@ -161,23 +195,24 @@
   display: flex;
   gap: 10px;
   align-self: flex-start;
-  margin-top: 8px;
   margin-left:  -3px;
 }
 
 /* Common Pill Styles */
 .job-info .service-pill,
-.job-info .frequency-pill {
-  font-size: 13px;
-  padding: 5px 12px;
+.job-info .frequency-pill,
+.job-info .cost-pill {
+  font-size: clamp(11px, 2vw, 13px);
+  padding: clamp(3px, 1vw, 5px) clamp(8px, 2vw, 12px);
   border-radius: 20px;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: clamp(4px, 1vw, 8px);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   font-weight: 500;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .job-info .service-pill:hover,
@@ -223,15 +258,15 @@
 
 /* Cost Pill - Special styling */
 .job-info .cost-pill {
-  font-size: 14px;
-  padding: 5px 10px;
+  font-size: clamp(12px, 2vw, 14px);
+  padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 10px);
   border-radius: 20px;
   align-items: center;
-  gap: 0px; /* Reduced gap between icon and text */
+  gap: 0px; 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   transition: all 0.2s ease;
   font-weight: 500;
-  letter-spacing: 0;  /* Removed letter spacing for tighter text */
+  letter-spacing: 0;  
   background: rgba(76, 175, 80, 0.15);
   border: 1px solid rgba(76, 175, 80, 0.3);
   color: #c8e6c9;
@@ -246,19 +281,18 @@
 .job-info .cost-pill:hover {
   background: rgba(76, 175, 80, 0.25);
   transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(76, 175, 80, 0.2);
 }
 
 /* Sort Controls
 ------------------------------------------*/
 .sort-button-container {
   position: absolute;
-  right: 25px;
+  right: clamp(10px, 3vw, 25px);
   top: 60px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 14px;
+  gap: clamp(5px, 1.5vw, 10px);
+  font-size: clamp(12px, 2vw, 14px);
   color: rgba(255, 255, 255, 0.7);
 }
 
@@ -266,11 +300,12 @@
   background: rgba(255, 255, 255, 0.1);
   border: none;
   color: white;
-  padding: 6px 12px;
+  padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px);
   border-radius: 4px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: clamp(11px, 2vw, 13px); /* Was: font-size: 13px */
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .sort-button:hover {
@@ -287,6 +322,7 @@
   display: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 1001;
+  min-width: clamp(120px, 20vw, 150px);
 }
 
 .sort-button-container:hover .sort-dropdown {
@@ -308,4 +344,55 @@
 
 .sort-dropdown button:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 450px) {
+  /* General adjustments for very small screens */
+  
+  .info-container {
+    margin-top: 25px;
+  }
+  
+  
+  .client-info .client-item {
+    /* Smaller gaps between items */
+  }
+  
+  .client-info .client-item:first-child span {
+    /* Smaller name text */
+  }
+  
+  .client-info .client-item:not(:first-child) span {
+    /* Smaller contact text */
+  }
+  
+  /* Job Info Adjustments */
+  .job-info {
+    font-size: 8px; /* Smaller font size */
+    padding: 0 10px; /* Reduced padding */
+
+  }
+  
+  .job-info .contact {
+    /* Stack contact info vertically */
+  }
+  
+  .job-info .service-tags {
+    /* Adjust service tags layout */
+  }
+  
+  .job-info .service-pill,
+  .job-info .frequency-pill,
+  .job-info .cost-pill {
+    /* Smaller pills */
+  }
+  
+  /* Sort Controls */
+  .sort-button-container {
+    /* Adjust sort controls position/size */
+  }
+  
+  .sort-button {
+    /* Smaller sort button */
+  }
 }

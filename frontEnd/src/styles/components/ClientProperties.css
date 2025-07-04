@@ -5,6 +5,7 @@
   width: 100%;
   position: relative;
   overflow: hidden;
+  font-family: "Outfit", sans-serif;
 }
 
 /* Animation for all animated elements */
@@ -13,13 +14,9 @@
     opacity: 0;
     transform: translateX(100px);
   }
-  60% {
-    opacity: 1;
-    transform: translateX(10px);
-  }
   100% {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0); /* Settle at final position */
   }
 }
 
@@ -28,7 +25,7 @@
 .add-property-item,
 .no-properties {
   opacity: 0;
-  animation: slideIn 0.3s ease-out forwards;
+  animation: slideIn .3s ease forwards;
   cursor: pointer;
 }
 
@@ -44,7 +41,7 @@
 .property-item:hover {
   background: rgba(40, 40, 40, 0.6);
   transform: translateY(-2px);
-  transition: all 0.1s ease;
+  transition: all 0.2s ease;
 }
 
 /* Property content */
@@ -84,15 +81,15 @@
   display: flex;
   align-items: center;
   background: rgba(76, 175, 80, 0.15);
-  border: 1px solid rgba(76, 175, 80, 0.6);
+  border: 2px solid rgba(76, 175, 80, 0.6);
   border-radius: 6px;
   padding: 4px 10px;
   margin: 5px 0 5px 0;
   user-select: none;
-  transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
+  font-family: "Outfit", sans-serif;
 }
 
 /* Create subtle pulsing highlight effect */
@@ -109,13 +106,13 @@
     rgba(76, 175, 80, 0) 70%
   );
   opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
 .add-property-item:hover {
-  background: rgba(76, 175, 80, 0.25);
+  background: rgba(88, 161, 90, 0.365);
   border-color: rgba(76, 175, 80, 0.9);
   transform: translateY(-2px);
+  transition: all 0.2s ease;
 }
 
 .add-property-item:hover::before {
@@ -135,13 +132,11 @@
   color: rgba(76, 175, 80, 1);
 }
 
-.add-property-text {
+.add-property-text, .fa-solid.fa-house {
   font-size: 0.85em;
   font-weight: 600;
   letter-spacing: 0.5px;
   color: rgba(46, 125, 50, 0.9);
-  font-family: "Segoe UI", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
-  text-transform: uppercase;
 }
 
 /* Property button styling */

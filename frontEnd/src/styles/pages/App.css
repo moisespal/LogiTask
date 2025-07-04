@@ -1,7 +1,6 @@
 body, html, #root {
   margin: 0;
   height: 100%;
-  overflow: hidden; 
 }
 
 .app-container {
@@ -11,7 +10,6 @@ body, html, #root {
   flex-direction: column;
   align-items: flex-end; 
   box-sizing: border-box;
-  padding: 10vh 0px 10vh 20vw;
   overflow-y: auto; 
   overflow-x: hidden;
   background-size: cover;
@@ -36,18 +34,24 @@ body, html, #root {
   border-radius: 10px;
   font-size: 16px;
   transition: opacity 0.5s, background-color 0.5s, box-shadow 0.5s;
+  font-family: 'Outfit', sans-serif;
   opacity: 100;
   z-index: 10;
   pointer-events: none; 
   color: white;
-  background-color: rgba(47, 47, 48, 0.372); 
+  background-color: rgba(47, 47, 48, 0.578); 
+}
+
+.search-bar::placeholder {
+  color: #fbf7f5c0
 }
 
 .right-aligned-list {
   list-style: none;
   padding-top: 35px;
   padding-bottom: 80px;
-  width: 80%; 
+  padding: 15vh 0px 25vh 5vw;
+  width: 70%; 
   z-index: 2; 
   display: flex; 
   flex-direction: column; 
@@ -56,7 +60,7 @@ body, html, #root {
 
 /* Update the client wrapper */
 .client-wrapper {
-  width: 60%;
+  width: 42vw;
   display: flex;
   flex-direction: column;
   left: 100px;}

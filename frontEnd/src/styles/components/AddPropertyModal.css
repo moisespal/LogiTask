@@ -31,8 +31,6 @@
     position: absolute;
     top: 0.6rem;
     right: 0.6rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: none;
     color: #aaa;
     font-size: 1.1rem;
     cursor: pointer;
@@ -43,12 +41,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
 }
 
 .property-modal-close-btn:hover {
     color: #f44336;
-    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .property-modal-content h2 {
@@ -130,7 +126,7 @@
 }
 
 .property-form-group input:focus, .property-form-group select:focus, .property-state-input input:focus, .property-zip-input input:focus {
-    border-color: rgba(76, 175, 80, 0.5);
+    border-color: #90CAF9;
     background-color: rgba(255, 255, 255, 0.1);
     outline: none;
     box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);

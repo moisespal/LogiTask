@@ -1,15 +1,16 @@
 /* Keep payment modal styles unchanged */
 .payment-modal-overlay {
-  position: fixed;
+  position: fixed !important;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(2px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 2000;
 }
 
 .payment-modal-container {
@@ -24,6 +25,7 @@
   position: relative;
   margin: auto;
   max-height: 95vh;
+  font-family: "Outfit", sans-serif;
 }
 
 .payment-modal-container h3 {
@@ -216,7 +218,7 @@
 }
 
 .payment-amount-input-container input:focus {
-  border-color: rgba(76, 175, 80, 0.5);
+  border-color: #90CAF9;
   background-color: rgba(255, 255, 255, 0.1);
   outline: none;
   box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
@@ -251,8 +253,8 @@
 }
 
 .payment-method-pill.active {
-  background-color: rgba(76, 175, 80, 0.2);
-  border-color: rgba(76, 175, 80, 0.5);
+  background-color: #6f97b963;
+  border-color: #90CAF9;
   box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 

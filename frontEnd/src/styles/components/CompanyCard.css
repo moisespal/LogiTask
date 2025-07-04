@@ -61,7 +61,6 @@
     padding: 12px;
     border-radius: 10px;
     background-color: rgba(33, 33, 36, 0.9);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     user-select: none;
     box-sizing: border-box;
     flex-shrink: 0;
@@ -74,8 +73,7 @@
 }
 
 .company-profile-card:hover {
-    background-color: rgba(40, 40, 45, 0.95);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    box-shadow: 50px 0 20px rgba(44, 44, 44, 0.6);
 }
 
 .company-profile-card.active {
@@ -106,7 +104,7 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    box-shadow: 0 0 10px rgb(95, 94, 94);
+    box-shadow: 0 0 10px rgb(36, 36, 36);
     margin-right: 15px;
     overflow: hidden;
     object-position: center;
@@ -128,7 +126,6 @@
 .company-info-text {
     font-size: 16px;
     color: #ffffff;
-    font-family: 'Arial', sans-serif;
     text-align: left;
     width: 100%;
 }
@@ -141,7 +138,7 @@
 
 .level {
     margin: 0;
-    color: #ffd700;
+    color: #eddb75;
     font-weight: bold;
     text-align: left;
 }
