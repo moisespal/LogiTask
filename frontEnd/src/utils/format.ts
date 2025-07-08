@@ -93,3 +93,12 @@ export const formatUTCtoLocal = (dateStr: string, timeZone: string): string => {
     timeStyle: "short"     // 1:06 AM
   }).format(new Date(dateStr));
 };
+
+export const formatCapitalized = (str: string): string => {
+  if (!str) return "";
+  
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}

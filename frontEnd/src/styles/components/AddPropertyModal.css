@@ -206,7 +206,6 @@
 .property-btn-primary:hover {
     background-color: #45a049;
     transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(76, 175, 80, 0.3);
 }
 
 .property-btn-secondary {
@@ -216,7 +215,7 @@
 }
 
 .property-btn-secondary:hover {
-    background-color: rgba(45, 45, 48, 0.9);
+    background-color: rgba(29, 29, 31, 0.9);
     transform: translateY(-1px);
 }
 

@@ -1,10 +1,10 @@
 .calendar-container {
   font-family: "Outfit", sans-serif;
   position: absolute;
-  top: 170px;
-  left: 80px;
-  width: 360px;
-  padding: 20px;
+  top: clamp(180px, 15vh, 240px); 
+  left: 6vw;
+  width: clamp(400px, 50vw, 400px); 
+  padding: clamp(15px, 3vw, 20px); 
   background-color: rgba(30, 30, 33, 0.95);
   color: #f0f0f0;
   border-radius: 15px;
@@ -12,6 +12,9 @@
   z-index: 10;
   user-select: none;
   cursor: grab;
+  max-width: calc(100vw - 40px);
+  box-sizing: border-box;
+  transition: width 0.3s ease, padding 0.3s ease;
 }
 
 .calendar-header {
@@ -23,7 +26,7 @@
 
 .calendar-container h2 {
   margin: 0;
-  font-size: 1.5em;
+  font-size: clamp(1.2em, 3vw, 1.5em);
 }
 
 .calendar-content {
@@ -34,7 +37,7 @@
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 5px;
+  gap: clamp(3px, 1vw, 5px); 
   margin-bottom: 15px;
 }
 
@@ -42,27 +45,28 @@
   position: absolute;
   top: 100%;
   right: 0;
-  width: 100%;
-  background-color: rgba(40, 40, 43, 0.95);
-  border-radius: 0 0 15px 15px;
-  padding: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  transform: translateY(-100%);
+  margin-left: 15px;
+  min-width: 200px;
+  background-color: rgba(44, 44, 48, 0.95);
+  border-radius: 15px;
+  padding: 12px;
   opacity: 0;
+  transform: translateY(-10px);
   transition: all 0.3s ease;
   pointer-events: none;
+  z-index: 1000;
 }
 
 .balance-info.show {
-  transform: translateY(0);
   opacity: 1;
-  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .balance-toggle {
   background: none;
   border: none;
-  font-size: 1.2em;
+  /* CHANGED: Responsive font size */
+  font-size: clamp(1em, 2.5vw, 1.2em); /* Was: font-size: 1.2em */
   cursor: pointer;
   padding: 5px;
   transition: all 0.3s ease;
@@ -87,7 +91,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 1.1em;
+  font-size: clamp(0.9em, 2vw, 1.1em); 
 }
 
 .outstanding-balance .amount {
@@ -98,9 +102,9 @@
 .calendar-weekday {
   font-weight: bold;
   text-align: center;
-  padding: 10px 0;
+  padding: clamp(6px, 1.5vw, 10px) 0; 
   color: #9e9e9e;
-  font-size: 0.9em;
+  font-size: clamp(0.7em, 1.8vw, 0.9em); 
 }
 
 .calendar-day {
@@ -109,9 +113,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 0.9em;
+  height: clamp(30px, 6vw, 40px); 
+  border-radius: 20%;
+  font-size: clamp(0.7em, 1.8vw, 0.9em); 
   transition: all 0.3s ease;
 }
 
@@ -120,7 +124,7 @@
 }
 
 .calendar-day.today {
-  background-color: rgba(76, 175, 80, 0.2);
+  background-color: rgba(89, 93, 98, 0.523);
   font-weight: bold;
 }
 
@@ -149,9 +153,9 @@
   background-color: rgba(0, 0, 0, 0.8);
   color: #fff;
   text-align: center;
-  padding: 5px 10px;
+  padding: clamp(3px, 1vw, 5px) clamp(6px, 2vw, 10px);
   border-radius: 6px;
-  font-size: 0.8em;
+  font-size: clamp(0.7em, 1.5vw, 0.8em); 
   white-space: nowrap;
   opacity: 0;
   transition: opacity 0.3s, visibility 0.3s;
@@ -172,4 +176,51 @@
   border-width: 5px;
   border-style: solid;
   border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+}
+
+@media (max-width: 768px) {
+  .calendar-container {
+    width: clamp(240px, 50vw, 320px); 
+  }
+
+}
+
+@media (max-width: 480px) {
+  .calendar-container {
+    left: 4vw;
+    width: 50vw;
+    padding: 15px;
+  }
+  
+  .calendar-grid {
+    gap: 2px;
+  }
+  
+  .calendar-day {
+    height: 35px;
+    font-size: 0.8em;
+  }
+  
+  .outstanding-balance {
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 320px) {
+  .calendar-container {
+    padding: 10px;
+    border-radius: 10px;
+  }
+  
+  .calendar-day {
+    height: 30px;
+    font-size: 0.75em;
+  }
+  
+  .tooltip {
+    font-size: 0.7em;
+    padding: 2px 6px;
+  }
 }

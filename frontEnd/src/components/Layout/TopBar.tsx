@@ -1,6 +1,7 @@
 import React from 'react';
 import { ClientDataID, Job } from '../../types/interfaces';
 import '../../styles/components/TopBar.css';
+import { formatCapitalized, formatPhoneNumber } from '../../utils/format';
 
 interface TopBarProps {
   focusedItemId: number | null;
@@ -10,13 +11,6 @@ interface TopBarProps {
   sortOption: string;
   handleSortChange: (option: string) => void;
 }
-
-const formatPhoneNumber = (phone: string | undefined): string => {
-  if (!phone) return "";
-  const cleaned = phone.replace(/\D/g, '');
-  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-  return match ? `(${match[1]}) ${match[2]}-${match[3]}` : phone;
-};
 
 const TopBar: React.FC<TopBarProps> = ({ 
   focusedItemId, 
@@ -70,7 +64,7 @@ const TopBar: React.FC<TopBarProps> = ({
               </div>
               <div className="frequency-pill">
                 <i className="fa-solid fa-calendar-days" />
-                {selectedJob.schedule.frequency}
+                {formatCapitalized(selectedJob.schedule.frequency)}
               </div>
               <div className="cost-pill">
                 <i className="fa-solid fa-dollar-sign" />

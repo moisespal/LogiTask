@@ -265,10 +265,10 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                     
                     <div className="property-form-actions">
                         <button type="button" className="property-btn-secondary" onClick={onClose}>
-                            <i className="fas fa-times"></i> Cancel
+                            Cancel
                         </button>
                         <button type="submit" className="property-btn-primary">
-                            <i className="fas fa-plus"></i> Add Property
+                            Add Property
                         </button>
                     </div>
                 </form>

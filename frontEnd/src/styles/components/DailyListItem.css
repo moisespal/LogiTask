@@ -25,7 +25,7 @@
 
 /* Container */
 .job-wrapper {
-  width: 42vw;
+  width: 44vw;
   display: flex;
   flex-direction: column;
 }
@@ -34,7 +34,7 @@
 .daily-item.list-item {
   background: var(--item-bg);
   color: var(--text-primary);
-  padding: 14px 16px;
+  padding: 20px 15px;
   margin: 8px 0;
   border-radius: 10px 0 0 10px;
   transition: all 0.2s ease-out;

@@ -38,6 +38,12 @@
   z-index: -1;
 }
 
+@media (max-width: 850px) {
+  .top-menu-shape {
+    clip-path: polygon(45% 30%, 55% 20%, 100% 20%, 100% 0, 0 0, 0 30%);
+  }
+}
+
 /* CHANGED: Added media queries for clip-path responsiveness */
 @media (max-width: 768px) {
   .top-menu-shape {
@@ -48,7 +54,7 @@
 
 @media (max-width: 480px) {
   .top-menu-shape {
-    clip-path: polygon(65% 30%, 75% 20%, 100% 20%, 100% 0, 0 0, 0 30%);
+    clip-path: polygon(75% 30%, 85% 20%, 100% 20%, 100% 0, 0 0, 0 30%);
   }
 }
 
@@ -192,17 +198,15 @@
 
 /* Service Tags Section */
 .job-info .service-tags {
+  font-size: 12px;
   display: flex;
-  gap: 10px;
-  align-self: flex-start;
-  margin-left:  -3px;
+  gap: clamp(2px, 2vw, 0.6vw);
 }
 
 /* Common Pill Styles */
 .job-info .service-pill,
 .job-info .frequency-pill,
 .job-info .cost-pill {
-  font-size: clamp(11px, 2vw, 13px);
   padding: clamp(3px, 1vw, 5px) clamp(8px, 2vw, 12px);
   border-radius: 20px;
   display: inline-flex;
@@ -346,53 +350,3 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-@media (max-width: 450px) {
-  /* General adjustments for very small screens */
-  
-  .info-container {
-    margin-top: 25px;
-  }
-  
-  
-  .client-info .client-item {
-    /* Smaller gaps between items */
-  }
-  
-  .client-info .client-item:first-child span {
-    /* Smaller name text */
-  }
-  
-  .client-info .client-item:not(:first-child) span {
-    /* Smaller contact text */
-  }
-  
-  /* Job Info Adjustments */
-  .job-info {
-    font-size: 8px; /* Smaller font size */
-    padding: 0 10px; /* Reduced padding */
-
-  }
-  
-  .job-info .contact {
-    /* Stack contact info vertically */
-  }
-  
-  .job-info .service-tags {
-    /* Adjust service tags layout */
-  }
-  
-  .job-info .service-pill,
-  .job-info .frequency-pill,
-  .job-info .cost-pill {
-    /* Smaller pills */
-  }
-  
-  /* Sort Controls */
-  .sort-button-container {
-    /* Adjust sort controls position/size */
-  }
-  
-  .sort-button {
-    /* Smaller sort button */
-  }
-}

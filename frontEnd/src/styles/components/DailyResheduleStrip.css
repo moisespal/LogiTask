@@ -1,12 +1,16 @@
 .daily-reschedule-strip-container {
   position: fixed;
   left: 5%;
-  bottom: 65%;
+  top: calc(70px + 20vh);
   transform: translateX(-50%);
   padding: 1rem 1.5rem;
   z-index: 100;
   opacity: 0;
   animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+.daily-reschedule-delete, .daily-reschedule-strip-container {
+  font-family: 'outfit', sans-serif;
 }
 
 .reschedule-label {
@@ -22,13 +26,28 @@
 .daily-reschedule-strip {
   display: flex;
   flex-direction: row;
-  gap: 0.8rem;
+  gap: clamp(0.4rem, 2vw, 0.8rem);
   justify-content: center;
+  flex-wrap: wrap;
+}
+@media (max-width: 1180px) {
+  .daily-reschedule-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: clamp(0.4rem, 2vw, 1rem);
+    justify-items: center;
+    max-width: 300px;
+  }
+  
+  .daily-reschedule-strip-container {
+    top: calc(70px + 15vh);
+  }
 }
 
 .box {
-  width: 5.5rem;
-  height: 6rem;
+  width: clamp(4rem, 10vw, 5.5rem);
+  height: clamp(4.5rem, 12vw, 6rem);
   background: #ffffff;
   border: 2px solid #e0e6f2;
   border-radius: 10px;
@@ -50,7 +69,7 @@
 
 
 .weekday {
-  font-size: 0.85rem;
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
   font-weight: 600;
   color: #3a4566;
   text-align: center;
@@ -58,13 +77,12 @@
 }
 
 .dates {
-  font-size: 0.8rem;
+  font-size: clamp(0.65rem, 1.8vw, 0.8rem); 
   color: #5d6b8a;
   text-align: center;
   border-radius: 4px;
   margin-top: 0.3rem;
 }
-
 
 .box::before {
   content: "";
@@ -78,13 +96,67 @@
   transition: all 0.2s ease;
 }
 
-
 .box:hover {
   border-color: #b8d3ff;
   background: #f8fbff;
   transform: translateY(29px);
 }
 
+@media (max-width: 768px) {
+  .box:hover {
+    transform: translateY(15px);
+  }
+  .box.is-over {
+    transform: scale(1.3);
+  }
+  .box::before {
+    top: -18px;
+    border-width: 8px;
+  }
+  
+  .box.is-over::before {
+    top: -10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-reschedule-strip {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.3rem, 1.5vw, 0.5rem);
+    align-items: center;
+    max-width: 120px;
+  }
+  
+  .daily-reschedule-strip-container {
+    top: calc(70px + 10vh);
+    padding: 0.5rem 1rem;
+  }
+  
+  .reschedule-label {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+  .box {
+    width: clamp(3.5rem, 8vw, 4.5rem);
+    height: clamp(4rem, 10vw, 5rem);
+    padding: 0.3rem;
+  }
+  .box:hover {
+    transform: translateY(10px);
+  }
+  .box.is-over {
+    transform: scale(1.2);
+  }
+  .box::before {
+    top: -15px;
+    border-width: 6px;
+  }
+  
+  .box.is-over::before {
+    top: -8px;
+  }
+}
 
 .box.is-over {
   background: #e6f4ff;
@@ -94,36 +166,12 @@
   z-index: 1000;
 }
 
-.box.is-over::before {
-  transform: translateX(-50%) scale(1);
-  opacity: 1;
-  top: -12px;
-}
-
-
-.box.is-over::after {
-  content: "Reschedule";
-  position: absolute;
-  bottom: -25px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #00aaff;
-  color: white;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  white-space: nowrap;
-  font-weight: 500;
-}
-
-
 .box:nth-child(1) { animation-delay: 0.05s; }
-.box:nth-child(2) { animation-delay: 0.1s; }
+.box:nth-child(2) { animation-delay: 0.10s; }
 .box:nth-child(3) { animation-delay: 0.15s; }
-.box:nth-child(4) { animation-delay: 0.2s; }
+.box:nth-child(4) { animation-delay: 0.20s; }
 .box:nth-child(5) { animation-delay: 0.25s; }
-.box:nth-child(6) { animation-delay: 0.3s; }
-
+.box:nth-child(6) { animation-delay: 0.30s; }
 
 @keyframes fadeIn {
   from {
@@ -139,7 +187,7 @@
 @keyframes fadeInBox {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.1);
   }
   to {
     opacity: 1;
@@ -174,8 +222,8 @@
 }
 
 .trash-can {
-  width: 70px;
-  height: 80px;
+  width: clamp(50px, 12vw, 70px);
+  height: clamp(60px, 15vw, 80px);
   position: relative;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -186,7 +234,7 @@
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 60px;
+  width: clamp(42px, 10vw, 60px);
   height: 10px;
   background: #7a7a7a;
   border-radius: 3px;
@@ -206,14 +254,13 @@
   border-radius: 3px 3px 0 0;
 }
 
-
 .trash-container {
   position: absolute;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 50px;
-  height: 60px;
+  width: clamp(35px, 8vw, 50px);
+  height: clamp(42px, 10vw, 60px);
   background: #adadad;
   border-radius: 5px 5px 8px 8px;
   overflow: hidden;
@@ -244,7 +291,7 @@
   transform: translateX(-50%);
   width: 100%;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
   font-weight: 500;
   color: #020202;
   opacity: 0.8;

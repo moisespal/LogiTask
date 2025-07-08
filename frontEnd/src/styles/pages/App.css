@@ -48,16 +48,14 @@ body, html, #root {
 
 .right-aligned-list {
   list-style: none;
-  padding-top: 35px;
-  padding-bottom: 80px;
-  padding: 15vh 0px 25vh 5vw;
+  padding-top: clamp(60px, 18vh, 120px);
+  padding-bottom: clamp(50px, 20vh, 300px);
   width: 70%; 
   z-index: 2; 
   display: flex; 
   flex-direction: column; 
   align-items: flex-end;
 }
-
 /* Update the client wrapper */
 .client-wrapper {
   width: 42vw;
