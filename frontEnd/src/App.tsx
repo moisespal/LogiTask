@@ -14,16 +14,22 @@ import Dev from "./pages/dev";
 import { CompanySetUp } from "./pages/CompanySetUp";
 import PropertyView from "./pages/PropertyView";
 import ClientView from "./pages/ClientView";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 
-const Logout: React.FC = () => {
+
+const clearAllData = (queryClient: QueryClient) => {
+  queryClient.clear();
   localStorage.clear();
   sessionStorage.clear();
+};
+
+const Logout: React.FC = () => {
+  clearAllData(useQueryClient());
   return <Navigate to="/login" />;
 };
 
 const RegisterAndLogout: React.FC = () => {
-  localStorage.clear();
-  sessionStorage.clear();
+  clearAllData(useQueryClient());
   return <RegisterPage />;
 };
 

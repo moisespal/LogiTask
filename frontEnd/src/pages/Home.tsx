@@ -10,6 +10,10 @@ import { ClientDataID, Job } from '../types/interfaces';
 import api from "../api"
 import '../styles/pages/App.css';
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useClients } from '../hooks/useClients';
+import { useTodaysJobs } from '../hooks/useJobs';
+
 import { DndContext, pointerWithin, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableDailyList from '../components/Daily/SortableDailyList';
@@ -41,37 +45,13 @@ const Home: React.FC = () => {
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
-  const [customers, setCustomer] = useState<ClientDataID[]>([]);
+  const { clients } = useClients( modeType === 'Client');
+  const queryClient = useQueryClient();
   const focusedElementRef = useRef<HTMLDivElement | null>(null);
-  
-  // New job-related states
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const { jobs } = useTodaysJobs(modeType === 'Daily');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  
   const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
-
-  // Memoized callbacks to prevent recreation on every render
-  const getClients = useCallback(() => {
-    api
-        .get("/api/clients/")
-        .then((res) => res.data)
-        .then((data) => {
-            setCustomer(data);
-        })
-        .catch((err) => alert(err));
-  }, []);
-
-  // Function to fetch today's jobs
-  const fetchTodaysJobs = useCallback(async () => {
-    try {
-      const response = await api.get('/api/getTodaysJobs/');
-      setJobs(response.data);
-      console.log('Jobs fetched:', response.data);
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-    }
-  }, []);
 
   // Handle job completion toggle
   const handleJobComplete = useCallback(async (jobId: number) => {
@@ -80,16 +60,24 @@ const Home: React.FC = () => {
       if (!job) return;
       const newStatus = job.status === 'complete' ? 'uncomplete' : 'complete';
       const dateTime = job.status === 'complete' ? null : getUTCISOString();
-      await api.patch(`/api/Update-Schedule/${jobId}/`, { status: newStatus, complete_date:dateTime })
-      setJobs(prevJobs => 
-        prevJobs.map(job => 
+
+      queryClient.setQueryData(['todaysJobs'], (oldJobs: Job[] | undefined) => {
+        if (!oldJobs) return [];
+        return oldJobs.map(job => 
           job.id === jobId ? { ...job, status: newStatus } : job
-        )
-      );
+        );
+      });
+
+      if (selectedJob?.id === jobId) {
+        setSelectedJob({ ...selectedJob, status: newStatus });
+      }
+      await api.patch(`/api/Update-Schedule/${jobId}/`, { 
+        status: newStatus, complete_date:dateTime 
+      });
     } catch (error) {
       console.error('Error toggling job completion:', error);
-    }
-  }, [jobs]);
+    } 
+  }, [jobs, queryClient, selectedJob]);
 
   // Event Handlers
   const handleModeClick = useCallback(async () => {
@@ -139,8 +127,8 @@ const Home: React.FC = () => {
     }), [sortOption]);
 
   const filteredClients = useMemo(() => 
-    sortClients(filterClientsBySearch(filterClientsByMode(customers))), 
-    [sortClients, filterClientsBySearch, filterClientsByMode, customers]
+    sortClients(filterClientsBySearch(filterClientsByMode(clients || [])) || []), 
+    [sortClients, filterClientsBySearch, filterClientsByMode, clients]
   );
 
   const selectedClient = useMemo(() => 
@@ -232,7 +220,7 @@ const Home: React.FC = () => {
 
   // This effect runs whenever focusedItemId changes
   useEffect(() => {
-    if (modeType === 'Client' && customers.length === 0) return;
+    if (modeType === 'Client' && clients?.length === 0) return;
     if (modeType === 'Daily' && jobs.length === 0) return;
 
     const selector = modeType === 'Client'
@@ -247,7 +235,7 @@ const Home: React.FC = () => {
         block: 'center'
       });
     }
-  }, [focusedItemId, modeType, customers.length, jobs.length]);
+  }, [focusedItemId, modeType, clients?.length, jobs.length]);
 
   const handleClientClick = useCallback((id: number) => {
     setFocusedItemId(id);
@@ -267,19 +255,17 @@ const Home: React.FC = () => {
    
   useEffect(() => {
     if (modeType === "Client") {
-      getClients();
       const savedFocusedId = sessionStorage.getItem('lastFocusedClientId');
       if (savedFocusedId) {
         setFocusedItemId(parseInt(savedFocusedId));
       }
     } else {
-      fetchTodaysJobs();
       const savedFocusedId = sessionStorage.getItem('lastFocusedJobId');
       if (savedFocusedId) {
         setFocusedItemId(parseInt(savedFocusedId));
       }
     }
-  }, [modeType, getClients, fetchTodaysJobs]);
+  }, [modeType]);
 
   useEffect(() => {
     if (modeType === 'Daily' && focusedItemId && jobs.length > 0) {
@@ -326,14 +312,9 @@ const Home: React.FC = () => {
           jobDate: formattedDate,
         });
         if (response.status === 200) {
-          setJobs(prevJobs => {
-            const updatedJobs = prevJobs.filter(job => job.id !== active.id);
-            if (updatedJobs.length === 0) {
-              setSelectedJob(null);
-            }
-            return updatedJobs;
-          });
-        }
+            console.log('Job rescheduled successfully');
+            queryClient.invalidateQueries({ queryKey: ['todaysJobs'] });
+          }
       } catch (error) {
         console.error('Error rescheduling job:', error);
         alert('Failed to reschedule job');
@@ -344,13 +325,8 @@ const Home: React.FC = () => {
       try {
         const response = await api.delete(`/api/job/delete/${active.id}/`, {});
         if (response.status === 204) {
-          setJobs(prevJobs => {
-            const updatedJobs = prevJobs.filter(job => job.id !== active.id);
-            if (updatedJobs.length === 0) {
-              setSelectedJob(null);
-            }
-            return updatedJobs;
-          });
+          console.log('Job deleted successfully');
+          queryClient.invalidateQueries({ queryKey: ['todaysJobs'] });
         }
       } catch (error) {
         console.error('Error deleting job:', error);
@@ -359,18 +335,22 @@ const Home: React.FC = () => {
     }
 
     if (over && active.id !== over.id) {
-      setJobs((currentJobs) => {
-        const oldIndex = currentJobs.findIndex(job => job.id === active.id);
-        const newIndex = currentJobs.findIndex(job => job.id === over.id);
+      queryClient.setQueryData(['todaysJobs'], (oldJobs: Job[] | undefined) => {
+        if (!oldJobs) return [];
         
-        const reorderedJobs = [...currentJobs];
-        const [movedJob] = reorderedJobs.splice(oldIndex, 1);
-        reorderedJobs.splice(newIndex, 0, movedJob);
+        const jobs = [...oldJobs];
+        const oldIndex = jobs.findIndex(job => job.id === active.id);
+        const newIndex = jobs.findIndex(job => job.id === over.id);
         
-        return reorderedJobs;
-      });
-    }
-  }, []);
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const [movedJob] = jobs.splice(oldIndex, 1);
+          jobs.splice(newIndex, 0, movedJob);
+        }
+        
+        return jobs;
+    });
+}
+  }, [queryClient]);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
