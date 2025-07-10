@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../../styles/components/ClientProperties.css";
 import AddPropertyModal from "../Property/AddPropertyModal";
 import { useNavigate } from "react-router-dom";
@@ -18,16 +18,16 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (onPropertyModalStateChange) {
-      onPropertyModalStateChange(isModalOpen);
-    }
-  }, [isModalOpen, onPropertyModalStateChange]);
-
   if (!visible) return null;
 
   const handleModalState = (isOpen: boolean) => {
     setIsModalOpen(isOpen);
+    if (isOpen && onPropertyModalStateChange) {
+      onPropertyModalStateChange(true);
+    }
+    else {
+      onPropertyModalStateChange?.(false);
+    }
   };
 
    const handlePropertyClick = (propertyIndex: number) => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import ClientCalendar from '../components/Calendar/ClientCalendar';
 import ClientListItem from '../components/Client/ClientListItem';
 import ClientProperties from '../components/Client/ClientProperties';
@@ -13,7 +13,6 @@ import '../styles/pages/App.css';
 import { DndContext, pointerWithin, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableDailyList from '../components/Daily/SortableDailyList';
-// Utility functions
 
 const renderStars = (count: number): JSX.Element[] => (
   Array.from({ length: count }, (_, i) => <span key={i} className="star">★</span>)
@@ -29,6 +28,7 @@ const restrictWithinWindow = ({ transform }: { transform: { x: number; y: number
     x: Math.max(-maxLeftDistance, Math.min(maxRightDistance, transform.x))
   };
 };
+const getUTCISOString = () => new Date().toISOString();
 
 // Main Component
 const Home: React.FC = () => {
@@ -49,83 +49,86 @@ const Home: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   
   const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
-
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
 
-  const getClients = () => {
+  // Memoized callbacks to prevent recreation on every render
+  const getClients = useCallback(() => {
     api
         .get("/api/clients/")
         .then((res) => res.data)
         .then((data) => {
             setCustomer(data);
-            console.log('Clients loaded:', data);
         })
         .catch((err) => alert(err));
-  };
+  }, []);
 
   // Function to fetch today's jobs
-  const fetchTodaysJobs = async () => {
+  const fetchTodaysJobs = useCallback(async () => {
     try {
       const response = await api.get('/api/getTodaysJobs/');
       setJobs(response.data);
+      console.log('Jobs fetched:', response.data);
     } catch (error) {
       console.error('Error fetching jobs:', error);
     }
-  };
-
-  function getUTCISOString() {
-    return new Date().toISOString();
-  }
+  }, []);
 
   // Handle job completion toggle
-  const handleJobComplete = async (jobId: number) => {
+  const handleJobComplete = useCallback(async (jobId: number) => {
     try {
       const job = jobs.find(job => job.id === jobId);
       if (!job) return;
       const newStatus = job.status === 'complete' ? 'uncomplete' : 'complete';
       const dateTime = job.status === 'complete' ? null : getUTCISOString();
       await api.patch(`/api/Update-Schedule/${jobId}/`, { status: newStatus, complete_date:dateTime })
-      setJobs(jobs.map(job => 
-        job.id === jobId ? { ...job, status: newStatus } : job
-      ));
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.id === jobId ? { ...job, status: newStatus } : job
+        )
+      );
     } catch (error) {
       console.error('Error toggling job completion:', error);
     }
-  };
+  }, [jobs]);
 
   // Event Handlers
-  const handleModeClick = async () => {
+  const handleModeClick = useCallback(async () => {
     const newMode = modeType === 'Client' ? 'Daily' : 'Client';
     localStorage.setItem('mode',newMode)
     setModeType(newMode);
     setIsModeRotated(prev => !prev);
-  };
+  }, [modeType]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, []);
 
-  const handleSortChange = (option: string) => setSortOption(option);
+  const handleSortChange = useCallback((option: string) => {
+    setSortOption(option);
+  }, []);
 
-  // Filtering and Sorting
-  const filterClientsByMode = (clients: ClientDataID[]): ClientDataID[] => {
+  // Memoized filtering and sorting functions
+  const filterClientsByMode = useCallback((clients: ClientDataID[]): ClientDataID[] => {
     return clients;
-  };
+  }, []);
 
-  const filterClientsBySearch = (clients: ClientDataID[]): ClientDataID[] => 
+  const filterClientsBySearch = useCallback((clients: ClientDataID[]): ClientDataID[] => 
     clients.filter(client =>
       [client.firstName, client.lastName, client.phoneNumber, client.email, client.properties?.[0]?.street, client.properties?.[0]?.zipCode]
         .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    ), [searchTerm]);
 
-  const filterJobsBySearch = (jobs: Job[]): Job[] =>
+  const filterJobsBySearch = useCallback((jobs: Job[]): Job[] =>
     jobs.filter(job => job ?
       [job.client.firstName, job.client.lastName, job.property.street, job.client.phoneNumber, job.client.email, job.property.zipCode]
         .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()))
         : false
-    );
+    ), [searchTerm]);
 
-  const filteredJobs = filterJobsBySearch(jobs);
+  // Memoized filtered jobs
+  const filteredJobs = useMemo(() => filterJobsBySearch(jobs), [filterJobsBySearch, jobs]);
 
-  const sortClients = (clients: ClientDataID[]): ClientDataID[] =>
+  const sortClients = useCallback((clients: ClientDataID[]): ClientDataID[] =>
     [...clients].sort((a, b) => {
       switch (sortOption) {
         case 'firstName': return a.firstName.localeCompare(b.firstName);
@@ -133,9 +136,40 @@ const Home: React.FC = () => {
         case 'phoneNumber': return a.phoneNumber.localeCompare(b.phoneNumber);
         default: return 0;
       }
-    });
+    }), [sortOption]);
 
-  const filteredClients = sortClients(filterClientsBySearch(filterClientsByMode(customers)));
+  const filteredClients = useMemo(() => 
+    sortClients(filterClientsBySearch(filterClientsByMode(customers))), 
+    [sortClients, filterClientsBySearch, filterClientsByMode, customers]
+  );
+
+  const selectedClient = useMemo(() => 
+    focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) ?? null : null,
+    [focusedItemId, filteredClients]
+  );
+
+  const navigateFocusedItem = useCallback((direction: number) => {
+    if (modeType === 'Client') {
+      if (filteredClients.length === 0) return;
+      
+      setFocusedItemId(prevId => {
+        const currentIndex = filteredClients.findIndex(client => client.id === prevId);
+        const newIndex = Math.min(Math.max(currentIndex + direction, 0), filteredClients.length - 1);
+        return filteredClients[newIndex]?.id ?? null;
+      });
+    } else {
+      if (filteredJobs.length === 0) return;
+      
+      const currentJobIndex = filteredJobs.findIndex(job => job.id === focusedItemId);
+      const newJobIndex = Math.min(Math.max(currentJobIndex + direction, 0), filteredJobs.length - 1);
+      const selectedJob = filteredJobs[newJobIndex];
+      
+      if (selectedJob) {
+        setFocusedItemId(selectedJob.id);
+        setSelectedJob(selectedJob);
+      }
+    }
+  }, [modeType, filteredClients, filteredJobs, focusedItemId]);
 
   // Keyboard Navigation
   useEffect(() => {
@@ -173,31 +207,7 @@ const Home: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [filteredClients, jobs, modeType, isAddClientModalOpen, isPropertyModalOpen]);
-
-  const navigateFocusedItem = (direction: number) => {
-    if (modeType === 'Client') {
-      if (filteredClients.length === 0) return;
-      
-      setFocusedItemId(prevId => {
-        const currentIndex = filteredClients.findIndex(client => client.id === prevId);
-        const newIndex = Math.min(Math.max(currentIndex + direction, 0), filteredClients.length - 1);
-        return filteredClients[newIndex]?.id ?? null;
-      });
-    } else {
-      // Daily mode - navigate through jobs
-      if (filteredJobs.length === 0) return;
-      
-      const currentJobIndex = filteredJobs.findIndex(job => job.id === focusedItemId);
-      const newJobIndex = Math.min(Math.max(currentJobIndex + direction, 0), filteredJobs.length - 1);
-      const selectedJob = filteredJobs[newJobIndex];
-      
-      if (selectedJob) {
-        setFocusedItemId(selectedJob.id);
-        setSelectedJob(selectedJob);
-      }
-    }
-  };
+  }, [navigateFocusedItem, isAddClientModalOpen, isPropertyModalOpen]);
 
   // Automatically focus the first or reset focus when needed
   useEffect(() => {
@@ -218,44 +228,42 @@ const Home: React.FC = () => {
           setSelectedJob(null);
         }
     }
-}, [filteredClients, filteredJobs, focusedItemId, modeType]);
+  }, [filteredClients, filteredJobs, focusedItemId, modeType]);
 
   // This effect runs whenever focusedItemId changes
   useEffect(() => {
-  if (modeType === 'Client' && customers.length === 0) return;
-  if (modeType === 'Daily' && jobs.length === 0) return;
+    if (modeType === 'Client' && customers.length === 0) return;
+    if (modeType === 'Daily' && jobs.length === 0) return;
 
-  const selector = modeType === 'Client'
-    ? `[data-client-id="${focusedItemId}"]`
-    : `[data-job-id="${focusedItemId}"]`;
-  
-  const focusedElement = document.querySelector(selector);
-  if (focusedElement) {
-    focusedElementRef.current = focusedElement as HTMLDivElement;
-    focusedElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
-    });
-  }
-}, [focusedItemId, modeType, customers, searchTerm, jobs]);
+    const selector = modeType === 'Client'
+      ? `[data-client-id="${focusedItemId}"]`
+      : `[data-job-id="${focusedItemId}"]`;
+    
+    const focusedElement = document.querySelector(selector);
+    if (focusedElement) {
+      focusedElementRef.current = focusedElement as HTMLDivElement;
+      focusedElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  }, [focusedItemId, modeType, customers.length, jobs.length]);
 
-  const selectedClient = focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) ?? null : null;
-
-  const handleClientClick = (id: number) => {
+  const handleClientClick = useCallback((id: number) => {
     setFocusedItemId(id);
     sessionStorage.setItem('lastFocusedClientId', id.toString());
-  };
+  }, []);
 
-  const handleJobClick = (id: number, job: Job) => {
+  const handleJobClick = useCallback((id: number, job: Job) => {
     setFocusedItemId(id);
     setSelectedJob(job);
     sessionStorage.setItem('lastFocusedJobId', id.toString());
-  };
+  }, []);
 
   // Handle property modal state changes
-  const handlePropertyModalStateChange = (isOpen: boolean) => {
+  const handlePropertyModalStateChange = useCallback((isOpen: boolean) => {
     setIsPropertyModalOpen(isOpen);
-  };
+  }, []);
    
   useEffect(() => {
     if (modeType === "Client") {
@@ -271,16 +279,16 @@ const Home: React.FC = () => {
         setFocusedItemId(parseInt(savedFocusedId));
       }
     }
-  }, [modeType]);
+  }, [modeType, getClients, fetchTodaysJobs]);
 
   useEffect(() => {
-  if (modeType === 'Daily' && focusedItemId && jobs.length > 0) {
-    const job = jobs.find(job => job.id === focusedItemId);
-    if (job) {
-      setSelectedJob(job);
+    if (modeType === 'Daily' && focusedItemId && jobs.length > 0) {
+      const job = jobs.find(job => job.id === focusedItemId);
+      if (job) {
+        setSelectedJob(job);
+      }
     }
-  }
-}, [focusedItemId, jobs, modeType]);
+  }, [focusedItemId, jobs, modeType]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -293,10 +301,10 @@ const Home: React.FC = () => {
     })
   );
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event; // active is the item being dragged, over is the item being hovered over
-    setActiveJobId(null); // used to reset UI state after drag ends
-    console.log('Drag Ended:', active.id, 'over:', over?.id);
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveJobId(null);
+
     if (!over) return;
     if (active.id === over.id) {
       console.log('Dropped on itself, no action taken');
@@ -304,32 +312,28 @@ const Home: React.FC = () => {
     }
   
     if (over.id.toString().includes('droppable-')) {
-      const dayIndex = parseInt(over.id.toString().split('-')[1]); // uses the droppable id to determine how many days to shift the job
+      const dayIndex = parseInt(over.id.toString().split('-')[1]);
 
       try {
         const tz = localStorage.getItem("userTimeZone") || "America/Chicago";
         const target = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
-        target.setHours(0, 0, 0, 0); // resets the time to midnight
-        target.setDate(target.getDate() + dayIndex); // applies that shift to the current date
+        target.setHours(0, 0, 0, 0);
+        target.setDate(target.getDate() + dayIndex);
 
         const formattedDate = target.toISOString().slice(0, 10);
 
-        const rescheduleJob = async () => {
-            const response = await api.patch(`/api/Update-Schedule/${active.id}/`, {
-              jobDate: formattedDate,
-            });
-            if (response.status === 200) {
-              setJobs(prevJobs => {
-                const updatedJobs = prevJobs.filter(job => job.id !== active.id);
-                if (updatedJobs.length === 0) {
-                  setSelectedJob(null);
-                }
-                return updatedJobs;
-              });
+        const response = await api.patch(`/api/Update-Schedule/${active.id}/`, {
+          jobDate: formattedDate,
+        });
+        if (response.status === 200) {
+          setJobs(prevJobs => {
+            const updatedJobs = prevJobs.filter(job => job.id !== active.id);
+            if (updatedJobs.length === 0) {
+              setSelectedJob(null);
             }
-        };
-        rescheduleJob();
-
+            return updatedJobs;
+          });
+        }
       } catch (error) {
         console.error('Error rescheduling job:', error);
         alert('Failed to reschedule job');
@@ -337,25 +341,21 @@ const Home: React.FC = () => {
     }
 
     if (over.id == 'delete-job') {
-      const deleteJob = async () => {
-        try {
-          const response = await api.delete(`/api/job/delete/${active.id}/`, {});
-          if (response.status === 204) {
-            setJobs(prevJobs => {
-              const updatedJobs = prevJobs.filter(job => job.id !== active.id);
-              if (updatedJobs.length === 0) {
-                setSelectedJob(null);
-              }
-              return updatedJobs;
-            });
-            
-          }
-        } catch (error) {
-          console.error('Error deleting job:', error);
-          alert('Failed to delete job');
+      try {
+        const response = await api.delete(`/api/job/delete/${active.id}/`, {});
+        if (response.status === 204) {
+          setJobs(prevJobs => {
+            const updatedJobs = prevJobs.filter(job => job.id !== active.id);
+            if (updatedJobs.length === 0) {
+              setSelectedJob(null);
+            }
+            return updatedJobs;
+          });
         }
-      };
-      deleteJob();
+      } catch (error) {
+        console.error('Error deleting job:', error);
+        alert('Failed to delete job');
+      }
     }
 
     if (over && active.id !== over.id) {
@@ -370,16 +370,22 @@ const Home: React.FC = () => {
         return reorderedJobs;
       });
     }
-  };
+  }, []);
 
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
     setActiveJobId(active.id as number)
-  }
+  }, []);
 
-  const toggleDraggingEnabled = (isDisabled: boolean) => {
-  setIsDraggingDisabled(isDisabled);
-};
+  const toggleDraggingEnabled = useCallback((isDisabled: boolean) => {
+    setIsDraggingDisabled(isDisabled);
+  }, []);
+
+  // Memoize the active job for DragOverlay
+  const activeJob = useMemo(() => 
+    activeJobId ? jobs.find(job => job.id === activeJobId) : null,
+    [activeJobId, jobs]
+  );
   
   return (
     <div
@@ -388,7 +394,7 @@ const Home: React.FC = () => {
         backgroundImage: `url('https://oldschoolgrappling.com/wp-content/uploads/2018/08/Background-opera-speeddials-community-web-simple-backgrounds.jpg')`
       }}
     >      
-      {modeType === 'Client' && selectedClient && (
+      {modeType === 'Client' && selectedClient && !isPropertyModalOpen && (
         <ClientCalendar visits={[]} client_id={focusedItemId?focusedItemId:null} />
       )}
     
@@ -480,15 +486,15 @@ const Home: React.FC = () => {
                     ))}  
                 </SortableContext>
                 <DragOverlay dropAnimation={null} style={{zIndex: 5}}>
-                  {activeJobId ? (
+                  {activeJob ? (
                     <div 
-                      key={activeJobId}
+                      key={activeJob.id}
                       className="job-wrapper"
                       style={{ width: '100%'}}
                     >
                       <SortableDailyList
-                        job={jobs.find(job => job.id === activeJobId)!}
-                        isFocused={focusedItemId === activeJobId}
+                        job={activeJob}
+                        isFocused={focusedItemId === activeJob.id}
                         onClick={() => {}}
                         onComplete={handleJobComplete}
                         isDisabled={false}
