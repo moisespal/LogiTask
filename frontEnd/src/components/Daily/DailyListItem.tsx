@@ -17,11 +17,22 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
   const [isHovered, setIsHovered] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleItemClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    // Only focus if not already focused
+    if (!isFocused) {
+      onClick(job.id);
+    }
+  };
+
+  const handleIconClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
     if (isFocused && onComplete) {
+      // If already focused, complete it
       onComplete(job.id);
     } else {
+      // If not focused, focus it
       onClick(job.id);
     }
   };
@@ -48,14 +59,15 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
     <>
       <li
         className={`list-item daily-item ${isFocused ? 'focused daily-focused' : ''} ${isComplete ? 'daily-complete' : ''} ${isHovered ? 'hovered' : ''}`}
-        onClick={handleClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={handleItemClick}
         data-job-id={job.id}
       >
         <div className="list-item-header">
           <div 
             className={`daily-icon ${isComplete ? 'status-complete' : isFocused ? 'status-focused' : 'status-pending'}`}
+            onClick={handleIconClick}
           >
             {isComplete ? (
               <i className="fa-solid fa-check-circle"></i>
