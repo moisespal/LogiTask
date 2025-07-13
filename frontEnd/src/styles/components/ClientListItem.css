@@ -9,7 +9,7 @@
   box-sizing: border-box;
   cursor: pointer;
   z-index: 10;
-  min-width: 0; /* Changed from 100% to allow shrinking */
+  min-width: 0;
   width: 100%;
   user-select: none;
   display: flex;
@@ -17,7 +17,7 @@
   align-items: flex-start;
   border-left: 3px solid rgba(70, 130, 220, 0.4);
   transition: all 0.3s ease-out;
-  /* font-size: clamp(14px, 3vw, 16px); */
+  font-size: clamp(10px, 2.5vw, 18px);
 }
 
 .list-item.focused {
@@ -33,10 +33,6 @@
   transform: scale(1.02);
   z-index: 2;
   border-left-color: rgba(70, 130, 220, 0.6);
-}
-
-.list-item-name {
-  flex: 1;
 }
 /* Profile Pic and stars specific to ClientListItem */
 .profile-pic-container {
@@ -83,31 +79,6 @@
   gap: 8px;
   align-items: center;
 }
-
-/* Shared button styles */
-.gear-button{
-  background-color: rgba(50, 50, 55, 0.7);
-  border: none;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-/* Button hover effects */
-.gear-button:hover {
-  background-color: rgba(60, 60, 65, 0.8);
-}
-
-/* Button active effects */
-.gear-button:active{
-  transform: translateY(1px);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-}
-
 
 .client-payment-button:hover {
   background-color: rgba(45, 130, 45, 0.8);
@@ -163,5 +134,28 @@
 
 .gear-button i {
   color: rgba(255, 255, 255, 0.95);
-  font-size: 14px;
+}
+
+
+
+@media (max-width: 850px) {
+  .list-item {
+    font-size: clamp(13px, 2.5vw, 18px);
+    padding: clamp(14px, 2vw, 16px) clamp(15px, 3vw, 18px);
+  }
+  .profile-pic-container {
+    width: clamp(28px, 8vw, 32px);
+    height: clamp(28px, 8vw, 32px);
+  }
+}
+
+@media (max-width: 400px) {
+  .list-item {
+    font-size: clamp(10px, 2.5vw, 12px);
+    padding: clamp(12px, 2vw, 14px) clamp(15px, 3vw, 16px);
+  }
+  .profile-pic-container {
+    width: clamp(22px, 8vw, 26px);
+    height: clamp(22px, 8vw, 26px);
+  }
 }
