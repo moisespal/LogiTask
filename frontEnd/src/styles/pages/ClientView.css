@@ -2,20 +2,24 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 30px 50px 0;
+    padding: 30px 50px 100px;
     background: rgba(40, 40, 43, 1);
     color: white;
-    height: 100vh;       /* or max-height:100vh */
+    height: 100vh;
     overflow-y: auto;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Outfit', sans-serif;
     user-select: none;
+}
+
+.client-info-card, .client-balance-card {
+    min-width: 280px;
 }
 
 /* Header Section - Client Info and Balance */
 .client-header-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 50px;
+    gap: 20px;
     align-items: center;
 }
 
@@ -25,12 +29,13 @@
     padding: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 1rem;
 }
 
 .client-info-card {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
+    gap: 1em;
 }
 
 .client-avatar img {
@@ -55,7 +60,6 @@
     gap: 10px;
 }
 .client-name {
-    font-size: 20px;
     font-weight: bold;
     color: #fdfdfd;
     margin: 0;
@@ -72,7 +76,6 @@
     align-items: center;
     gap: 20px;
     color: #e0e0e0;
-    font-size: 15px;
 }
 
 .client-balance-card {
@@ -104,7 +107,6 @@
     align-items: baseline;
     gap: 10px;
     font-weight: 500;
-    font-size: 18px;
 }
 
 .header-buttons {
@@ -114,16 +116,14 @@
 
 .payment-button-secondary, .balance-adjustment-button {
     padding: 80px 15px;
-    font-size: 15px;
 }
 
 .balance-amount {
-    font-size: 28px;
     margin-left: 10px;
-    font-weight: bold;
-    font-family: 'arial';
+    font-weight: 700;
     color: transparent;
     background-clip: text;
+    font-size: 1.5rem;
 }
 
 .balance-progress-bar {
@@ -181,7 +181,7 @@
 /* Details Section - Addresses, Services, Payments */
 .client-details-section {
     display: grid;
-    grid-template-columns: 0.75fr 3fr 1.2fr;
+    grid-template-columns: 0.75fr 2.75fr 1.5fr;
     gap: 20px;
 }
 
@@ -190,6 +190,7 @@
     border-radius: 12px;
     padding: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-size: clamp(0.8rem, 1vw + 1rem, 1rem);
 }
 .panel-header {
     padding-bottom: 10px;
@@ -197,13 +198,13 @@
     margin-bottom: 15px;
     color: #fdfdfd;
     display: flex;
-    font-size: 1.2em;
     font-weight: 700;
     justify-content: space-between;
 }
 
 .total-amount {
     color: #4CAF50;
+    font-size: clamp(1rem, 2vw + 1rem, 1.2rem);
 }
 
 .address-list {
@@ -288,5 +289,18 @@
     
     .client-contact {
         justify-content: center;
+    }
+}
+
+@media (max-width: 460px) {
+    .client-view-container {
+        padding: 20px 15px 10px;
+    }
+    .client-info-card, .client-balance-card, .client-panel {
+        min-width: calc(100vw - 30px);
+    }
+    
+    .client-details-section {
+        gap: 15px;
     }
 }

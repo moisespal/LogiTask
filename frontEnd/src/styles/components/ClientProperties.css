@@ -160,12 +160,12 @@
   }
 
   .property-address, .property-location {
-    font-size: clamp(.7rem, 1vw, .8rem);
+    font-size: clamp(.75rem, 1vw, .85rem);
   }
 
   .add-property-item {
     padding: clamp(3px, 1vw, 4px) clamp(9px, 2vw, 10px);
-    font-size: clamp(.7rem, 1vw, .8rem);
+    font-size: clamp(.75rem, 1vw, .85rem);
   }
   
 }
