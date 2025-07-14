@@ -52,16 +52,16 @@
 }
 
 .property-address {
-  font-size: 0.9em;
   color: #e0e0e0;
   margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: clamp(0.8rem, 1vw, 1rem);
 }
 
 .property-location {
-  font-size: 0.8em;
+  font-size: clamp(0.75rem, 1vw, 0.85rem);
   color: #c8c8c8;
   white-space: nowrap;
   overflow: hidden;
@@ -90,6 +90,8 @@
   position: relative;
   overflow: hidden;
   font-family: "Outfit", sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* Create subtle pulsing highlight effect */
@@ -149,4 +151,21 @@
   cursor: pointer;
   color: inherit;
   font: inherit;
+}
+
+@media (max-width: 850px) {
+
+  .property-item {
+    padding: 6px 10px;
+  }
+
+  .property-address, .property-location {
+    font-size: clamp(.75rem, 1vw, .85rem);
+  }
+
+  .add-property-item {
+    padding: clamp(3px, 1vw, 4px) clamp(9px, 2vw, 10px);
+    font-size: clamp(.75rem, 1vw, .85rem);
+  }
+  
 }

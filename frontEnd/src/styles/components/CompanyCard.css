@@ -29,7 +29,6 @@
 .popup-menu-button {
     border: none;
     color: white;
-    font-size: 16px;
     padding: 10px 15px;
     cursor: pointer;
     display: flex;
@@ -67,7 +66,6 @@
     display: flex;
     align-items: center;
     margin-right: auto;
-    transition: all 0.2s ease-in-out;
     cursor: pointer;
     border: 1px solid transparent;
 }
@@ -153,29 +151,35 @@
     position: relative;
 }
 
-.xp-bar {
-    width: 75%;
-    height: 100%;
-    background: linear-gradient(90deg, #4CAF50, #8BC34A);
-    border-radius: 5px;
-    transition: width 0.5s ease;
-}
-
-.xp-glow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    animation: xp-glow-animation 2s infinite;
-}
-
 @keyframes xp-glow-animation {
     0% {
-        transform: translateX(-100%);
+        transform: translateX(0%);
     }
     100% {
         transform: translateX(100%);
+
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .company-profile-card {
+        width: 200px;
+        white-space: nowrap;
+    }
+    .company-name, .level {
+        font-size: clamp(12px, 2vw, 14px);
+    }
+
+    #company-image {
+        width: 40px;
+        height: 40px;
+    }
+
+    .company-popup-menu {
+        font-size: clamp(12px, 2vw, 14px);
+        width: 200px;
+    }
+    .popup-menu-button {
+        padding: 12px 12px;
     }
 }

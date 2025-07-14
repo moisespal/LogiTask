@@ -12,8 +12,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 20px;
     z-index: 10;
+    transition: all 0.3s ease;
 }
 
 /* Base container styles */
@@ -98,18 +98,19 @@
 
 /* Very small screens / mobile */
 @media screen and (max-width: 480px) {
-    .bottom-menu {
-        height: 100px;
+    
+    .bottom-menu{
+        height: 100px; /* Reduced height for very small screens */
+        padding: 0 10px; /* Reduced padding */
+    }
+    
+    .action-button {
+        width: clamp(60px, 8vw, 80px); /* Responsive width */
+        height: clamp(60px, 8vw, 80px);
+        font-size: 20px; /* Smaller icon size */
     }
     
     .bottom-menu-container {
-        width: 100%;
-        gap: 20px;
-        justify-content: space-between;
-        padding: 0 10px;
-    }
-    
-    .bottom-menu-button-container {
-        gap: 10px;
+        gap: clamp(30px, 5vw, 40px); /* Smaller gap for very small screens */
     }
 }    

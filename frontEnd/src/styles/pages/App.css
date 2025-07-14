@@ -17,6 +17,9 @@ body, html, #root {
   transition: background-image 0.1s ease-in-out;
   scroll-behavior: smooth;
   z-index: 1; 
+
+  /* Add these mobile-specific fixes */
+  
 }
 
 .app-container::-webkit-scrollbar {
@@ -40,6 +43,8 @@ body, html, #root {
   pointer-events: none; 
   color: white;
   background-color: rgba(47, 47, 48, 0.578); 
+  min-width: 130px;
+  user-select: none;
 }
 
 .search-bar::placeholder {
@@ -48,20 +53,23 @@ body, html, #root {
 
 .right-aligned-list {
   list-style: none;
-  padding-top: clamp(60px, 18vh, 120px);
+  padding-top: clamp(120px, 20vh, 150px);
   padding-bottom: clamp(50px, 20vh, 300px);
-  width: 70%; 
   z-index: 2; 
   display: flex; 
   flex-direction: column; 
   align-items: flex-end;
+  width: 45%;
 }
 /* Update the client wrapper */
 .client-wrapper {
-  width: 42vw;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  left: 100px;}
+  box-sizing: border-box; /* Include padding/borders in width */
+}
+
 
 .no-jobs-message {
   position: absolute;
@@ -87,4 +95,3 @@ body, html, #root {
   margin-bottom: 1rem;
   color: #4caf50;
 }
-
