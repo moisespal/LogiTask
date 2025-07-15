@@ -34,6 +34,7 @@
     display: flex;
     align-items: center;
     text-align: left;
+    border-radius: 6px;
     transition: background-color 0.2s ease;
 }
 
@@ -52,6 +53,9 @@
 
 .popup-menu-button.logout-button svg {
     color: #EF5350; 
+}
+.popup-menu-button.my-team-button svg {
+    color: #22C55E; 
 }
 
 .company-profile-card {
@@ -182,4 +186,9 @@
     .popup-menu-button {
         padding: 12px 12px;
     }
+}
+
+.team-member-amount {
+    margin-left: 4px;
+    color: #22C55E
 }

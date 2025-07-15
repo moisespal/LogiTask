@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/components/CompanyCard.css';
 import { FaCog, FaSignOutAlt, FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { BsPeopleFill } from "react-icons/bs";
 import { Company } from '../../types/interfaces';
 
 const CompanyCard: React.FC<Company> = ({image, name, level }) => {
@@ -39,12 +40,21 @@ const CompanyCard: React.FC<Company> = ({image, name, level }) => {
         <div className="company-card-wrapper">
             <div className={`company-popup-menu ${showMenu ? 'visible' : ''}`}>
                 <button 
+                    className="popup-menu-button my-team-button"
+                >
+                    <BsPeopleFill  />
+                    <span>Team Settings</span>
+                    <div className='team-member-amount'> ({0})</div>
+                </button>
+
+                <button 
                     className="popup-menu-button settings-button"
                     onClick={handleSettings}
                 >
                     <FaCog />
-                    <span>Settings</span>
+                    <span>My Settings</span>
                 </button>
+
                 <button 
                     className="popup-menu-button logout-button"
                     onClick={handleLogout}

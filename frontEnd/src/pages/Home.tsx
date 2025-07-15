@@ -387,13 +387,15 @@ const Home: React.FC = () => {
         handleSortChange={handleSortChange}
       />
 
-      <input
-        type="text"
-        className={`search-bar ${searchTerm ? 'active' : ''}`}
-        value={searchTerm}
-        onChange={handleChange}
-        placeholder={modeType === 'Client' ? "Search clients..." : "Search jobs..."}
-      />
+      <div className="search-container">
+          <input
+            type="text"
+            className={`search-bar ${searchTerm ? 'active' : ''}`}
+            value={searchTerm}
+            onChange={handleChange}
+            placeholder={modeType === 'Client' ? "Search clients..." : "Search jobs..."}
+          />
+      </div>
     
       <ul className="right-aligned-list">
         {modeType === 'Client' ? (

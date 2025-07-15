@@ -90,6 +90,26 @@
 ------------------------------------------*/
 
 /* Common icon styles */
+.job-client {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 3px 10px;
+  background-color: #304557ab;
+  transition: backround-color 0.5s ease, transform 0.2s ease;
+  cursor: pointer;
+  margin-bottom: clamp(-2px, -1vw, -4px);
+}
+
+.job-client:hover {
+  background-color: #3c566dab;
+  transform: translateY(-2px);
+}
+
+.job-client:active {
+  background-color: #2c3e50ab;
+  transform: translateY(0);
+}
+
 .job-client i {
   color: #64b5f6;
 }
@@ -102,6 +122,7 @@
   display: flex;
   white-space: nowrap;
   gap: clamp(10px, 1.5vw, 15px);
+  margin-left: clamp(-8px, -5px, -10px);
 }
 
 .job-info .contact .phone i {
@@ -268,7 +289,7 @@
   .top-menu-shape {
     clip-path: polygon(45% 29%, 50% 20%, 100% 20%, 100% 0, 0 0, 0 29%);
   }
-  .pill-container {
+  .pill-container .job-client {
     padding: 4px 6px;
     font-size: clamp(0.8rem, 1vw, 0.95rem);
   }
@@ -281,7 +302,7 @@
   .info-container {
     padding: clamp(18px, 19px, 20px) clamp(15px, 18px, 20px);
   }
-  .pill-container {
+  .pill-container .job-client {
     padding: 4px 8px;
     font-size: clamp(0.75rem, 1.2vw, 0.85rem);
   }

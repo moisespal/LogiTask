@@ -2,6 +2,9 @@ import React from 'react';
 import { ClientDataID, Job } from '../../types/interfaces';
 import '../../styles/components/TopBar.css';
 import { formatCapitalized, formatPhoneNumber } from '../../utils/format';
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from '@tanstack/react-query';
+import api from '../../api';
 
 interface TopBarProps {
   focusedItemId: number | null;
@@ -20,6 +23,43 @@ const TopBar: React.FC<TopBarProps> = ({
   sortOption, 
   handleSortChange 
 }) => {
+
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const handleClientClick = async () => {
+  
+    if (mode !== 'Daily' || !selectedJob?.client?.id) {
+      return;
+    }
+
+    const clientId = selectedJob.client.id;
+    
+    const cachedClients = queryClient.getQueryData<ClientDataID[]>(['clients']);
+    const cachedClient = cachedClients?.find(client => client.id === clientId);
+    
+    if (cachedClient) {
+      navigate('client-view/', {
+        state: { client: cachedClient }
+      });
+      return;
+    }
+
+    try {
+      const response = await api.get(`/api/client/${clientId}/properties/`);
+      
+      if (response.status === 200) {
+        navigate('client-view/', {
+          state: { client: response.data }
+        });
+      } else {
+        console.error('Failed to fetch client properties');
+      }
+    } catch (error) {
+      console.error('Error fetching client:', error);
+    }
+  };
+
   return (
     <div className="top-bar">
       <div className="top-menu-shape" />
@@ -48,7 +88,7 @@ const TopBar: React.FC<TopBarProps> = ({
               </div>
             </div>
             <div className="contact">
-              <div className="job-client service-item">
+              <div className="job-client service-item" onClick={handleClientClick}>
                 <i className="fa-solid fa-user" />
                 <span>{selectedJob.client.firstName} {selectedJob.client.lastName}</span>
               </div>
