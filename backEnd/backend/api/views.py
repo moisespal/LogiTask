@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -434,3 +434,15 @@ def create_worker(request):
         return Response({"message": "Worker created successfully"})
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class GetClientProperties(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request,client_id):
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return Response({"detail": "User Client not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ClientPropertiesSerializer(client)
+        return Response(serializer.data, status=status.HTTP_200_OK)

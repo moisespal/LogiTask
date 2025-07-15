@@ -8,12 +8,18 @@ const Dev: React.FC = () => {
     const createworker = async () => {
       await api.get("/api/worker/create/", {});
     };
-  
+
+    const client_id = 11;
+    const getProperties = async () => {
+      await api.get(`/api/client/${client_id}/properties/`,{});
+    };
   
   return(
   <>
     <div>Dev</div>;
     <button onClick={createworker}> TRY ME</button>
+    <div>Dev</div>;
+    <button onClick={getProperties}> TRY ME</button>
     
   </>
   )
