@@ -241,3 +241,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = userProfile
         fields = ['timezone','role']
 
+class ClientPropertiesSerializer(serializers.ModelSerializer):
+    properties = PropertySerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Client
+        fields = ["id", "firstName", "lastName", "phoneNumber", "email",'properties']
+        extra_kwargs = {
+            "created_at": {"read_only":True}
+        }
