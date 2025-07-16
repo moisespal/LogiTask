@@ -418,23 +418,47 @@ class AdjustmentCreate(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def create_worker(request):
-    user = request.user
-    if not hasattr(user, 'userprofile') or not user.userprofile.company:
-        return Response({"error": "User profile or company not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    company = user.userprofile.company
+class CreateWorker(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self,request):
+        user = request.user
+        if not hasattr(user, 'userprofile') or not user.userprofile.company:
+            return Response({"error": "User profile or company not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    try:
-        with transaction.atomic():
-            user = User.objects.create_user(password='123', username='worker3@gmail.com')
-            userProfile.objects.create(user=user, company=company)
-        return Response({"message": "Worker created successfully"})
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        company = user.userprofile.company
 
+        try:
+             with transaction.atomic():
+                serializer = userSerializer(data=request.data)
+                if not serializer.is_valid():
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+                new_user = serializer.save()
+                new_profile = userProfile.objects.get(user=new_user)
+                new_profile.role = 'WORKER'
+                new_profile.company = company
+                new_profile.save()
+                
+                return Response({
+                    "message": "Worker created successfully",
+                    "worker": serializer.data
+                }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class getWorkers(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self,request):
+        user = request.user
+        if not hasattr(user, 'userprofile') or not user.userprofile.company:
+            return Response({"error": "User profile or company not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        workers = User.objects.filter(userprofile__company=user.userprofile.company,userprofile__role='WORKER')
+        emails = workers.values_list('username',flat=True)
+        return Response({"emails": list(emails)},status=status.HTTP_200_OK)
 class GetClientProperties(APIView):
     permission_classes = [IsAuthenticated]
 

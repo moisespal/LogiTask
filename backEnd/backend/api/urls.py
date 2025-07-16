@@ -29,6 +29,7 @@ urlpatterns = [
     path("job/delete/<int:pk>/", views.JobDelete.as_view(),name="job-delete"),
     path('client/<int:client_id>/unapplied/', views.GetUnappliedObjects.as_view(), name='get-unapplied-objects'),
     path('client/<int:client_id>/adjustments/', views.AdjustmentCreate.as_view(), name='create-adjustment'),
-    path('worker/create/',views.create_worker,name='create-worker'),
-    path('client/<int:client_id>/properties/', views.GetClientProperties.as_view(), name='get-client-properties')
+    path('worker/create/',views.CreateWorker.as_view(),name='create-worker'),
+    path('client/<int:client_id>/properties/', views.GetClientProperties.as_view(), name='get-client-properties'),
+    path('user/workers/',views.getWorkers.as_view(), name='get-workers-list')
 ]
