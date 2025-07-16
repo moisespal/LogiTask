@@ -80,6 +80,7 @@ export interface Company {
   name: string;
   image: string;
   level: string;
+  onTeamModalOpen: () => void;
 }
 
 export interface ClientSchedule {

@@ -7,9 +7,10 @@ interface BottomBarProps {
     isModeRotated: boolean;
     handleModeClick: () => void;
     openAddClientModal: () => void;
+    onTeamModalOpen: () => void;
 }
 
-const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, openAddClientModal }) => (
+const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, openAddClientModal, onTeamModalOpen}) => (
     <div className="bottom-menu">
         <div className="bottom-menu-container">
             <div className="bottom-menu-button-container">
@@ -28,6 +29,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, o
                     image="https://art.pixilart.com/thumb/sr2e1188a7c216a.png" 
                     name="Company Name"
                     level="Lvl 5" 
+                    onTeamModalOpen={onTeamModalOpen}
             />
         </div>
     </div>

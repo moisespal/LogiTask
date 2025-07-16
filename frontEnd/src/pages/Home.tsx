@@ -17,6 +17,7 @@ import { useTodaysJobs } from '../hooks/useJobs';
 import { DndContext, pointerWithin, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableDailyList from '../components/Daily/SortableDailyList';
+import TeamModal from '../components/Company/CompanyTeamModal';
 
 const renderStars = (count: number): JSX.Element[] => (
   Array.from({ length: count }, (_, i) => <span key={i} className="star">★</span>)
@@ -44,6 +45,7 @@ const Home: React.FC = () => {
   });
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
   const { clients } = useClients( modeType === 'Client');
   const queryClient = useQueryClient();
@@ -86,6 +88,14 @@ const Home: React.FC = () => {
     setModeType(newMode);
     setIsModeRotated(prev => !prev);
   }, [modeType]);
+
+  const handleTeamModalOpen = useCallback(() => {
+    setIsTeamModalOpen(true);
+  }, []);
+
+  const handleTeamModalClose = useCallback(() => {
+    setIsTeamModalOpen(false);
+  }, []);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -499,11 +509,16 @@ const Home: React.FC = () => {
         isModeRotated={isModeRotated}
         handleModeClick={handleModeClick}
         openAddClientModal={() => setIsAddClientModalOpen(true)}
+        onTeamModalOpen={handleTeamModalOpen}
       />
             
       <AddClientModal
         isOpen={isAddClientModalOpen}
         onClose={() => setIsAddClientModalOpen(false)}
+      />
+      <TeamModal
+        isOpen={isTeamModalOpen}
+        onClose={handleTeamModalClose}
       />
     </div>
   );
