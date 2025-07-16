@@ -5,13 +5,19 @@ const Dev: React.FC = () => {
     //  const generateJobs = async () => {
     //   await api.get("/api/generateJobs/", {});
     // };
+    const username = 'worker5@gmail.com'
+    const password = '123'
     const createworker = async () => {
-      await api.get("/api/worker/create/", {});
+      await api.post("/api/worker/create/",  { username, password });
     };
 
     const client_id = 11;
     const getProperties = async () => {
       await api.get(`/api/client/${client_id}/properties/`,{});
+    };
+
+    const getworkers = async () => {
+      await api.get(`/api/user/workers/`,{});
     };
   
   return(
@@ -20,6 +26,8 @@ const Dev: React.FC = () => {
     <button onClick={createworker}> TRY ME</button>
     <div>Dev</div>;
     <button onClick={getProperties}> TRY ME</button>
+    <div>workers</div>;
+    <button onClick={getworkers}> TRY ME</button>
     
   </>
   )
