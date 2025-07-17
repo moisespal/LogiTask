@@ -58,8 +58,9 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
     } 
     try {
       const res = await api.get("/api/get-user-profile/");
-      if (res.data.timezone) {
+      if (res.data) {
         localStorage.setItem("userTimeZone", res.data.timezone);
+        localStorage.setItem('role',res.data.role)
       }
     } catch (error) {
       console.error("Error checking user time zone:", error);

@@ -456,7 +456,7 @@ class getWorkers(APIView):
         if not hasattr(user, 'userprofile') or not user.userprofile.company:
             return Response({"error": "User profile or company not found"}, status=status.HTTP_404_NOT_FOUND)
         
-        workers = User.objects.filter(userprofile__company=user.userprofile.company,userprofile__role='WORKER')
+        workers = User.objects.filter(userprofile__company=user.userprofile.company,userprofile__role='WORKER',userprofile__timezone=user.userprofile.timezone)
         emails = workers.values_list('username',flat=True)
         return Response({"emails": list(emails)},status=status.HTTP_200_OK)
 class GetClientProperties(APIView):
