@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/components/TeamModal.css';
 import api from '../../api';
+import { useUser } from '../../contexts/userContext';
 
 interface TeamMember {
   email: string;
@@ -16,6 +17,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const user = useUser();
 
   useEffect(() => {
     if (isOpen) {
@@ -154,12 +156,14 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
             </div>
           </form>
         ) : (
-          <button 
-            className="add-member-btn"
-            onClick={() => setShowAddForm(true)}
-          >
-            Add Team Member
-          </button>
+          user.role === 'BOSS' && (
+            <button 
+              className="add-member-btn"
+              onClick={() => setShowAddForm(true)}
+            >
+              Add Team Member
+            </button>
+          )
         )}
       </div>
     </div>

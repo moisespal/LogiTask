@@ -18,6 +18,7 @@ import { DndContext, pointerWithin, KeyboardSensor, PointerSensor, useSensor, us
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableDailyList from '../components/Daily/SortableDailyList';
 import TeamModal from '../components/Company/CompanyTeamModal';
+import { useUser } from '../contexts/userContext';
 
 const renderStars = (count: number): JSX.Element[] => (
   Array.from({ length: count }, (_, i) => <span key={i} className="star">★</span>)
@@ -37,10 +38,14 @@ const getUTCISOString = () => new Date().toISOString();
 
 // Main Component
 const Home: React.FC = () => {
+  const user = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [focusedItemId, setFocusedItemId] = useState<number | null>(null);
   const [sortOption, setSortOption] = useState<string>('none');
   const [modeType, setModeType] = useState(()=>{
+    if (user.role === 'WORKER') {
+      return 'Daily';
+    }
     return localStorage.getItem('mode') || "Client";
   });
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
