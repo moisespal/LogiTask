@@ -33,9 +33,10 @@
   margin-top: 0;
   margin-bottom: 0.6rem;
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 1.rem;
   color: #ffffff;
   font-weight: 500;
+  user-select: none;
 }
 
 .close-modal-btn {
@@ -127,6 +128,7 @@
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 500;
+  user-select: none;
 }
 
 /* Add Member Button */
@@ -144,6 +146,7 @@
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
+  user-select: none;
 }
 
 .add-member-btn:hover {
@@ -162,6 +165,7 @@
   border-radius: 8px;
   padding: 0.8rem;
   margin-top: 0.5rem;
+  user-select: none;
 }
 
 .add-member-form h4 {
@@ -231,8 +235,7 @@
 }
 
 .cancel-btn:hover {
-  background-color: rgba(45, 45, 48, 0.9);
-  transform: translateY(-1px);
+  background-color: rgba(35, 35, 38, 0.9);
 }
 
 .submit-btn {
@@ -242,7 +245,6 @@
 
 .submit-btn:hover {
   background-color: #57b15c;
-  transform: translateY(-1px);
 }
 
 /* Scrollbar styling */
@@ -264,7 +266,6 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Responsive Design */
 @media (max-width: 480px) {
   .team-modal-container {
     width: 90%;

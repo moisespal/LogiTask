@@ -219,6 +219,7 @@
   gap: clamp(5px, 1.5vw, 10px);
   font-size: clamp(12px, 2vw, 14px);
   color: rgba(255, 255, 255, 0.7);
+  user-select: none;
 }
 
 .sort-button {

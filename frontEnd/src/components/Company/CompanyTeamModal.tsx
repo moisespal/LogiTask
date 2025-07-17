@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/components/TeamModal.css';
+import api from '../../api';
 
 interface TeamMember {
-  id: number;
   email: string;
-  role: string;
 }
 
 interface TeamModalProps {
@@ -16,11 +15,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
-
-  const [teamMembers] = useState<TeamMember[]>([
-    { id: 1, email: 'john@company.com', role: 'Worker' },
-    { id: 2, email: 'jane@company.com', role: 'Worker' }
-  ]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
 
   useEffect(() => {
     if (isOpen) {
@@ -34,9 +29,44 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
     };
   }, [isOpen]);
 
+
+  useEffect(() => {
+  if (!isOpen) return;
+  
+  const getworkers = async () => {
+    try {
+      const response = await api.get(`/api/user/workers/`, {});
+      if (response.data && response.data.emails) {
+        const members = response.data.emails.map((email: string) => ({
+          email: email
+        }));
+        setTeamMembers(members);
+      }
+    } catch (error) {
+      console.error('Error fetching workers:', error);
+    }
+  };
+  
+  getworkers();
+}, [isOpen]);
+
   const handleAddMember = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Adding member:', { email: newEmail, password: newPassword });
+    const username = newEmail;
+    const password = newPassword;
+
+    const createworker = async () => {
+      await api.post("/api/worker/create/",  { username, password });
+    };
+    createworker()
+      .then(() => {
+        alert('Worker created successfully');
+        setTeamMembers([...teamMembers, { email: newEmail }]);
+      })
+      .catch((error) => {
+        console.error('Error creating worker:', error);
+      });
+    
     
     setNewEmail('');
     setNewPassword('');
@@ -67,18 +97,17 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
         <h3>Team Members</h3>
         
         <div className="team-members-list">
-          {teamMembers.map((member) => (
-            <div key={member.id} className="team-member-card">
+          {teamMembers.map(member => (
+            <div className="team-member-card"> 
               <div className="member-avatar">
                 <i className="fa-solid fa-user"></i>
               </div>
+
               <div className="member-info">
                 <div className="member-email">{member.email}</div>
               </div>
-              {member.role && (
-                <div className="member-role">{member.role}</div>
-              )}
-            </div>
+              <div className="member-role">Worker</div>
+           </div>
           ))}
         </div>
 
@@ -93,7 +122,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
                 type="email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                placeholder="newmember@company.com"
+                placeholder="Enter email"
                 required
               />
             </div>
@@ -104,7 +133,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Set initial password"
+                placeholder="Enter password"
                 required
               />
             </div>

@@ -49,8 +49,7 @@ const CompanyCard: React.FC<Company> = ({image, name, level, onTeamModalOpen }) 
                     onClick={handleTeamClick}
                 >
                     <BsPeopleFill  />
-                    <span>Team Settings</span>
-                    <div className='team-member-amount'> ({0})</div>
+                    <span>My Team</span>
                 </button>
 
                 <button 
@@ -58,7 +57,7 @@ const CompanyCard: React.FC<Company> = ({image, name, level, onTeamModalOpen }) 
                     onClick={handleSettings}
                 >
                     <FaCog />
-                    <span>My Settings</span>
+                    <span>Settings</span>
                 </button>
 
                 <button 
