@@ -9,9 +9,12 @@ interface BottomBarProps {
     handleModeClick: () => void;
     openAddClientModal: () => void;
     onTeamModalOpen: () => void;
+    onStatsToggle: () => void;
+    modeType: string;
+    showStats?: boolean;
 }
 
-const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, openAddClientModal, onTeamModalOpen}) => {
+const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, openAddClientModal, onTeamModalOpen, onStatsToggle, modeType, showStats = false}) => {
     const user = useUser();
 
     return (
@@ -27,11 +30,22 @@ const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, o
                             >
                                 <FaExchangeAlt />
                             </button>
-                            <button className="action-button" onClick={openAddClientModal} title="Add Client">
-                                <FaUserPlus />
-                            </button>
+                            {modeType === 'Client' && (
+                                <button className="action-button" onClick={openAddClientModal} title="Add Client">
+                                    <FaUserPlus />
+                                </button>
+                            )}
                         </>
-                )}
+                    )}
+                    {modeType === 'Daily' && (
+                        <button 
+                            className={`action-button stats-button ${showStats ? 'active' : ''}`}
+                            onClick={onStatsToggle}
+                            title={showStats ? "Hide Daily Stats" : "Show Daily Stats"}
+                        >
+                            <i className="fa-solid fa-chart-bar"></i>
+                        </button>
+                    )}
                 </div>
                 
                 <CompanyCard 

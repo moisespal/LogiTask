@@ -1,0 +1,123 @@
+.daily-stats-panel {
+  position: fixed;
+  bottom: 15vh; 
+  right: 20px;
+  background: rgba(33, 33, 36, 0.712);
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 260px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  animation: slideInStats 0.3s ease;
+  user-select: none;
+  font-family: 'Outfit', sans-serif;
+}
+
+@keyframes slideInStats {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.stats-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64b5f6;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 8px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  color: #b0bec5;
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.10px;
+}
+
+.stat-value {
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.progress-mini {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill-mini {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill-mini.completion {
+  background: linear-gradient(90deg, #4CAF50, #8BC34A);
+}
+
+.progress-fill-mini.revenue {
+  background: linear-gradient(90deg, #2196F3, #64B5F6);
+}
+
+.stats-button.active {
+  background-color: #64b5f6 !important;
+  color: #1a1a1a !important;
+}
+
+
+@media (max-width: 768px) {
+  .daily-stats-panel {
+    right: 10px;
+    min-width: 180px;
+    padding: 12px;
+  }
+  
+  .stat-value {
+    font-size: 0.9rem;
+  }
+  
+  .stats-grid {
+    gap: 8px;
+  }
+}
+
+.date-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.date-display {
+  color: #edf5ee;
+}
+.date-display i {
+  font-size: 0.8rem;
+}
