@@ -250,3 +250,9 @@ class ClientPropertiesSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "created_at": {"read_only":True}
         }
+
+class PaymentInfoSerializer(serializers.ModelSerializer):
+    client = OnlyClientSerializer(read_only=True)
+    class Meta:
+        model=Payment
+        fields = ["id","amount","paymentType","paymentDate","client"]

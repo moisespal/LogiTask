@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -496,7 +496,7 @@ class getPayments(APIView):
             paymentDate__gte=start,
             paymentDate__lt=end,
             client__company=self.request.user.userprofile.company
-        ).order_by("paymentDate")
-        serializer = PaymentSerializer(payments,many=True)
+        ).order_by("-paymentDate")
+        serializer = PaymentInfoSerializer(payments,many=True)
 
         return Response({'payments': list(serializer.data)},status=status.HTTP_200_OK)
