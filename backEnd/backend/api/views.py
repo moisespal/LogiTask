@@ -20,7 +20,7 @@ from django.db.models import Sum
 from decimal import Decimal
 from collections import defaultdict
 from django.db import transaction
-
+from datetime import timedelta, datetime
 
 
 
@@ -471,3 +471,32 @@ class GetClientProperties(APIView):
 
         serializer = ClientPropertiesSerializer(client)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class getPayments(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request, date=None):
+        
+
+        profile = userProfile.objects.get(user=self.request.user)
+        user_timezone = profile.timezone
+        try:
+            user_timezone = pytz.timezone(user_timezone)
+        except pytz.exceptions.UnknownTimeZoneError:
+            user_timezone = pytz.UTC
+        utc_now = timezone.now()
+        local_now = utc_now.astimezone(user_timezone)
+        today_in_user_tz = local_now.date()
+        start = timezone.make_aware(datetime.combine(today_in_user_tz, datetime.min.time()), timezone=user_timezone)
+        end = start + timedelta(days=1)
+
+
+        payments = Payment.objects.filter(
+            paymentDate__gte=start,
+            paymentDate__lt=end,
+            client__company=self.request.user.userprofile.company
+        )
+        serializer = PaymentSerializer(payments,many=True)
+
+        return Response({'payments': list(serializer.data)},status=status.HTTP_200_OK)

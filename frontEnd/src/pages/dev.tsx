@@ -19,6 +19,11 @@ const Dev: React.FC = () => {
     const getworkers = async () => {
       await api.get(`/api/user/workers/`,{});
     };
+
+
+    const getPayment = async () =>{
+      await api.get(`/api/daily/payments/`,{});
+    };
   
   return(
   <>
@@ -28,6 +33,8 @@ const Dev: React.FC = () => {
     <button onClick={getProperties}> TRY ME</button>
     <div>workers</div>;
     <button onClick={getworkers}> TRY ME</button>
+    <div>payments</div>
+    <button onClick={getPayment}>me</button>
     
   </>
   )
