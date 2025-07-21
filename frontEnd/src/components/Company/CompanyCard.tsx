@@ -49,7 +49,7 @@ const CompanyCard: React.FC<Company> = ({image, name, level, onTeamModalOpen }) 
                     onClick={handleTeamClick}
                 >
                     <BsPeopleFill  />
-                    <span>My Team</span>
+                    <span>Team</span>
                 </button>
 
                 <button 

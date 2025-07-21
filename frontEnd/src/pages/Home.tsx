@@ -6,6 +6,7 @@ import TopBar from '../components/Layout/TopBar';
 import BottomBar from '../components/Layout/BottomBar';
 import AddClientModal from '../components/Client/AddClientModal';
 import DailyReschedule from '../components/Daily/DailyReschedule';
+import DailyStatsModal from '../components/Daily/DailyStatsModal';
 import { ClientDataID, Job } from '../types/interfaces';
 import api from "../api"
 import '../styles/pages/App.css';
@@ -18,6 +19,7 @@ import { DndContext, pointerWithin, KeyboardSensor, PointerSensor, useSensor, us
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableDailyList from '../components/Daily/SortableDailyList';
 import TeamModal from '../components/Company/CompanyTeamModal';
+import { useUser } from '../contexts/userContext';
 
 const renderStars = (count: number): JSX.Element[] => (
   Array.from({ length: count }, (_, i) => <span key={i} className="star">★</span>)
@@ -37,15 +39,20 @@ const getUTCISOString = () => new Date().toISOString();
 
 // Main Component
 const Home: React.FC = () => {
+  const user = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [focusedItemId, setFocusedItemId] = useState<number | null>(null);
   const [sortOption, setSortOption] = useState<string>('none');
   const [modeType, setModeType] = useState(()=>{
+    if (user.role === 'WORKER') {
+      return 'Daily';
+    }
     return localStorage.getItem('mode') || "Client";
   });
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const [showDailyStats, setShowDailyStats] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
   const { clients } = useClients( modeType === 'Client');
   const queryClient = useQueryClient();
@@ -103,6 +110,10 @@ const Home: React.FC = () => {
 
   const handleSortChange = useCallback((option: string) => {
     setSortOption(option);
+  }, []);
+
+  const handleStatsToggle = useCallback(() => {
+    setShowDailyStats(prev => !prev);
   }, []);
 
   // Memoized filtering and sorting functions
@@ -510,6 +521,9 @@ const Home: React.FC = () => {
         handleModeClick={handleModeClick}
         openAddClientModal={() => setIsAddClientModalOpen(true)}
         onTeamModalOpen={handleTeamModalOpen}
+        onStatsToggle={handleStatsToggle}
+        modeType={modeType}
+        showStats={showDailyStats}
       />
             
       <AddClientModal
@@ -519,6 +533,10 @@ const Home: React.FC = () => {
       <TeamModal
         isOpen={isTeamModalOpen}
         onClose={handleTeamModalClose}
+      />
+      <DailyStatsModal
+        jobs={jobs}
+        isVisible={showDailyStats && modeType === 'Daily'}
       />
     </div>
   );

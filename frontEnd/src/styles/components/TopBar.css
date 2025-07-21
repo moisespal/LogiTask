@@ -51,7 +51,7 @@
   gap: clamp(20px, 1.5vw, 25px);
 }
 
-.client-item, .service-item, .service-tags {
+.client-item, .service-item, .service-tags, .job-client {
   display: flex;
   align-items: center;
   gap: clamp(7px, 1.5vw, 10px);
@@ -90,7 +90,8 @@
 ------------------------------------------*/
 
 /* Common icon styles */
-.job-client {
+
+.job-client-button {
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 15px;
   padding: 3px 10px;
@@ -98,14 +99,15 @@
   transition: backround-color 0.5s ease, transform 0.2s ease;
   cursor: pointer;
   margin-bottom: clamp(-2px, -1vw, -4px);
+  margin-left: clamp(-10px, 1vw, -15px);
 }
 
-.job-client:hover {
+.job-client-button:hover {
   background-color: #3c566dab;
   transform: translateY(-2px);
 }
 
-.job-client:active {
+.job-client-button:active {
   background-color: #2c3e50ab;
   transform: translateY(0);
 }
@@ -122,7 +124,6 @@
   display: flex;
   white-space: nowrap;
   gap: clamp(10px, 1.5vw, 15px);
-  margin-left: clamp(-8px, -5px, -10px);
 }
 
 .job-info .contact .phone i {

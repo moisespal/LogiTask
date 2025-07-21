@@ -5,6 +5,7 @@ import { formatCapitalized, formatPhoneNumber } from '../../utils/format';
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from '@tanstack/react-query';
 import api from '../../api';
+import { useUser } from '../../contexts/userContext.tsx';
 
 interface TopBarProps {
   focusedItemId: number | null;
@@ -23,7 +24,7 @@ const TopBar: React.FC<TopBarProps> = ({
   sortOption, 
   handleSortChange 
 }) => {
-
+  const user = useUser();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -88,7 +89,7 @@ const TopBar: React.FC<TopBarProps> = ({
               </div>
             </div>
             <div className="contact">
-              <div className="job-client service-item" onClick={handleClientClick}>
+              <div className={`job-client ${user.role === 'BOSS' ? 'job-client-button' : ''}`} onClick={user.role === 'BOSS' ? handleClientClick : undefined}>
                 <i className="fa-solid fa-user" />
                 <span>{selectedJob.client.firstName} {selectedJob.client.lastName}</span>
               </div>
