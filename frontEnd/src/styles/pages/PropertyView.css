@@ -1044,13 +1044,31 @@
 .date-readout {
   padding: 0.40rem 1rem;
   border-radius: 20px;
-  text-align: center;          
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-
-.date-readout:not(:empty):not(:has(:empty)) {
+.date-readout:not(:empty) {
   color: #bcb8b8;
   background-color: rgba(59, 58, 58, 0.969);
+}
+
+.clear-date-btn {
+  background: none;
+  border: none;
+  color: #ff5252;
+  cursor: pointer;
+  padding: 2px 0px;
+  border-radius: 3px;
+  font-size: 12px;
+
+}
+
+.clear-date-btn:hover {
+  transform: scale(1.1);
 }
 
 @media (max-width: 768px) {

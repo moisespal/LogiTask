@@ -59,8 +59,14 @@ const PropertyView: React.FC = () => {
 
 
   const openPicker = (ref: React.RefObject<HTMLInputElement>) => {
-    if (ref.current?.showPicker) ref.current.showPicker();
-    else ref.current?.click();
+    if (ref.current) {
+      if (/iPad|iPhone|iPod/.test(navigator.userAgent) || !ref.current.showPicker) {
+        ref.current.focus();
+        ref.current.click();
+      } else {
+        ref.current.showPicker();
+      }
+    }
   };
   
   useEffect(() => {
@@ -635,7 +641,18 @@ const handleNextDateConfirm = async() => {
                 className="sr-only"
               />
 
-              <div className="date-readout">{dialogData.nextDate ? formatDateLocal(dialogData.nextDate, userTimeZone) : 'None Set'}</div>
+              <div className="date-readout">{dialogData.nextDate ? formatDateLocal(dialogData.nextDate, userTimeZone) : 'None Set'}
+                {dialogData.nextDate && (
+                  <button
+                    type="button"
+                    className="clear-date-btn"
+                    onClick={() => setDialogData({ ...dialogData, nextDate: "" })}
+                    title="Clear next date"
+                  >
+                    <i className="fa-solid fa-eraser"></i>
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* ---------- END DATE ---------- */}
@@ -660,7 +677,19 @@ const handleNextDateConfirm = async() => {
                 className="sr-only"
               />
 
-              <div className="date-readout">{dialogData.endDate ? formatDateLocal(dialogData.endDate, userTimeZone) : 'Not Set'}</div>
+              <div className="date-readout">
+                {dialogData.endDate ? formatDateLocal(dialogData.endDate, userTimeZone) : 'Not Set'}
+                {dialogData.endDate && (
+                  <button
+                    type="button"
+                    className="clear-date-btn"
+                    onClick={() => setDialogData({ ...dialogData, endDate: "" })}
+                    title="Clear end date"
+                  >
+                    <i className="fa-solid fa-eraser"></i>
+                  </button>
+                )}
+              </div>
             </div>
           </div>}
         onConfirm={handleNextDateConfirm}

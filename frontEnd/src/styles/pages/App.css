@@ -45,7 +45,7 @@ body, html, #root {
   color: white;
   background-color: rgba(47, 47, 48, 0.578);
   user-select: none;
-  font-size: clamp(12px, 2vw, 16px);
+  font-size: clamp(16px, 2vw, 18px);
 }
 
 .search-bar::placeholder {

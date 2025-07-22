@@ -239,6 +239,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                         value={prop.nextDate}
                                         name='nextDate'
                                         onChange={(e) => handlePropertyChange(index, "nextDate", e.target.value)}
+                                        className='date-input'
                                         required
                                     />
                                 </div>

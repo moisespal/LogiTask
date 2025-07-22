@@ -196,7 +196,6 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(255, 255, 255, 0.07);
   color: #f0f0f0;
-  font-size: 0.85rem;
   transition: all 0.2s ease;
 }
 
@@ -286,11 +285,8 @@
     height: 35px;
   }
 
-  .member-username {
-    font-size: 0.9rem;
+  .member-username, .member-email {
+    font-size: 16px;
   }
 
-  .member-email {
-    font-size: 0.8rem;
-  }
 }

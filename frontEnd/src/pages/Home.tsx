@@ -14,6 +14,7 @@ import '../styles/pages/App.css';
 import { useQueryClient } from '@tanstack/react-query';
 import { useClients } from '../hooks/useClients';
 import { useTodaysJobs } from '../hooks/useJobs';
+import { useTodaysPayments } from '../hooks/useTodaysPayments';
 
 import { DndContext, pointerWithin, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -58,6 +59,7 @@ const Home: React.FC = () => {
   const queryClient = useQueryClient();
   const focusedElementRef = useRef<HTMLDivElement | null>(null);
   const { jobs } = useTodaysJobs(modeType === 'Daily');
+  const { data: paymentsData } = useTodaysPayments(modeType === 'Daily' && showDailyStats);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
@@ -536,6 +538,7 @@ const Home: React.FC = () => {
       />
       <DailyStatsModal
         jobs={jobs}
+        payments={paymentsData?.payments || []}
         isVisible={showDailyStats && modeType === 'Daily'}
       />
     </div>
