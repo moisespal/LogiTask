@@ -2,7 +2,7 @@
   position: fixed;
   bottom: 40px;
   right: 50px;
-  background: rgba(63, 63, 69, 0.945);
+  background: rgb(63, 63, 69);
   border-radius: 12px;
   padding: 16px;
   min-width: 300px;
@@ -102,6 +102,13 @@
   
   .stats-grid {
     gap: 8px;
+  }
+}
+
+@media (max-width: 430px) {
+  .daily-stats-panel {
+    bottom: 100px;
+    min-width: 200px;
   }
 }
 
@@ -238,7 +245,7 @@
 }
 
 .payment-time {
-  color: #8e8c8c;
+  color: #b3aeae;
   font-size: 14px;
   font-weight: 400;
 }

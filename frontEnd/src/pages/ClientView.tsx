@@ -146,7 +146,7 @@ const ClientView: React.FC = () => {
                                 <span className="balance-status">Credit: <span className="balance-amount" style={{  backgroundImage: gradientAndPercentage[0]}}>${(newBalance)}  </span></span>
                             ) : (
                                 <>
-                                    <span>Balance Due:</span> <span className="balance-amount" style={{  backgroundImage: gradientAndPercentage[0]}}>${Math.abs(newBalance)}</span>
+                                    <span>Balance Due:</span> <span className="balance-amount" style={{  backgroundImage: gradientAndPercentage[0]}}>${(Math.abs(newBalance)).toFixed(2)}</span>
                                 </>
                             )}
                         </div>
@@ -197,7 +197,7 @@ const ClientView: React.FC = () => {
                 
                 {/* Services */}
                 <div className="client-panel services-panel">
-                    <h3 className="panel-header">Completed Jobs<span className="total-amount">${allJobsTotal}</span></h3>
+                    <h3 className="panel-header">Completed Jobs<span className="total-amount">${allJobsTotal.toFixed(2)}</span></h3>
                     <div className="table-container">
                         <table className="data-table">
                             <thead>
@@ -224,7 +224,7 @@ const ClientView: React.FC = () => {
                 
                 {/* Payments */}
                 <div className="client-panel payments-panel">
-                    <h3 className="panel-header">Payments<span className="total-amount">${allPaymentsTotal}</span></h3>
+                    <h3 className="panel-header">Payments<span className="total-amount">${allPaymentsTotal.toFixed(2)}</span></h3>
                     <div className="table-container">
                         <table className="data-table">
                             <thead>

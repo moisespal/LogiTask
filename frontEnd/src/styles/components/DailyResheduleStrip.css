@@ -48,7 +48,7 @@
 .box {
   width: clamp(4rem, 10vw, 5.5rem);
   height: clamp(4.5rem, 12vw, 6rem);
-  background: #ffffff;
+  background: #aeb2ba37;
   border: 2px solid #e0e6f2;
   border-radius: 10px;
   display: flex;
@@ -58,18 +58,16 @@
   user-select: none;
   touch-action: none;
   transition: all 0.25s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 6px rgba(28, 29, 29, 0.843);
   cursor: pointer;
   position: relative;
   z-index: 10;
-  padding: 0.5rem;
   opacity: 0;
   animation: fadeInBox 0.3s ease-in-out forwards;
 }
 
-
 .weekday {
-  font-size: clamp(0.7rem, 2vw, 0.85rem);
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
   font-weight: 600;
   color: #3a4566;
   text-align: center;
@@ -77,7 +75,7 @@
 }
 
 .dates {
-  font-size: clamp(0.65rem, 1.8vw, 0.8rem); 
+  font-size: clamp(0.75rem, 1.8vw, 0.85rem); 
   color: #5d6b8a;
   text-align: center;
   border-radius: 4px;

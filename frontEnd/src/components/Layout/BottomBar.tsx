@@ -43,7 +43,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, o
                             onClick={onStatsToggle}
                             title={showStats ? "Hide Daily Stats" : "Show Daily Stats"}
                         >
-                            <i className="fa-solid fa-chart-bar"></i>
+                            <i className="fa-solid fa-chart-column"></i>
                         </button>
                     )}
                 </div>

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import DailyListItem from './DailyListItem';
@@ -16,9 +16,18 @@ interface SortableDailyListItemProps {
   onModalToggle?: (isOpen: boolean) => void;
 }
 
-const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
-  const { job, isFocused, onClick, onComplete, isDisabled = false, isDragging: externalIsDragging = false, onModalToggle } = props;
-  const [mouseDirection, setMouseDirection] = useState(0);
+const SortableDailyListItem: React.FC<SortableDailyListItemProps> = ({
+  job,
+  isFocused,
+  onClick,
+  onComplete,
+  isDisabled = false,
+  isDragging: externalIsDragging = false,
+  onModalToggle
+}) => {
+  const [rotation, setRotation] = useState(0);
+  const movementBufferRef = useRef<number[]>([0, 0, 0]);
+  const rafIdRef = useRef<number>();
 
   const {
     attributes,
@@ -34,29 +43,85 @@ const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
 
   const effectiveIsDragging = externalIsDragging || internalIsDragging;
 
+  const updateRotation = useCallback((movementX: number) => {
+    if (rafIdRef.current) return;
+
+    rafIdRef.current = requestAnimationFrame(() => {
+      const buffer = movementBufferRef.current;
+      buffer.shift();
+      buffer.push(movementX);
+
+      const weightedMovement = buffer[0] * 0.2 + buffer[1] * 0.3 + buffer[2] * 0.5;
+      const newRotation = Math.max(-6, Math.min(6, weightedMovement * 1.2));
+      
+      setRotation(newRotation);
+      rafIdRef.current = undefined;
+    });
+  }, []);
+
   useEffect(() => {
-    if (externalIsDragging) {
-        const recentMovements = [0, 0, 0];
-        
-        const handleMouseMove = (e: MouseEvent) => {
-            recentMovements.shift();
-            recentMovements.push(e.movementX);
-            
-            const weightedSum = recentMovements[0] * 0.2 + 
-                                recentMovements[1] * 0.3 + 
-                                recentMovements[2] * 0.5;
-            
-            const sensitivity = 1.2;
-            const maxRotation = 6;
-            const rotation = Math.max(-maxRotation, Math.min(maxRotation, weightedSum * sensitivity));
-            
-            setMouseDirection(rotation);
-        };
-        
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+    if (!effectiveIsDragging) {
+      setRotation(0);
+      return;
     }
-}, [externalIsDragging]);
+
+    let lastClientX = 0;
+
+    const handlePointerMove = (e: MouseEvent | TouchEvent) => {
+      const clientX = 'touches' in e ? e.touches[0]?.clientX ?? 0 : e.clientX;
+      const movementX = clientX - lastClientX;
+      lastClientX = clientX;
+      
+      if (movementX !== 0) {
+        updateRotation(movementX);
+      }
+    };
+
+    const handlePointerStart = (e: MouseEvent | TouchEvent) => {
+      lastClientX = 'touches' in e ? e.touches[0]?.clientX ?? 0 : e.clientX;
+      
+      if ('touches' in e) {
+        document.body.style.touchAction = 'none';
+        document.body.style.overflow = 'hidden';
+      }
+    };
+ 
+    const handlePointerEnd = () => {
+      document.body.style.touchAction = '';
+      document.body.style.overflow = '';
+      setRotation(0);
+    };
+
+    window.addEventListener('mousemove', handlePointerMove, { passive: false });
+    window.addEventListener('touchmove', handlePointerMove, { passive: false });
+    window.addEventListener('mousedown', handlePointerStart);
+    window.addEventListener('touchstart', handlePointerStart);
+    window.addEventListener('mouseup', handlePointerEnd);
+    window.addEventListener('touchend', handlePointerEnd);
+
+    return () => {
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('mousedown', handlePointerStart);
+      window.removeEventListener('touchstart', handlePointerStart);
+      window.removeEventListener('mouseup', handlePointerEnd);
+      window.removeEventListener('touchend', handlePointerEnd);
+      
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+      document.body.style.touchAction = '';
+      document.body.style.overflow = '';
+    };
+  }, [effectiveIsDragging, updateRotation]);
+
+  const dragStyle = effectiveIsDragging ? {
+    rotate: rotation,
+    boxShadow: "20px 10px 25px rgba(0,0,0,0.3), 0px 4px 10px rgba(0,0,0,0.2)",
+  } : {
+    rotate: 0,
+    boxShadow: isFocused ? "0px 2px 5px rgba(0,0,0,0.1)" : "none",
+  };
 
   return (
     <div 
@@ -72,12 +137,7 @@ const SortableDailyListItem: React.FC<SortableDailyListItemProps> = (props) => {
     >
       <motion.div 
         className={`sortable-job-wrapper ${isDisabled ? 'disabled' : ''} ${isFocused ? 'draggable' : ''}`}
-        animate={effectiveIsDragging ? { rotate: mouseDirection} : { rotate: 0, scale: 1 }}
-        style={{
-          boxShadow: effectiveIsDragging 
-            ? "20px 10px 25px rgba(0,0,0,0.3), 0px 4px 10px rgba(0,0,0,0.2)" 
-            : (isFocused ? "0px 2px 5px rgba(0,0,0,0.1)" : "none")
-        }}
+        animate={dragStyle}
         transition={{
           rotate: {
             type: "spring",
