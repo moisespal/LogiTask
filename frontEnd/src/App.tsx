@@ -13,14 +13,23 @@ import ProtectedRoute from "./components/Auth/ProtectedRoute";
 import Dev from "./pages/dev";
 import { CompanySetUp } from "./pages/CompanySetUp";
 import PropertyView from "./pages/PropertyView";
+import ClientView from "./pages/ClientView";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
+
+
+const clearAllData = (queryClient: QueryClient) => {
+  queryClient.clear();
+  localStorage.clear();
+  sessionStorage.clear();
+};
 
 const Logout: React.FC = () => {
-  localStorage.clear();
+  clearAllData(useQueryClient());
   return <Navigate to="/login" />;
 };
 
 const RegisterAndLogout: React.FC = () => {
-  localStorage.clear();
+  clearAllData(useQueryClient());
   return <RegisterPage />;
 };
 
@@ -50,10 +59,19 @@ const App: React.FC = () => {
 
         {/* Protected Property View Route */}
         <Route
-          path="/property-view/:propertyId"
+          path="/property-view/"
           element={
             <ProtectedRoute>
               <PropertyView />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/client-view/"
+          element={
+            <ProtectedRoute>
+              <ClientView />
             </ProtectedRoute>
           }
         />

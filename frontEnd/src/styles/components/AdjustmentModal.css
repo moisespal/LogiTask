@@ -1,0 +1,44 @@
+.payment-method-pill i.fa-arrow-down {
+  color: #f53737;
+}
+
+.payment-method-pill i.fa-arrow-up {
+  color: #59db61
+}
+
+.payment-form-section label.payment-section-title {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.payment-form-section textarea {
+  width: 100%;
+  color: #f0f0f0;
+  background-color: rgba(255, 255, 255, 0.07);
+  padding: 3px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  resize: none; 
+  min-height: 35px;
+  overflow: hidden; 
+  font-family: inherit;
+  transition: border-color 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+.payment-form-section textarea:focus {
+  outline: none;
+  border: 1px solid rgba(215, 215, 215, 0.1);
+}
+
+.payment-form-section textarea::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.payment-form-section label[for="payment-notes"].payment-section-title::after {
+  content: " (optional)";
+  font-weight: 400;
+  color: #989797;
+  font-size: 0.9em;
+}

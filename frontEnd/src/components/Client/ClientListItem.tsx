@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ClientDataID } from '../../types/interfaces';
 import PaymentModal from '../Payment/PaymentModal';
+import { useNavigate } from "react-router-dom";
 import '../../styles/components/ClientListItem.css';
 
 interface ClientListItemProps {
@@ -23,11 +24,26 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onCl
         setShowPaymentModal(false);
     };
 
+    const navigate = useNavigate();
+    const handleClientClick = () => {
+        if (!isFocused) return;
+        navigate(`client-view/`, {
+            state: {
+                client: client,
+            }
+        });
+    };
+
+    const handleListItemClick = () => {
+        onClick(client.id);
+        handleClientClick(); 
+    };
+    
     return (
         <>
             <li
                 className={`list-item ${isFocused ? 'focused' : ''}`}
-                onClick={() => onClick(client.id)}
+                onClick={handleListItemClick}
             >
                 <div className="list-item-header">
                     <div className="profile-pic-container">

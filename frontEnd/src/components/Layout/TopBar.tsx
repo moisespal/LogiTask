@@ -1,6 +1,11 @@
 import React from 'react';
 import { ClientDataID, Job } from '../../types/interfaces';
 import '../../styles/components/TopBar.css';
+import { formatCapitalized, formatPhoneNumber } from '../../utils/format';
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from '@tanstack/react-query';
+import api from '../../api';
+import { useUser } from '../../contexts/userContext.tsx';
 
 interface TopBarProps {
   focusedItemId: number | null;
@@ -11,13 +16,6 @@ interface TopBarProps {
   handleSortChange: (option: string) => void;
 }
 
-const formatPhoneNumber = (phone: string | undefined): string => {
-  if (!phone) return "";
-  const cleaned = phone.replace(/\D/g, '');
-  const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
-  return match ? `(${match[1]}) ${match[2]}-${match[3]}` : phone;
-};
-
 const TopBar: React.FC<TopBarProps> = ({ 
   focusedItemId, 
   selectedClient, 
@@ -26,6 +24,43 @@ const TopBar: React.FC<TopBarProps> = ({
   sortOption, 
   handleSortChange 
 }) => {
+  const user = useUser();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const handleClientClick = async () => {
+  
+    if (mode !== 'Daily' || !selectedJob?.client?.id) {
+      return;
+    }
+
+    const clientId = selectedJob.client.id;
+    
+    const cachedClients = queryClient.getQueryData<ClientDataID[]>(['clients']);
+    const cachedClient = cachedClients?.find(client => client.id === clientId);
+    
+    if (cachedClient) {
+      navigate('client-view/', {
+        state: { client: cachedClient }
+      });
+      return;
+    }
+
+    try {
+      const response = await api.get(`/api/client/${clientId}/properties/`);
+      
+      if (response.status === 200) {
+        navigate('client-view/', {
+          state: { client: response.data }
+        });
+      } else {
+        console.error('Failed to fetch client properties');
+      }
+    } catch (error) {
+      console.error('Error fetching client:', error);
+    }
+  };
+
   return (
     <div className="top-bar">
       <div className="top-menu-shape" />
@@ -48,31 +83,31 @@ const TopBar: React.FC<TopBarProps> = ({
         ) : mode === 'Daily' && selectedJob && focusedItemId !== null ? (
           <div className="job-info">
             <div className="property">
-              <div className="address">
+              <div className="address service-item">
                 <i className="fa-solid fa-location-dot" />
                 {selectedJob.property.street}, {selectedJob.property.city}, {selectedJob.property.state} {selectedJob.property.zipCode}
               </div>
             </div>
             <div className="contact">
-              <div className="job-client">
+              <div className={`job-client ${user.role === 'BOSS' ? 'job-client-button' : ''}`} onClick={user.role === 'BOSS' ? handleClientClick : undefined}>
                 <i className="fa-solid fa-user" />
                 <span>{selectedJob.client.firstName} {selectedJob.client.lastName}</span>
               </div>
-              <div className="phone">
+              <div className="phone service-item">
                 <i className="fa-solid fa-phone" />
-                {formatPhoneNumber(selectedJob.client.phoneNumber)}
+                <span>{formatPhoneNumber(selectedJob.client.phoneNumber)}</span>
               </div>
             </div>
             <div className="service-tags">
-              <div className="service-pill">
+              <div className="service-pill service-item pill-container">
                 <i className="fa-solid fa-briefcase" />
                 {selectedJob.schedule.service}
               </div>
-              <div className="frequency-pill">
+              <div className="frequency-pill service-item pill-container">
                 <i className="fa-solid fa-calendar-days" />
-                {selectedJob.schedule.frequency}
+                {formatCapitalized(selectedJob.schedule.frequency)}
               </div>
-              <div className="cost-pill">
+              <div className="cost-pill service-item pill-container">
                 <i className="fa-solid fa-dollar-sign" />
                 {Math.floor(selectedJob.cost)}
               </div>

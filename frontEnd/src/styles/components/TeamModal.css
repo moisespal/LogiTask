@@ -1,0 +1,292 @@
+/* Team Modal Styles */
+.team-modal-overlay {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99000;
+}
+
+.team-modal-container {
+  background-color: rgba(40, 40, 43, 0.97);
+  color: #ffffff;
+  padding: 0.9rem;
+  width: 400px;
+  max-height: 70vh;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  position: relative;
+  margin: auto;
+  font-family: "Outfit", sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.team-modal-container h3 {
+  margin-top: 0;
+  margin-bottom: 0.6rem;
+  text-align: center;
+  font-size: 1.rem;
+  color: #ffffff;
+  font-weight: 500;
+  user-select: none;
+}
+
+.close-modal-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.close-modal-btn:hover {
+  color: #f44336;
+}
+
+/* Team Members List */
+.team-members-list {
+  margin-bottom: 0.8rem;
+  max-height: 800px;
+}
+
+.team-member-card {
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.6rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.team-member-card:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(2px);
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  background-color: rgba(144, 202, 249, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.member-avatar i {
+  color: #90CAF9;
+  font-size: 1.2rem;
+}
+
+.member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-username {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+}
+
+.member-email {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.member-role {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  user-select: none;
+}
+
+/* Add Member Button */
+.add-member-btn {
+  background-color: rgba(76, 175, 79, 0.613);
+  color: #d4d6d4;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  user-select: none;
+}
+
+.add-member-btn:hover {
+  background-color: rgba(76, 175, 79, 0.696);
+  transform: translateY(-1px);
+}
+
+.add-member-btn i {
+  font-size: 0.85rem;
+}
+
+/* Add Member Form */
+.add-member-form {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 0.8rem;
+  margin-top: 0.5rem;
+  user-select: none;
+}
+
+.add-member-form h4 {
+  margin: 0 0 0.6rem 0;
+  font-size: 0.95rem;
+  color: #90CAF9;
+  font-weight: 500;
+}
+
+.form-group {
+  margin-bottom: 0.8rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  color: #90CAF9;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.07);
+  color: #f0f0f0;
+  transition: all 0.2s ease;
+}
+
+.form-group input:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.form-group input:focus {
+  border-color: #90CAF9;
+  background-color: rgba(255, 255, 255, 0.1);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(144, 202, 249, 0.2);
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.cancel-btn,
+.submit-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.cancel-btn {
+  background-color: rgba(33, 33, 36, 0.9);
+  color: #ddd;
+}
+
+.cancel-btn:hover {
+  background-color: rgba(35, 35, 38, 0.9);
+}
+
+.submit-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #57b15c;
+}
+
+/* Scrollbar styling */
+.team-members-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.team-members-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.team-members-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.team-members-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 480px) {
+  .team-modal-container {
+    width: 90%;
+    max-width: 380px;
+    padding: 0.7rem;
+  }
+
+  .team-modal-container h3 {
+    font-size: 1rem;
+  }
+
+  .team-member-card {
+    padding: 0.6rem;
+  }
+
+  .member-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .member-username, .member-email {
+    font-size: 16px;
+  }
+
+}

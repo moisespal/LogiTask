@@ -169,7 +169,9 @@ const ClientCalendar: React.FC<CalendarProps> = ({ visits,client_id }) => {
 
         <div className={`balance-info ${showBalance ? 'show' : ''}`}>
           <div className="outstanding-balance">
-            <span>Outstanding Balance</span>
+            <span>
+              {balance && parseFloat(balance.estimated_balance) < 0 ? 'Balance: ' : 'Credit: '}
+            </span>
             <span 
               style={{ color: balance && parseFloat(balance.estimated_balance) < 0 ? 'red' : 'green' }}
             >

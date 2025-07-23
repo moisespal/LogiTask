@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../../styles/components/ClientProperties.css";
 import AddPropertyModal from "../Property/AddPropertyModal";
 import { useNavigate } from "react-router-dom";
@@ -18,24 +18,23 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (onPropertyModalStateChange) {
-      onPropertyModalStateChange(isModalOpen);
-    }
-  }, [isModalOpen, onPropertyModalStateChange]);
-
   if (!visible) return null;
 
   const handleModalState = (isOpen: boolean) => {
     setIsModalOpen(isOpen);
+    if (isOpen && onPropertyModalStateChange) {
+      onPropertyModalStateChange(true);
+    }
+    else {
+      onPropertyModalStateChange?.(false);
+    }
   };
 
-  const handlePropertyClick = (propertyIndex: number) => {
+   const handlePropertyClick = (propertyIndex: number) => {
 
     const property = client.properties[propertyIndex];
-    const id = (property as {id?: number}).id;
     
-    navigate(`/property-view/${id}`, {
+    navigate(`/property-view/`, {
       state: {
         property: property,
         client: client,
@@ -78,24 +77,9 @@ const ClientProperties: React.FC<ClientPropertiesProps> = ({
         }}
       >
         <div className="add-property-icon">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            <line x1="12" y1="5" x2="12" y2="9"></line>
-            <line x1="10" y1="7" x2="14" y2="7"></line>
-          </svg>
+        <div className="fa-solid fa-house"></div>
         </div>
-        <div className="add-property-text">ADD NEW PROPERTY</div>
+        <div className="add-property-text">Add New Property</div>
       </div>
 
       <AddPropertyModal

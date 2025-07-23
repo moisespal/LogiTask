@@ -1,13 +1,16 @@
 import React, { useMemo } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import "../../styles/components/DailyResheduleStrip.css"
+import { useUser } from "../../contexts/userContext";
 
 interface DailyRescheduleProps {
   isDragging?: boolean;
 }
 
 const DailyReschedule: React.FC<DailyRescheduleProps> = ({ isDragging }) => {
-  const userTimeZone = useMemo(
+  const user = useUser();
+
+const userTimeZone = useMemo(
   () => localStorage.getItem("userTimeZone") ?? "America/Chicago",
   []
 );
@@ -16,7 +19,7 @@ const nextSixDays = useMemo(() => {
   const todayInUserTZ = new Date(
     new Date().toLocaleString("en-US", { timeZone: userTimeZone })
   );
-
+  todayInUserTZ.setHours(0, 0, 0, 0);
   const fmt = new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     month: "short",
@@ -48,7 +51,7 @@ const nextSixDays = useMemo(() => {
 
   const deleteJob = useDroppable({ id: "delete-job" });
   
-  if (!isDragging) {
+  if (!isDragging || user.role !== "BOSS") {
     return null; 
   }
 

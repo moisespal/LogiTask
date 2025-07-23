@@ -1,7 +1,6 @@
 body, html, #root {
   margin: 0;
   height: 100%;
-  overflow: hidden; 
 }
 
 .app-container {
@@ -11,7 +10,6 @@ body, html, #root {
   flex-direction: column;
   align-items: flex-end; 
   box-sizing: border-box;
-  padding: 10vh 0px 10vh 20vw;
   overflow-y: auto; 
   overflow-x: hidden;
   background-size: cover;
@@ -25,41 +23,74 @@ body, html, #root {
   display: none; 
 }
 
-.search-bar {
+.search-container {
   position: fixed;
-  top: 115px; 
-  width: 20%;
-  height: 4%;
-  padding: 15px;
-  margin-bottom: 20px;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  transition: opacity 0.5s, background-color 0.5s, box-shadow 0.5s;
-  opacity: 100;
+  top: 115px;
+  width: 18%;
+  height: 3%;
   z-index: 10;
-  pointer-events: none; 
-  color: white;
-  background-color: rgba(47, 47, 48, 0.372); 
+  min-width: 130px;
 }
+
+.search-bar {
+  width: 100%;
+  height: 100%;
+  padding: 15px 15px 15px 15px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  transition: opacity 0.5s, background-color 0.9s, box-shadow 0.5s;
+  font-family: 'Outfit', sans-serif;
+  opacity: 1;
+  pointer-events: auto;
+  color: white;
+  background-color: rgba(47, 47, 48, 0.578);
+  user-select: none;
+  font-size: clamp(16px, 2vw, 18px);
+}
+
+.search-bar::placeholder {
+  color: #f3eaea; /* Gray */
+}
+
+.search-bar.active {
+  background-color: rgba(35, 35, 36, 0.692);
+  border: 3px solid #3b82f6;
+  animation: borderCycle 2s ease-in-out infinite;
+}
+
+.search-bar:focus {
+  outline: none;
+  border: 3px solid #3b82f6;
+  animation: borderPulse 2s ease-in-out infinite;
+}
+
+@keyframes borderCycle {
+  0%, 100% { border-color: #3bc1f6; }
+  25% { border-color: #5c78f6; }
+  50% { border-color: #9242ee; }
+  75% { border-color: #567dff; }
+}
+
+
 
 .right-aligned-list {
   list-style: none;
-  padding-top: 35px;
-  padding-bottom: 80px;
-  width: 80%; 
+  padding-top: clamp(120px, 20vh, 150px);
+  padding-bottom: clamp(50px, 20vh, 300px);
   z-index: 2; 
   display: flex; 
   flex-direction: column; 
   align-items: flex-end;
+  width: 45%;
 }
-
 /* Update the client wrapper */
 .client-wrapper {
-  width: 60%;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  left: 100px;}
+  box-sizing: border-box; /* Include padding/borders in width */
+}
 
 .no-jobs-message {
   position: absolute;
@@ -85,4 +116,3 @@ body, html, #root {
   margin-bottom: 1rem;
   color: #4caf50;
 }
-

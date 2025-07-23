@@ -3,6 +3,7 @@ import api from "../../api"
 import { useNavigate} from "react-router-dom";
 import "../../styles/components/AuthForm.css";
 import { ACCESS_TOKEN,REFRESH_TOKEN } from "../../constants";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 interface FormProps {
@@ -14,6 +15,7 @@ function AuthForm({ route, method }: FormProps) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
     const name = method === "login" ? "Login" : "Register";
 
@@ -24,6 +26,8 @@ function AuthForm({ route, method }: FormProps) {
             const res = await api.post(route, { username, password });
             if (method === "login") {
                 localStorage.clear();
+                sessionStorage.clear();
+                queryClient.clear();
                 localStorage.setItem(ACCESS_TOKEN, res.data.access);
                 localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
                 navigate("/");
