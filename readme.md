@@ -1,5 +1,3 @@
-READ ME
-
 ## BackEnd
 
 ### Setup Virtual Environment
