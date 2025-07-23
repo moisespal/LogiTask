@@ -356,6 +356,7 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
                     value={prop.schedules[0].nextDate}
                     name='nextDate'
                     onChange={(e)=> updateSchedule(index,0,"nextDate",e.target.value)}
+                    className='date-input'
                     required
                   />
                 </div>

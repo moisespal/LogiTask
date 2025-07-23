@@ -11,9 +11,7 @@ from decimal import Decimal
 
 
 # Create your models here.
-class userProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    timezone = models.CharField(max_length=100, default='UTC')
+
     
 class Company(models.Model):
     companyName = models.CharField(max_length=100)
@@ -33,6 +31,18 @@ class Company(models.Model):
                 print("error processing image", e)
         super().save(*args, **kwargs)
 
+
+class userProfile(models.Model):
+    ROLE_CHOICES = [
+        ('BOSS', 'Boss'),
+        ('WORKER', 'Worker'),
+        ('VIEWER','VIEWER')
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    timezone = models.CharField(max_length=100, default='UTC')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE,null=True,blank=True)
+    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='BOSS')
 class Client(models.Model):
     firstName = models.CharField(max_length=100)
     lastName = models.CharField(max_length=100)
@@ -40,6 +50,7 @@ class Client(models.Model):
     email = models.EmailField(max_length=254, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     author  = models.ForeignKey(User, on_delete=models.CASCADE, related_name="clients")
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
 
     def __str__(self):
         return self.firstName
@@ -62,6 +73,7 @@ class Note(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notes")
+    
 
     def __str__(self):
         return self.title
@@ -98,21 +110,23 @@ class Schedule(models.Model):
             user = profile.user
             local_now = timezone.now().astimezone(user_timezone)
             today_in_user_tz = local_now.date()
-
+            total_jobs = Job.objects.filter(jobDate=today_in_user_tz).count()
+            
             schedules = cls.objects.filter(
                 nextDate=today_in_user_tz,
                 isActive=True,
-                property__client__author=user
+                property__client__company=profile.company
             )
-
+            count = 1
             for schedule in schedules:
                 Job.objects.create(
                     schedule=schedule,
                     cost=schedule.cost,
                     jobDate=schedule.nextDate,
-                    client=schedule.property.client
+                    client=schedule.property.client,
+                    order = total_jobs+count
                 )
-
+                count+=1
                 if schedule.endDate and schedule.nextDate > schedule.endDate:
                     schedule.isActive = False
                 else:
@@ -143,6 +157,7 @@ class Job(models.Model):
     complete_date = models.DateTimeField(null=True, blank=True)
     cost = models.DecimalField(max_digits=10,decimal_places=2)
     is_applied_to_balance = models.BooleanField(default=False)
+    order = models.PositiveIntegerField(help_text="Order of the job. Must be a positive number.", null=True, blank=True)
 
 class Payment(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
@@ -178,12 +193,19 @@ class Balance(models.Model):
             # Save current balance
             self.save()
 
+            #calculate invoice month and year
+            base_date = timezone.now()
+            prev_month = base_date.replace(day=1) - timedelta(days=1)
+            
             # Create balance history record
             history = BalanceHistory.objects.create(
                 balance=self,
                 delta=delta,
                 new_balance=self.current_balance,
-                adjustment=total_adjustments
+                adjustment=total_adjustments,
+                service_month=prev_month.month,
+                service_year = prev_month.year
+
             )
             history.jobs.set(unapplied_jobs)
             history.payments.set(unapplied_payments)
@@ -216,11 +238,23 @@ class Balance(models.Model):
         return self.current_balance + delta
         
 class BalanceAdjustment(models.Model):
+    ADJUSTMENT_TYPE = (
+    ('credit', 'Credit'),
+    ('debit', 'Debit'),
+    )   
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='adjustments')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     reason = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_applied_to_balance = models.BooleanField(default=False)
+    adjustment_type = models.CharField(max_length=6, choices=ADJUSTMENT_TYPE,default='credit')
+    
+    def save(self, *args, **kwargs):
+        if self.adjustment_type == 'debit':
+            self.amount = abs(self.amount) * -1
+        else:
+            self.amount = abs(self.amount)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Adjustment of {self.amount} on {self.created_at.date()}"
@@ -230,6 +264,8 @@ class BalanceHistory(models.Model):
     new_balance = models.DecimalField(max_digits=10, decimal_places=2)
     adjustment = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
+    service_month = models.PositiveSmallIntegerField(null=True,blank=True)
+    service_year = models.PositiveSmallIntegerField(null=True,blank=True)
 
     # Store related job/payment IDs for traceability
     jobs = models.ManyToManyField("Job")

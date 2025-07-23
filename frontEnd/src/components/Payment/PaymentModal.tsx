@@ -17,8 +17,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   client, 
   onPaymentSubmit 
 }) => {
-  // If job is provided, use its cost, otherwise default to 0
-  const [paymentAmount, setPaymentAmount] = useState(job ? job.cost.toString() : '0');
+  // If job is provided, use its set cost, otherwise default to empty string so inputs are more user-friendly
+  const [paymentAmount, setPaymentAmount] = useState(job ? job.cost.toString() : '');
   const [paymentMethod, setPaymentMethod] = useState('');
 
   // Reset payment amount when job or client changes
@@ -74,22 +74,29 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     setPaymentAmount(cost.toString())
   };
 
+  const handleCancel = (e: React.MouseEvent) => {
+    e.stopPropagation(); 
+    onClose();
+    setPaymentMethod('');
+    setPaymentAmount(job ? job.cost.toString() : '');
+  }
+
+  const handleDisabledSubmit = () => {
+    if (!paymentMethod || paymentAmount === '') {
+      return true; 
+    }
+    return false; 
+  }
+    
+
   if (!isOpen) return null;
   
   return (
     <div 
       className="payment-modal-overlay" 
-      onClick={(e) => {
-        e.stopPropagation();
-        onClose();
-      }}
     >
       <div 
         className="payment-modal-container" 
-        onClick={(e) => {
-          e.stopPropagation(); 
-          e.preventDefault();
-        }}
       >
         <button 
           type="button"
@@ -97,10 +104,11 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           onClick={(e) => {
             e.stopPropagation();
             onClose();
+            handleCancel(e);
           }}
           aria-label="Close"
         >
-          x
+          <i className="fas fa-xmark"></i>
         </button>
         
         <h3>Record Payment</h3>
@@ -135,14 +143,14 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                   <span className="dollar-sign">$</span>
                   <input
                     id="payment-amount"
-                  name="payment-amount"
+                    name="payment-amount"
                     type="number"
-                  value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)}
+                    value={paymentAmount}
+                    onChange={(e) => setPaymentAmount(e.target.value)}
                     min="0"
-                    step="1"
+                    step="0.01"
                     required
-                  onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => e.stopPropagation()}
                     placeholder="Amount"
                   />
                 </div>
@@ -213,18 +221,18 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 className="property-btn-secondary" 
               onClick={(e) => {
                 e.stopPropagation();
-                  onClose();
-                }}
+                handleCancel(e);
+              }}
               >
-                <i className="fas fa-times"></i> Cancel
+                Cancel
               </button>
               <button 
                 type="submit"
-                className="property-btn-primary" 
-                disabled={!paymentMethod}
+                className="record-payment-btn" 
+                disabled={handleDisabledSubmit()}
                 onClick={(e) => e.stopPropagation()} // Ensure this does not block form submission
               >
-                <i className="fas fa-check"></i> Record Payment
+                 Record Payment
               </button>
               
             </div>

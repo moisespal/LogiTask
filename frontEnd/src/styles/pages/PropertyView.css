@@ -4,16 +4,16 @@
   width: 100%;
   margin: 0;
   padding: 12px;
-  font-family: "Segoe UI", Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Outfit", sans-serif;
   color: #e0e0e0;
-  background: rgba(40, 40, 43, 1);
+  background: rgb(40, 40, 43);
   overflow-y: auto;
 }
 
 /* Property Header Card */
 .property-header-card {
   display: flex;
-  background: rgb(47, 47, 52);
+  background: rgb(33, 33, 36);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   padding: 20px;
@@ -113,9 +113,6 @@
 .contact-icons i {
   color: rgba(255, 255, 255, 0.623);
   font-size: 18px;
-  padding: 2px;
-  background-color: rgba(70, 130, 220, 0.004);
-  border-radius: 8px;
   transition: background-color 0.2s ease;
 }
 
@@ -219,7 +216,7 @@
 
 .schedules-list {
   padding: 10px;
-  background-color: #2c2e33;
+  background-color: rgb(33, 33, 36);
   user-select: none;
 }
 
@@ -663,7 +660,7 @@
 
 /* Stats Cards */
 .stat-card {
-  background: rgba(40, 40, 43, 1);
+  background: rgb(33, 33, 36);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   padding: 18px;
@@ -1047,11 +1044,231 @@
 .date-readout {
   padding: 0.40rem 1rem;
   border-radius: 20px;
-  text-align: center;          
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
-
-.date-readout:not(:empty):not(:has(:empty)) {
+.date-readout:not(:empty) {
   color: #bcb8b8;
   background-color: rgba(59, 58, 58, 0.969);
+}
+
+.clear-date-btn {
+  background: none;
+  border: none;
+  color: #ff5252;
+  cursor: pointer;
+  padding: 2px 0px;
+  border-radius: 3px;
+  font-size: 12px;
+
+}
+
+.clear-date-btn:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .property-view-container {
+    padding: 20px;
+  }
+
+  .property-header-card {
+    flex-direction: column;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .property-map {
+    width: 100%;
+    height: 150px;
+    margin-bottom: 16px;
+  }
+
+  .property-details h2 {
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .client-info-container {
+    width: 100%;
+    align-self: center;
+  }
+
+  .content-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .schedules-column {
+    order: 2;
+  }
+
+  .stats-column {
+    width: 100%;
+    order: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .stat-card {
+    flex: 1;
+    min-width: calc(50% - 5px);
+    margin-bottom: 0;
+  }
+
+  .stat-card h3 {
+    font-size: 14px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .schedules-column {
+    width: 100%;
+  }
+  .schedule-summary {
+    padding: 10px;
+  }
+  .schedules-header h2 {
+    font-size: 22px;
+  }
+  .service-top-row {
+    flex-wrap: nowrap;
+  }
+
+  .service-name, .service-cost {
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+  }
+
+  .service-bottom-row {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .left-info {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .job-table-header {
+    font-size: 12px;
+  }
+
+  .job-item {
+    padding: 5px 12px;
+  }
+
+  .job-date-column {
+    flex: 2;
+  }
+
+  .dialog-container {
+    width: 95%;
+    max-width: none;
+    margin: 16px;
+  }
+
+  .dialog-service-preview {
+    padding: 12px;
+  }
+
+  .dialog-service-info .top-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .dialog-service-name {
+    font-size: 18px;
+  }
+
+  .dialog-service-cost {
+    font-size: 18px;
+  }
+
+  .select-buttons-container {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .select-button {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    text-align: center;
+  }
+
+}
+
+@media (max-width: 480px) {
+  .property-details h2 {
+    font-size: 20px;
+  }
+
+  .schedules-header h2 {
+    font-size: 20px;
+  }
+
+  .service-name {
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .service-cost {
+    font-size: clamp(1.25rem, 2vw, 1.6rem);
+  }
+
+  .contact-icons {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .service-name-container {
+    gap: 8px;
+  }
+
+  .select-button {
+    min-width: 100%;
+  }
+
+  .service-bottom-row {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Landscape phones */
+@media (max-width: 768px) and (orientation: landscape) {
+  .property-header-card {
+    flex-direction: row;
+  }
+
+  .property-map {
+    width: 200px;
+    height: 140px;
+    margin-right: 20px;
+    margin-bottom: 0;
+  }
+
+  .client-info-container {
+    width: 250px;
+  }
+
+  .content-layout {
+    flex-direction: row;
+  }
+
+  .stats-column {
+    flex-direction: column;
+  }
+
+  .stat-card {
+    min-width: auto;
+  }
 }

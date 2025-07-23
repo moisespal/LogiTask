@@ -2,3 +2,13 @@
   opacity: 0;
   visibility: hidden;
 }
+
+.sortable-job-wrapper.draggable {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.sortable-job-wrapper.draggable .daily-list-item {
+  pointer-events: auto;
+}

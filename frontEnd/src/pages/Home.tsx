@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import ClientCalendar from '../components/Calendar/ClientCalendar';
 import ClientListItem from '../components/Client/ClientListItem';
 import ClientProperties from '../components/Client/ClientProperties';
@@ -6,14 +6,21 @@ import TopBar from '../components/Layout/TopBar';
 import BottomBar from '../components/Layout/BottomBar';
 import AddClientModal from '../components/Client/AddClientModal';
 import DailyReschedule from '../components/Daily/DailyReschedule';
+import DailyStatsModal from '../components/Daily/DailyStatsModal';
 import { ClientDataID, Job } from '../types/interfaces';
 import api from "../api"
 import '../styles/pages/App.css';
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useClients } from '../hooks/useClients';
+import { useTodaysJobs } from '../hooks/useJobs';
+import { useTodaysPayments } from '../hooks/useTodaysPayments';
+
 import { DndContext, pointerWithin, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableDailyList from '../components/Daily/SortableDailyList';
-// Utility functions
+import TeamModal from '../components/Company/CompanyTeamModal';
+import { useUser } from '../contexts/userContext';
 
 const renderStars = (count: number): JSX.Element[] => (
   Array.from({ length: count }, (_, i) => <span key={i} className="star">★</span>)
@@ -29,103 +36,110 @@ const restrictWithinWindow = ({ transform }: { transform: { x: number; y: number
     x: Math.max(-maxLeftDistance, Math.min(maxRightDistance, transform.x))
   };
 };
+const getUTCISOString = () => new Date().toISOString();
 
 // Main Component
 const Home: React.FC = () => {
+  const user = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [focusedItemId, setFocusedItemId] = useState<number | null>(null);
   const [sortOption, setSortOption] = useState<string>('none');
   const [modeType, setModeType] = useState(()=>{
+    if (user.role === 'WORKER') {
+      return 'Daily';
+    }
     return localStorage.getItem('mode') || "Client";
   });
   const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const [showDailyStats, setShowDailyStats] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
-  const [customers, setCustomer] = useState<ClientDataID[]>([]);
+  const { clients } = useClients( modeType === 'Client');
+  const queryClient = useQueryClient();
   const focusedElementRef = useRef<HTMLDivElement | null>(null);
-  
-  // New job-related states
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const { jobs } = useTodaysJobs(modeType === 'Daily');
+  const { data: paymentsData } = useTodaysPayments(modeType === 'Daily' && showDailyStats);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
-  
   const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
-
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
 
-  const getClients = () => {
-    api
-        .get("/api/clients/")
-        .then((res) => res.data)
-        .then((data) => {
-            setCustomer(data);
-            console.log('Clients loaded:', data);
-        })
-        .catch((err) => alert(err));
-  };
-
-  // Function to fetch today's jobs
-  const fetchTodaysJobs = async () => {
-    try {
-      const response = await api.get('/api/getTodaysJobs/');
-      setJobs(response.data);
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-    }
-  };
-
-  function getUTCISOString() {
-    return new Date().toISOString();
-  }
-
   // Handle job completion toggle
-  const handleJobComplete = async (jobId: number) => {
+  const handleJobComplete = useCallback(async (jobId: number) => {
     try {
       const job = jobs.find(job => job.id === jobId);
       if (!job) return;
       const newStatus = job.status === 'complete' ? 'uncomplete' : 'complete';
       const dateTime = job.status === 'complete' ? null : getUTCISOString();
-      await api.patch(`/api/Update-Schedule/${jobId}/`, { status: newStatus, complete_date:dateTime })
-      setJobs(jobs.map(job => 
-        job.id === jobId ? { ...job, status: newStatus } : job
-      ));
+
+      queryClient.setQueryData(['todaysJobs'], (oldJobs: Job[] | undefined) => {
+        if (!oldJobs) return [];
+        return oldJobs.map(job => 
+          job.id === jobId ? { ...job, status: newStatus } : job
+        );
+      });
+
+      if (selectedJob?.id === jobId) {
+        setSelectedJob({ ...selectedJob, status: newStatus });
+      }
+      await api.patch(`/api/Update-Schedule/${jobId}/`, { 
+        status: newStatus, complete_date:dateTime 
+      });
     } catch (error) {
       console.error('Error toggling job completion:', error);
-    }
-  };
+    } 
+  }, [jobs, queryClient, selectedJob]);
 
   // Event Handlers
-  const handleModeClick = async () => {
+  const handleModeClick = useCallback(async () => {
     const newMode = modeType === 'Client' ? 'Daily' : 'Client';
     localStorage.setItem('mode',newMode)
     setModeType(newMode);
     setIsModeRotated(prev => !prev);
-  };
+  }, [modeType]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value);
+  const handleTeamModalOpen = useCallback(() => {
+    setIsTeamModalOpen(true);
+  }, []);
 
-  const handleSortChange = (option: string) => setSortOption(option);
+  const handleTeamModalClose = useCallback(() => {
+    setIsTeamModalOpen(false);
+  }, []);
 
-  // Filtering and Sorting
-  const filterClientsByMode = (clients: ClientDataID[]): ClientDataID[] => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, []);
+
+  const handleSortChange = useCallback((option: string) => {
+    setSortOption(option);
+  }, []);
+
+  const handleStatsToggle = useCallback(() => {
+    setShowDailyStats(prev => !prev);
+  }, []);
+
+  // Memoized filtering and sorting functions
+  const filterClientsByMode = useCallback((clients: ClientDataID[]): ClientDataID[] => {
     return clients;
-  };
+  }, []);
 
-  const filterClientsBySearch = (clients: ClientDataID[]): ClientDataID[] => 
+  const filterClientsBySearch = useCallback((clients: ClientDataID[]): ClientDataID[] => 
     clients.filter(client =>
       [client.firstName, client.lastName, client.phoneNumber, client.email, client.properties?.[0]?.street, client.properties?.[0]?.zipCode]
         .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    ), [searchTerm]);
 
-  const filterJobsBySearch = (jobs: Job[]): Job[] =>
+  const filterJobsBySearch = useCallback((jobs: Job[]): Job[] =>
     jobs.filter(job => job ?
       [job.client.firstName, job.client.lastName, job.property.street, job.client.phoneNumber, job.client.email, job.property.zipCode]
         .some(field => field?.toLowerCase().includes(searchTerm.toLowerCase()))
         : false
-    );
+    ), [searchTerm]);
 
-  const filteredJobs = filterJobsBySearch(jobs);
+  // Memoized filtered jobs
+  const filteredJobs = useMemo(() => filterJobsBySearch(jobs), [filterJobsBySearch, jobs]);
 
-  const sortClients = (clients: ClientDataID[]): ClientDataID[] =>
+  const sortClients = useCallback((clients: ClientDataID[]): ClientDataID[] =>
     [...clients].sort((a, b) => {
       switch (sortOption) {
         case 'firstName': return a.firstName.localeCompare(b.firstName);
@@ -133,9 +147,40 @@ const Home: React.FC = () => {
         case 'phoneNumber': return a.phoneNumber.localeCompare(b.phoneNumber);
         default: return 0;
       }
-    });
+    }), [sortOption]);
 
-  const filteredClients = sortClients(filterClientsBySearch(filterClientsByMode(customers)));
+  const filteredClients = useMemo(() => 
+    sortClients(filterClientsBySearch(filterClientsByMode(clients || [])) || []), 
+    [sortClients, filterClientsBySearch, filterClientsByMode, clients]
+  );
+
+  const selectedClient = useMemo(() => 
+    focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) ?? null : null,
+    [focusedItemId, filteredClients]
+  );
+
+  const navigateFocusedItem = useCallback((direction: number) => {
+    if (modeType === 'Client') {
+      if (filteredClients.length === 0) return;
+      
+      setFocusedItemId(prevId => {
+        const currentIndex = filteredClients.findIndex(client => client.id === prevId);
+        const newIndex = Math.min(Math.max(currentIndex + direction, 0), filteredClients.length - 1);
+        return filteredClients[newIndex]?.id ?? null;
+      });
+    } else {
+      if (filteredJobs.length === 0) return;
+      
+      const currentJobIndex = filteredJobs.findIndex(job => job.id === focusedItemId);
+      const newJobIndex = Math.min(Math.max(currentJobIndex + direction, 0), filteredJobs.length - 1);
+      const selectedJob = filteredJobs[newJobIndex];
+      
+      if (selectedJob) {
+        setFocusedItemId(selectedJob.id);
+        setSelectedJob(selectedJob);
+      }
+    }
+  }, [modeType, filteredClients, filteredJobs, focusedItemId]);
 
   // Keyboard Navigation
   useEffect(() => {
@@ -173,31 +218,7 @@ const Home: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [filteredClients, jobs, modeType, isAddClientModalOpen, isPropertyModalOpen]);
-
-  const navigateFocusedItem = (direction: number) => {
-    if (modeType === 'Client') {
-      if (filteredClients.length === 0) return;
-      
-      setFocusedItemId(prevId => {
-        const currentIndex = filteredClients.findIndex(client => client.id === prevId);
-        const newIndex = Math.min(Math.max(currentIndex + direction, 0), filteredClients.length - 1);
-        return filteredClients[newIndex]?.id ?? null;
-      });
-    } else {
-      // Daily mode - navigate through jobs
-      if (filteredJobs.length === 0) return;
-      
-      const currentJobIndex = filteredJobs.findIndex(job => job.id === focusedItemId);
-      const newJobIndex = Math.min(Math.max(currentJobIndex + direction, 0), filteredJobs.length - 1);
-      const selectedJob = filteredJobs[newJobIndex];
-      
-      if (selectedJob) {
-        setFocusedItemId(selectedJob.id);
-        setSelectedJob(selectedJob);
-      }
-    }
-  };
+  }, [navigateFocusedItem, isAddClientModalOpen, isPropertyModalOpen]);
 
   // Automatically focus the first or reset focus when needed
   useEffect(() => {
@@ -214,58 +235,69 @@ const Home: React.FC = () => {
           setSelectedJob(filteredJobs[0]);
         } 
         else if (filteredJobs.length > 1 && (!focusedItemId || !filteredJobs.some(job => job.id === focusedItemId))) {
-          setFocusedItemId(filteredJobs[0].id);
-          setSelectedJob(filteredJobs[0]);
-        }
-        else if (filteredJobs.length === 0) {
-          // If no jobs match, clear the selection
           setFocusedItemId(null);
           setSelectedJob(null);
         }
     }
-}, [filteredClients, filteredJobs, focusedItemId, modeType]);
+  }, [filteredClients, filteredJobs, focusedItemId, modeType]);
 
   // This effect runs whenever focusedItemId changes
   useEffect(() => {
-    if (focusedItemId === null) return;
-    
-    // Find the element with the matching data attribute
-    const selector = modeType === 'Client' 
-      ? `[data-client-id="${focusedItemId}"]` 
+    if (modeType === 'Client' && clients?.length === 0) return;
+    if (modeType === 'Daily' && jobs.length === 0) return;
+
+    const selector = modeType === 'Client'
+      ? `[data-client-id="${focusedItemId}"]`
       : `[data-job-id="${focusedItemId}"]`;
     
     const focusedElement = document.querySelector(selector);
     if (focusedElement) {
-      // Store reference to focused element
       focusedElementRef.current = focusedElement as HTMLDivElement;
-      
-      // Scroll into view with smooth behavior
       focusedElement.scrollIntoView({
         behavior: 'smooth',
         block: 'center'
       });
     }
-  }, [focusedItemId, modeType]);
+  }, [focusedItemId, modeType, clients?.length, jobs.length]);
 
-  const selectedClient = focusedItemId !== null ? filteredClients.find(client => client.id === focusedItemId) ?? null : null;
-
-  // Modify your client click handler
-  const handleClientClick = (id: number) => {
+  const handleClientClick = useCallback((id: number) => {
     setFocusedItemId(id);
-  };
+    sessionStorage.setItem('lastFocusedClientId', id.toString());
+  }, []);
+
+  const handleJobClick = useCallback((id: number, job: Job) => {
+    setFocusedItemId(id);
+    setSelectedJob(job);
+    sessionStorage.setItem('lastFocusedJobId', id.toString());
+  }, []);
 
   // Handle property modal state changes
-  const handlePropertyModalStateChange = (isOpen: boolean) => {
+  const handlePropertyModalStateChange = useCallback((isOpen: boolean) => {
     setIsPropertyModalOpen(isOpen);
-  };
+  }, []);
    
-  useEffect(()=>{
-    if (modeType==="Client"){
-      getClients();
-    }else{
-      fetchTodaysJobs();
+  useEffect(() => {
+    if (modeType === "Client") {
+      const savedFocusedId = sessionStorage.getItem('lastFocusedClientId');
+      if (savedFocusedId) {
+        setFocusedItemId(parseInt(savedFocusedId));
+      }
+    } else {
+      const savedFocusedId = sessionStorage.getItem('lastFocusedJobId');
+      if (savedFocusedId) {
+        setFocusedItemId(parseInt(savedFocusedId));
+      }
     }
   }, [modeType]);
+
+  useEffect(() => {
+    if (modeType === 'Daily' && focusedItemId && jobs.length > 0) {
+      const job = jobs.find(job => job.id === focusedItemId);
+      if (job) {
+        setSelectedJob(job);
+      }
+    }
+  }, [focusedItemId, jobs, modeType]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -278,10 +310,10 @@ const Home: React.FC = () => {
     })
   );
 
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event; // active is the item being dragged, over is the item being hovered over
-    setActiveJobId(null); // used to reset UI state after drag ends
-    console.log('Drag Ended:', active.id, 'over:', over?.id);
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveJobId(null);
+
     if (!over) return;
     if (active.id === over.id) {
       console.log('Dropped on itself, no action taken');
@@ -289,32 +321,23 @@ const Home: React.FC = () => {
     }
   
     if (over.id.toString().includes('droppable-')) {
-      const dayIndex = parseInt(over.id.toString().split('-')[1]); // uses the droppable id to determine how many days to shift the job
+      const dayIndex = parseInt(over.id.toString().split('-')[1]);
 
       try {
         const tz = localStorage.getItem("userTimeZone") || "America/Chicago";
         const target = new Date(new Date().toLocaleString("en-US", { timeZone: tz }));
-        target.setHours(0, 0, 0, 0); // resets the time to midnight
-        target.setDate(target.getDate() + dayIndex); // applies that shift to the current date
+        target.setHours(0, 0, 0, 0);
+        target.setDate(target.getDate() + dayIndex);
 
         const formattedDate = target.toISOString().slice(0, 10);
 
-        const rescheduleJob = async () => {
-            const response = await api.patch(`/api/Update-Schedule/${active.id}/`, {
-              jobDate: formattedDate,
-            });
-            if (response.status === 200) {
-              setJobs(prevJobs => {
-                const updatedJobs = prevJobs.filter(job => job.id !== active.id);
-                if (updatedJobs.length === 0) {
-                  setSelectedJob(null);
-                }
-                return updatedJobs;
-              });
-            }
-        };
-        rescheduleJob();
-
+        const response = await api.patch(`/api/Update-Schedule/${active.id}/`, {
+          jobDate: formattedDate,
+        });
+        if (response.status === 200) {
+            console.log('Job rescheduled successfully');
+            queryClient.invalidateQueries({ queryKey: ['todaysJobs'] });
+          }
       } catch (error) {
         console.error('Error rescheduling job:', error);
         alert('Failed to reschedule job');
@@ -322,49 +345,50 @@ const Home: React.FC = () => {
     }
 
     if (over.id == 'delete-job') {
-      const deleteJob = async () => {
-        try {
-          const response = await api.delete(`/api/job/delete/${active.id}/`, {});
-          if (response.status === 204) {
-            setJobs(prevJobs => {
-              const updatedJobs = prevJobs.filter(job => job.id !== active.id);
-              if (updatedJobs.length === 0) {
-                setSelectedJob(null);
-              }
-              return updatedJobs;
-            });
-            
-          }
-        } catch (error) {
-          console.error('Error deleting job:', error);
-          alert('Failed to delete job');
+      try {
+        const response = await api.delete(`/api/job/delete/${active.id}/`, {});
+        if (response.status === 204) {
+          console.log('Job deleted successfully');
+          queryClient.invalidateQueries({ queryKey: ['todaysJobs'] });
         }
-      };
-      deleteJob();
+      } catch (error) {
+        console.error('Error deleting job:', error);
+        alert('Failed to delete job');
+      }
     }
 
     if (over && active.id !== over.id) {
-      setJobs((currentJobs) => {
-        const oldIndex = currentJobs.findIndex(job => job.id === active.id);
-        const newIndex = currentJobs.findIndex(job => job.id === over.id);
+      queryClient.setQueryData(['todaysJobs'], (oldJobs: Job[] | undefined) => {
+        if (!oldJobs) return [];
         
-        const reorderedJobs = [...currentJobs];
-        const [movedJob] = reorderedJobs.splice(oldIndex, 1);
-        reorderedJobs.splice(newIndex, 0, movedJob);
+        const jobs = [...oldJobs];
+        const oldIndex = jobs.findIndex(job => job.id === active.id);
+        const newIndex = jobs.findIndex(job => job.id === over.id);
         
-        return reorderedJobs;
-      });
-    }
-  };
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const [movedJob] = jobs.splice(oldIndex, 1);
+          jobs.splice(newIndex, 0, movedJob);
+        }
+        
+        return jobs;
+    });
+}
+  }, [queryClient]);
 
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
     setActiveJobId(active.id as number)
-  }
+  }, []);
 
-  const toggleDraggingEnabled = (isDisabled: boolean) => {
-  setIsDraggingDisabled(isDisabled);
-};
+  const toggleDraggingEnabled = useCallback((isDisabled: boolean) => {
+    setIsDraggingDisabled(isDisabled);
+  }, []);
+
+  // Memoize the active job for DragOverlay
+  const activeJob = useMemo(() => 
+    activeJobId ? jobs.find(job => job.id === activeJobId) : null,
+    [activeJobId, jobs]
+  );
   
   return (
     <div
@@ -373,7 +397,7 @@ const Home: React.FC = () => {
         backgroundImage: `url('https://oldschoolgrappling.com/wp-content/uploads/2018/08/Background-opera-speeddials-community-web-simple-backgrounds.jpg')`
       }}
     >      
-      {modeType === 'Client' && selectedClient && (
+      {modeType === 'Client' && selectedClient && !isPropertyModalOpen && (
         <ClientCalendar visits={[]} client_id={focusedItemId?focusedItemId:null} />
       )}
     
@@ -386,13 +410,15 @@ const Home: React.FC = () => {
         handleSortChange={handleSortChange}
       />
 
-      <input
-        type="text"
-        className={`search-bar ${searchTerm ? 'active' : ''}`}
-        value={searchTerm}
-        onChange={handleChange}
-        placeholder={modeType === 'Client' ? "Search clients..." : "Search jobs..."}
-      />
+      <div className="search-container">
+          <input
+            type="text"
+            className={`search-bar ${searchTerm ? 'active' : ''}`}
+            value={searchTerm}
+            onChange={handleChange}
+            placeholder={modeType === 'Client' ? "Search clients..." : "Search jobs..."}
+          />
+      </div>
     
       <ul className="right-aligned-list">
         {modeType === 'Client' ? (
@@ -455,8 +481,7 @@ const Home: React.FC = () => {
                           job={job}
                           isFocused={focusedItemId === job.id}
                           onClick={(id) => {
-                            setFocusedItemId(id);
-                            setSelectedJob(job);
+                            handleJobClick(id, job);
                           }}
                           onComplete={handleJobComplete}
                           isDisabled={isDraggingDisabled}
@@ -466,15 +491,15 @@ const Home: React.FC = () => {
                     ))}  
                 </SortableContext>
                 <DragOverlay dropAnimation={null} style={{zIndex: 5}}>
-                  {activeJobId ? (
+                  {activeJob ? (
                     <div 
-                      key={activeJobId}
+                      key={activeJob.id}
                       className="job-wrapper"
                       style={{ width: '100%'}}
                     >
                       <SortableDailyList
-                        job={jobs.find(job => job.id === activeJobId)!}
-                        isFocused={focusedItemId === activeJobId}
+                        job={activeJob}
+                        isFocused={focusedItemId === activeJob.id}
                         onClick={() => {}}
                         onComplete={handleJobComplete}
                         isDisabled={false}
@@ -497,11 +522,24 @@ const Home: React.FC = () => {
         isModeRotated={isModeRotated}
         handleModeClick={handleModeClick}
         openAddClientModal={() => setIsAddClientModalOpen(true)}
+        onTeamModalOpen={handleTeamModalOpen}
+        onStatsToggle={handleStatsToggle}
+        modeType={modeType}
+        showStats={showDailyStats}
       />
             
       <AddClientModal
         isOpen={isAddClientModalOpen}
         onClose={() => setIsAddClientModalOpen(false)}
+      />
+      <TeamModal
+        isOpen={isTeamModalOpen}
+        onClose={handleTeamModalClose}
+      />
+      <DailyStatsModal
+        jobs={jobs}
+        payments={paymentsData?.payments || []}
+        isVisible={showDailyStats && modeType === 'Daily'}
       />
     </div>
   );

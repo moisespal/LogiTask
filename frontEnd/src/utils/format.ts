@@ -70,3 +70,35 @@ export const formatCurrency = (amount: number | null | undefined): string => {
     return new Intl.NumberFormat("en-US", options).format(amount);
 }
 
+export const formatPhoneNumber = (phoneNumber: string): string => {
+    if (!phoneNumber) return "N/A";
+    
+    const cleaned = phoneNumber.replace(/\D/g, "");
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    
+    if (match) {
+        return `(${match[1]}) ${match[2]}-${match[3]}`;
+    }
+    
+    return phoneNumber; // Return original if format is unexpected
+}
+
+export const formatUTCtoLocal = (dateStr: string, timeZone: string): string => {
+  if (!dateStr) return "—";
+
+  // “Jun 21 2025 1:06 AM”  → medium date + short time, no seconds
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: timeZone,
+    dateStyle: "medium",   // Jun 21, 2025
+    timeStyle: "short"     // 1:06 AM
+  }).format(new Date(dateStr));
+};
+
+export const formatCapitalized = (str: string): string => {
+  if (!str) return "";
+  
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}

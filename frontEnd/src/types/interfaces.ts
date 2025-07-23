@@ -14,12 +14,6 @@ export interface Visit {
   charge: number; // Added property
 }
 
-// export interface Schedule {
-//   frequency: string;
-//   nextServiceDate: string | null; // Updated to allow null
-//   lastServiceDate?: string;
-// }
-
 export interface ClientData {
   firstName: string;
   lastName: string;
@@ -80,6 +74,7 @@ export interface Company {
   name: string;
   image: string;
   level: string;
+  onTeamModalOpen: () => void;
 }
 
 export interface ClientSchedule {
@@ -98,3 +93,37 @@ export interface ClientSchedule {
   }[];
 }
 [];
+
+export interface Payment {
+  id: number;
+  amount: string;
+  paymentType: string;
+  paymentDate: string;
+}
+
+export interface clientViewJob {
+  client: ClientDataID;
+  complete_date: string;
+  cost: number;
+  id: number;
+  property: Property;
+  schedule: Schedule;
+}
+
+export interface PaymentWithClient {
+  id: number;
+  amount: string;
+  paymentType: string;
+  paymentDate: string;
+  client: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    email: string;
+  };
+}
+
+export interface TodaysPaymentsResponse {
+  payments: PaymentWithClient[];
+}

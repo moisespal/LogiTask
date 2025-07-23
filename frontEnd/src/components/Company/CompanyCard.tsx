@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/components/CompanyCard.css';
 import { FaCog, FaSignOutAlt, FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { BsPeopleFill } from "react-icons/bs";
 import { Company } from '../../types/interfaces';
 
-const CompanyCard: React.FC<Company> = ({image, name, level }) => {
+const CompanyCard: React.FC<Company> = ({image, name, level, onTeamModalOpen }) => {
     const [showMenu, setShowMenu] = useState(false);
     const navigate = useNavigate();
 
@@ -16,6 +17,11 @@ const CompanyCard: React.FC<Company> = ({image, name, level }) => {
     const handleLogout = () => {
         navigate('/logout');
     };
+
+    const handleTeamClick = () => {
+        onTeamModalOpen();
+        setShowMenu(false);
+    }
 
     const handleSettings = () => {
         console.log('Settings clicked');
@@ -39,12 +45,21 @@ const CompanyCard: React.FC<Company> = ({image, name, level }) => {
         <div className="company-card-wrapper">
             <div className={`company-popup-menu ${showMenu ? 'visible' : ''}`}>
                 <button 
+                    className="popup-menu-button my-team-button"
+                    onClick={handleTeamClick}
+                >
+                    <BsPeopleFill  />
+                    <span>Team</span>
+                </button>
+
+                <button 
                     className="popup-menu-button settings-button"
                     onClick={handleSettings}
                 >
                     <FaCog />
                     <span>Settings</span>
                 </button>
+
                 <button 
                     className="popup-menu-button logout-button"
                     onClick={handleLogout}

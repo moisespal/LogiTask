@@ -1,22 +1,16 @@
-@import './listItem.css';
-
 .list-item {
   position: relative;
-  font-family: Inter;
-  background: rgba(3, 3, 3, 0.212);
+  background: rgba(92, 90, 90, 0.323);
   backdrop-filter: blur(25px);
-  color: white;
-  padding: 10px 20px;
+  color: #f2f1f0;
+  padding: clamp(8px, 2vw, 10px) clamp(15px, 4vw, 20px);
   margin: 5px 0;
   border-radius: 10px 0 0 10px;
-  box-sizing: border-box;
   cursor: pointer;
   z-index: 10;
-  min-width: 100%;
+  min-width: 0;
   user-select: none;
-  display: flex;
   flex-direction: column;
-  align-items: flex-start;
   border-left: 3px solid rgba(70, 130, 220, 0.4);
   transition: all 0.2s ease-out;
 }
@@ -28,157 +22,54 @@
 }
 
 .list-item.focused {
-  transform: scale(1.01);
-  background: rgba(30, 30, 40, 0.5);
-  z-index: 5;
-  position: relative;
-  overflow: hidden;
+  background: rgba(81, 80, 80, 0.534);
+  backdrop-filter: blur(25px);
+  color: white;
   border-left: 6px solid rgba(70, 130, 220, 0.8);
-  animation: focusPulse 0.3s ease-out;
+  transform: scale(1.02);
 }
-
-@keyframes focusPulse {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(70, 130, 220, 0.4);
-  }
-  50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 10px rgba(70, 130, 220, 0);
-  }
-  100% {
-    transform: scale(1.01);
-    box-shadow: 0 0 0 0 rgba(70, 130, 220, 0);
-  }
-}
-
-.list-item-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-}
-
 /* Profile Pic and stars specific to ClientListItem */
 .profile-pic-container {
-  width: 40px;
-  height: 40px;
+  width: clamp(32px, 8vw, 40px); 
+  height: clamp(32px, 8vw, 40px); 
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0; 
 }
 
 .profile-pic {
-  width: 40px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
 }
 
-/* Client-specific styles */
+/* Client-Star styles */
 .stars {
   display: flex;
-  align-items: center;
-  margin-top: 5px;
-}
-
-.star {
-  margin-left: 3px;
-  font-size: 1.1em;
-  position: relative;
-  background: linear-gradient(90deg, 
-    rgba(255,255,255,0.3) 0%, 
-    rgba(255,255,255,0.6) 50%, 
-    rgba(255,255,255,0.3) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
+  align-items: flex-start;
+  color: rgb(233, 233, 232);
+  gap: clamp(0.1em, 1vw, 0.2em);
 }
 
 .list-item.focused .star {
-  background: linear-gradient(90deg, 
-    rgba(255, 255, 200, 1) 0%,
-    rgba(255, 250, 150, 1) 50%,
-    rgba(255, 245, 180, 0.7) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 4px rgba(225, 208, 14, 0.8));
+ color: rgb(234, 226, 116);
+ transition: all 0.2s ease;
 }
 
-/* Address styles */
-.address-container {
-  margin-top: 10px;
-  padding-left: 50px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.address-item {
-  background: linear-gradient(135deg, rgba(3, 3, 3, 0.671), rgba(255, 255, 255, 0.212));
-  padding: 20px 20px;
-  border-radius: 10px 0 0 10px;
-  font-size: 14px;
-  color: white;
-  margin: -5px 0 10px;
-  border-left: 3px solid rgba(255, 255, 255, 0.6);
-  display: flex;
-  align-items: center;
-  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.2);
-  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-  animation: slideInFade 0.2s ease-out forwards;
-  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  cursor: pointer;
-}
-
-.address-item:hover {
-  transform: scale(1.01);
-  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.4), 0 0 10px rgba(255, 255, 255, 0.3);
-}
-
-@keyframes slideInFade {
-  0% {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.fade-out {
-  animation: slideOutFade .5s ease-out forwards;
-}
-
-@keyframes slideOutFade {
-  0% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-}
-
-/* Action buttons container styles */
+/* Action buttons container */
 .client-action-buttons {
   display: flex;
-  gap: 8px;
+  gap: .45em;
   align-items: center;
 }
 
-/* Shared button styles */
-.gear-button,
-.client-payment-button {
-  background-color: rgba(50, 50, 55, 0.7);
-  border: none;
+/* Payment button and Gear button */
+.client-payment-button, .gear-button {
   width: 32px;
   height: 32px;
+  border: none;
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -186,37 +77,50 @@
   cursor: pointer;
   transition: all 0.15s ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  font-size: clamp(0.8rem, 1rem, 1.2rem);
 }
 
-/* Button hover effects */
-.gear-button:hover,
-.client-payment-button:hover {
-  background-color: rgba(60, 60, 65, 0.8);
-}
-
-/* Button active effects */
-.gear-button:active,
-.client-payment-button:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-}
-
-/* Payment button specific styles */
 .client-payment-button {
-  background-color: rgba(40, 120, 40, 0.7);
+  background-color: rgba(45, 130, 45, 0.7);
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .client-payment-button:hover {
   background-color: rgba(45, 130, 45, 0.8);
 }
 
-.client-payment-button i {
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 14px;
+.client-payment-button:active, .gear-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
-/* Gear button specific styles */
-.gear-button i {
+.gear-button {
+  background-color: rgba(60, 60, 65, 0.7);
   color: rgba(255, 255, 255, 0.95);
-  font-size: 14px;
-} 
+}
+
+.gear-button:hover {
+  background-color: rgba(60, 60, 65, 0.8);
+}
+
+@media (max-width: 850px) {
+  .list-item {
+    font-size: clamp(0.8rem, 1rem, 1.1rem);
+    padding: clamp(14px, 15px, 16px) clamp(15px, 17px, 18px);
+  }
+  .profile-pic-container {
+    width: clamp(28px, 8vw, 32px);
+    height: clamp(28px, 8vw, 32px);
+  }
+}
+
+@media (max-width: 400px) {
+  .list-item {
+    font-size: clamp(10px, 2.5vw, 12px);
+    padding: clamp(12px, 2vw, 14px) clamp(15px, 3vw, 16px);
+  }
+  .profile-pic-container {
+    width: clamp(22px, 25px, 26px);
+    height: clamp(22px, 25px, 26px);
+  }
+}

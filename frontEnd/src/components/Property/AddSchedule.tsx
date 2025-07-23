@@ -174,6 +174,7 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
                                 name="nextDate"
                                 value={clientData.nextDate}
                                 onChange={(e) => handleInputChange(e)}
+                                className='date-input'
                                 required
                             />
                         </div>

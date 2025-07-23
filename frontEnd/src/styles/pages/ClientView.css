@@ -1,0 +1,306 @@
+.client-view-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px 50px 100px;
+    background: rgba(40, 40, 43, 1);
+    color: white;
+    height: 100vh;
+    overflow-y: auto;
+    font-family: 'Outfit', sans-serif;
+    user-select: none;
+}
+
+.client-info-card, .client-balance-card {
+    min-width: 280px;
+}
+
+/* Header Section - Client Info and Balance */
+.client-header-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: center;
+}
+
+.client-info-card, .client-balance-card {
+    background-color: rgb(33, 33, 36);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 1rem;
+}
+
+.client-info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1em;
+}
+
+.client-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.client-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
+}
+
+.client-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+.client-name {
+    font-weight: bold;
+    color: #fdfdfd;
+    margin: 0;
+}
+
+.client-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: #e0e0e0;
+}
+
+.client-balance-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.balance-button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.client-balance-card h3 {
+    margin: 0 0 15px 0;
+    color: #fdfdfd;
+}
+.balance-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fdfdfd;
+    margin-bottom: 15px;
+}
+
+.balance-text {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.payment-button-secondary, .balance-adjustment-button {
+    padding: 80px 15px;
+}
+
+.balance-amount {
+    margin-left: 10px;
+    font-weight: 700;
+    color: transparent;
+    background-clip: text;
+    font-size: 1.5rem;
+}
+
+.balance-progress-bar {
+    height: 12px;
+    background-color: #41424e;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 6px;
+}
+
+.payment-button-secondary {
+    align-self: flex-end;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    border: none;
+    border-radius: 8px;
+    color: #fdfdfd;
+    font-weight: bold;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.payment-button-secondary:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, rgb(81, 190, 86), #95d34e);
+}
+
+.balance-adjustment-button {
+    background: linear-gradient(90deg, #FFA000, #FF8F00);
+    border: none;
+    border-radius: 8px;
+    color: #fdfdfd;
+    font-weight: bold;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.balance-adjustment-button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(90deg, #FFB300, #FFA000);
+}
+
+.balance-adjustment-button:active, .payment-button-secondary:active {
+    transform: scale(0.98);
+}
+
+/* Details Section - Addresses, Services, Payments */
+.client-details-section {
+    display: grid;
+    grid-template-columns: 0.75fr 2.75fr 1.5fr;
+    gap: 20px;
+}
+
+.client-panel {
+    background-color: rgb(33, 33, 36);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-size: clamp(0.8rem, 1vw + 1rem, 1rem);
+}
+.panel-header {
+    padding-bottom: 10px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #fdfdfd;
+    display: flex;
+    font-weight: 700;
+    justify-content: space-between;
+}
+
+.total-amount {
+    color: #4CAF50;
+    font-size: clamp(1rem, 2vw + 1rem, 1.2rem);
+}
+
+.address-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.client-address-item {
+    padding: 12px 15px;
+    border-radius: 6px;
+    background: rgba(40, 40, 43, 1);
+    margin-bottom: 8px;
+    transition: all 0.2s ease-out;
+}
+
+.client-address-item:hover {
+    background: rgb(42, 42, 45);
+    transform: scale(1.02);
+}
+
+.table-container {
+    overflow-y: auto;
+    overflow-x: auto;
+    border-radius: 10px 10px 0 0;
+    border: #31313b 1px solid;
+    box-shadow: #262628 0px 0px 10px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead tr {
+    background-color: #2a62db34;
+}
+
+
+
+.data-table td {
+    padding: 6px 15px;
+    border-bottom: 1px solid #31313b;
+    color: #fdfdfd;
+}
+
+.unapplied-job, .unapplied-payment {
+    border-left: 1px solid #f5c720;
+}
+
+.invoiced-job, .invoiced-payment {
+    border-left: 1px solid #92f58d;
+}
+
+.data-table th {
+    text-align: left;
+    padding: 12px 15px;
+    color: #fdfdfd;
+}
+.data-table tr:nth-child(even) {
+    background-color: #1a1a1c;
+}
+
+
+
+.data-table tbody tr:hover {
+    background: rgba(73, 73, 80, 0.695);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .client-header-section,
+    .client-details-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .client-info-card {
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+    }
+    
+    .client-contact {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 460px) {
+    .client-view-container {
+        padding: 20px 15px 10px;
+    }
+    .client-info-card, .client-balance-card, .client-panel {
+        min-width: calc(100vw - 30px);
+    }
+    
+    .client-details-section {
+        gap: 15px;
+    }
+}

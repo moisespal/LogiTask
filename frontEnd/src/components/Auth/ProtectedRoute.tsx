@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import api from "../../api";
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../../constants";
+import { useUser } from "../../contexts/userContext";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -15,6 +16,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
   const [tzChecked, setTzChecked] = useState(false);
   const location = useLocation();
   const isCompanySetupRoute = location.pathname === "/company-setup";
+  const { setRole } = useUser();
 
   // Check authentication when component mounts
   useEffect(() => {
@@ -51,15 +53,18 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   const checkUserTimeZone = async () => {
     const cachedTZ = localStorage.getItem("userTimeZone");
+    const cachedRole = localStorage.getItem('role');
 
-    if (cachedTZ) {
+    if (cachedTZ && cachedRole) {
       setTzChecked(true);
       return;
     } 
     try {
       const res = await api.get("/api/get-user-profile/");
-      if (res.data.timezone) {
+      if (res.data) {
         localStorage.setItem("userTimeZone", res.data.timezone);
+        localStorage.setItem('role',res.data.role)
+        setRole(res.data.role);
       }
     } catch (error) {
       console.error("Error checking user time zone:", error);

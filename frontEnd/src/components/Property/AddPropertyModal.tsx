@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../../styles/components/AddPropertyModal.css';
 import api from '../../api';
 import { Property_list,Schedule } from '../../types/interfaces';
+import { useQueryClient } from '@tanstack/react-query';
+
 interface AddPropertyModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -13,6 +15,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
     onClose, 
     clientId
 }) => {
+    const queryClient = useQueryClient();
     const [jobList, setJobList] = useState<string[]>(["mow"]);
     const [clientData, setClientData] = useState<Property_list>({
         street: "",
@@ -100,13 +103,9 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                 });
                 
                 // Close modal first
+                queryClient.invalidateQueries({ queryKey: ['clients'] }); 
+                queryClient.invalidateQueries({ queryKey: ['properties'] });
                 onClose();
-                
-                // This will trigger a reload of all clients in the parent component
-                // We're using a small delay to ensure the modal is fully closed first
-                setTimeout(() => {
-                    window.dispatchEvent(new CustomEvent('reload-clients'));
-                }, 100);
             } else {
                 alert("Failed to add property.");
             }
@@ -240,6 +239,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                         value={prop.nextDate}
                                         name='nextDate'
                                         onChange={(e) => handlePropertyChange(index, "nextDate", e.target.value)}
+                                        className='date-input'
                                         required
                                     />
                                 </div>
@@ -265,10 +265,10 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                     
                     <div className="property-form-actions">
                         <button type="button" className="property-btn-secondary" onClick={onClose}>
-                            <i className="fas fa-times"></i> Cancel
+                            Cancel
                         </button>
                         <button type="submit" className="property-btn-primary">
-                            <i className="fas fa-plus"></i> Add Property
+                            Add Property
                         </button>
                     </div>
                 </form>

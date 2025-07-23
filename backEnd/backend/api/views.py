@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -16,7 +16,11 @@ import pytz
 from django.utils import timezone
 from django.db.models import Prefetch
 from django.db.models.functions import Lower
-
+from django.db.models import Sum
+from decimal import Decimal
+from collections import defaultdict
+from django.db import transaction
+from datetime import timedelta, datetime
 
 
 
@@ -28,13 +32,13 @@ class ClientListCreate(generics.ListCreateAPIView):
 
     #retrive notes
     def get_queryset(self):
-        user = self.request.user
-        return Client.objects.filter(author=user)
+        company = self.request.user.userprofile.company
+        return Client.objects.filter(company=company)
     
     #creating note
     def perform_create(self, serializer):
         if serializer.is_valid():
-            serializer.save(author=self.request.user)
+            serializer.save(author=self.request.user,company = self.request.user.userprofile.company)
         else:
             print(serializer.errors)
     
@@ -58,12 +62,12 @@ class PropertyListCreate(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Property.objects.filter(client__author=self.request.user)
+        return Property.objects.filter(client__company=self.request.user.userprofile.company)
         
     def perform_create(self, serializer):
         client_id = self.request.data.get("clientId")
         if serializer.is_valid ():
-            client = Client.objects.get(id=client_id,author=self.request.user)
+            client = Client.objects.get(id=client_id,author=self.request.user,company = self.request.user.userprofile.company)
             serializer.save(client=client)
         else:
             print(serializer.errors)
@@ -77,7 +81,7 @@ class ClientScheduleSetUp(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         
         if serializer.is_valid():
-            serializer.save(author=self.request.user)
+            serializer.save(author=self.request.user,company = self.request.user.userprofile.company)
         else:
             print(serializer)
 
@@ -106,7 +110,7 @@ class GetTodaysJobs(ListAPIView):
         
         return Job.objects.filter(
             jobDate=today_in_user_tz,
-            client__author=self.request.user
+            client__company=self.request.user.userprofile.company
         )
 
 class PropertyListCreateView(generics.ListCreateAPIView):
@@ -118,7 +122,7 @@ class PropertyListCreateView(generics.ListCreateAPIView):
 
 class UpdateSchedule(UpdateAPIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = JobSerializer
+    serializer_class = JobOnlySerializer
     queryset = Job.objects.all()
     
     def patch(self, request, *args, **kwargs):
@@ -140,7 +144,8 @@ class UploadExcelView(APIView):
                     lastName=row['lastName'],  # Change column names based on Excel file
                     email=row['email'],
                     phoneNumber=row['phoneNumber'],
-                    author=self.request.user
+                    author=self.request.user,
+                    company = self.request.user.userprofile.company
                 )
                 property_obj = Property.objects.create(
                     street=row['street'],
@@ -188,12 +193,13 @@ class CompanyListCreate(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         if serializer.is_valid():
-            serializer.save(user=self.request.user)
+            serializer.save()
         else:
             print(serializer)
     
     def get_queryset(self):
-        return Company.objects.filter(user=self.request.user)
+        return Company.objects.filter(id=self.request.user.userprofile.company.id)
+    
 
 class CompanyUpdateView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
@@ -282,7 +288,7 @@ class update_balance_view(ListAPIView):
 
 
         #get balance table
-        balance, _ = Balance.objects.get_or_create(client=client)
+        balance= Balance.objects.get(client=client)
 
         #recalculate
         balance.recalculate_balance()
@@ -351,7 +357,47 @@ class GetUserProfile(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except userProfile.DoesNotExist:
             return Response({"detail": "User profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+class GetUnappliedObjects(APIView):
+    permission_classes = [IsAuthenticated]
         
+    def get(self,request, client_id):
+        if not client_id:
+            return Response({"error": "client_id is required"}, status=400)
+
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return Response({"error": "Client not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        unapplied_jobs = Job.objects.filter(client=client, is_applied_to_balance=False, status='complete').select_related('schedule__property')
+        unapplied_payments = Payment.objects.filter(client=client, is_applied_to_balance=False)
+        unapplied_adjustments = BalanceAdjustment.objects.filter(client=client, is_applied_to_balance=False)
+
+        total_jobs = unapplied_jobs.aggregate(Sum("cost"))["cost__sum"] or 0
+        total_payments = unapplied_payments.aggregate(Sum("amount"))["amount__sum"] or 0
+        total_adjustments = unapplied_adjustments.aggregate(Sum("amount"))["amount__sum"] or 0
+            
+        total_jobs = Decimal(total_jobs)
+        total_payments = Decimal(total_payments)
+        total_adjustments= Decimal(total_adjustments)
+
+        delta = total_payments - total_jobs + total_adjustments
+
+
+
+
+        #jobs_data = JobInfoSerializer(unapplied_jobs,many=True).data
+        job_data = JobInfoSerializer(unapplied_jobs,many=True).data
+        payments_data =  PaymentSerializer(unapplied_payments,many=True).data
+        adjustments_data = BalanceAdjustmentSerializer(unapplied_adjustments, many=True).data
+
+        return Response({
+            "unapplied_jobs": job_data,
+            "unapplied_payments": payments_data,
+            "unapplied_adjustments": adjustments_data,
+            "delta": str(delta)  # Use str to avoid JSON serialization errors with Decimal
+        })
 
 class JobDelete(generics.DestroyAPIView):
     serializer_class = JobSerializer
@@ -360,3 +406,97 @@ class JobDelete(generics.DestroyAPIView):
     def get_queryset(self):
         user = self.request.user
         return Job.objects.filter(client__author=user)
+class AdjustmentCreate(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self,request, client_id):  
+        client = get_object_or_404(Client, id=client_id)
+        serializer = BalanceAdjustmentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(client=client)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class CreateWorker(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self,request):
+        user = request.user
+        if not hasattr(user, 'userprofile') or not user.userprofile.company:
+            return Response({"error": "User profile or company not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        company = user.userprofile.company
+
+        try:
+             with transaction.atomic():
+                serializer = userSerializer(data=request.data)
+                if not serializer.is_valid():
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+                new_user = serializer.save()
+                new_profile = userProfile.objects.get(user=new_user)
+                new_profile.role = 'WORKER'
+                new_profile.company = company
+                new_profile.timezone = user.userprofile.timezone
+                new_profile.save()
+                
+                return Response({
+                    "message": "Worker created successfully",
+                    "worker": serializer.data
+                }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class getWorkers(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self,request):
+        user = request.user
+        if not hasattr(user, 'userprofile') or not user.userprofile.company:
+            return Response({"error": "User profile or company not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        workers = User.objects.filter(userprofile__company=user.userprofile.company,userprofile__role='WORKER')
+        emails = workers.values_list('username',flat=True)
+        return Response({"emails": list(emails)},status=status.HTTP_200_OK)
+class GetClientProperties(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request,client_id):
+        try:
+            client = Client.objects.get(id=client_id)
+        except Client.DoesNotExist:
+            return Response({"detail": "User Client not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ClientPropertiesSerializer(client)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class getPayments(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request, date=None):
+        
+
+        profile = userProfile.objects.get(user=self.request.user)
+        user_timezone = profile.timezone
+        try:
+            user_timezone = pytz.timezone(user_timezone)
+        except pytz.exceptions.UnknownTimeZoneError:
+            user_timezone = pytz.UTC
+        utc_now = timezone.now()
+        local_now = utc_now.astimezone(user_timezone)
+        today_in_user_tz = local_now.date()
+        start = timezone.make_aware(datetime.combine(today_in_user_tz, datetime.min.time()), timezone=user_timezone)
+        end = start + timedelta(days=1)
+
+
+        payments = Payment.objects.filter(
+            paymentDate__gte=start,
+            paymentDate__lt=end,
+            client__company=self.request.user.userprofile.company
+        ).order_by("-paymentDate")
+        serializer = PaymentInfoSerializer(payments,many=True)
+
+        return Response({'payments': list(serializer.data)},status=status.HTTP_200_OK)
