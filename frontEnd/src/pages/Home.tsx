@@ -22,6 +22,9 @@ import SortableDailyList from '../components/Daily/SortableDailyList';
 import TeamModal from '../components/Company/CompanyTeamModal';
 import { useUser } from '../contexts/userContext';
 
+import LoadingList from '../components/Loading/LoadingList';
+import LoadingJob from '../components/Loading/LoadingJobs';
+
 const renderStars = (count: number): JSX.Element[] => (
   Array.from({ length: count }, (_, i) => <span key={i} className="star">★</span>)
 );
@@ -55,10 +58,10 @@ const Home: React.FC = () => {
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [showDailyStats, setShowDailyStats] = useState(false);
   const [isModeRotated, setIsModeRotated] = useState(false);
-  const { clients } = useClients( modeType === 'Client');
+  const { clients, isLoading: isClientLoading } = useClients( modeType === 'Client');
   const queryClient = useQueryClient();
   const focusedElementRef = useRef<HTMLDivElement | null>(null);
-  const { jobs } = useTodaysJobs(modeType === 'Daily');
+  const { jobs, isLoading: isJobLoading } = useTodaysJobs(modeType === 'Daily');
   const { data: paymentsData } = useTodaysPayments(modeType === 'Daily' && showDailyStats);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
@@ -393,9 +396,6 @@ const Home: React.FC = () => {
   return (
     <div
       className="app-container" 
-      style={{
-        backgroundImage: `url('https://oldschoolgrappling.com/wp-content/uploads/2018/08/Background-opera-speeddials-community-web-simple-backgrounds.jpg')`
-      }}
     >      
       {modeType === 'Client' && selectedClient && !isPropertyModalOpen && (
         <ClientCalendar visits={[]} client_id={focusedItemId?focusedItemId:null} />
@@ -422,7 +422,11 @@ const Home: React.FC = () => {
     
       <ul className="right-aligned-list">
         {modeType === 'Client' ? (
-          // Client list rendering
+          isClientLoading ? ( 
+            <div className="loading-container">
+              <LoadingList />
+            </div>
+          ) :
           filteredClients.map((client: ClientDataID) => (
             <div 
               key={client.id} 
@@ -450,14 +454,8 @@ const Home: React.FC = () => {
         ) : (
           // Daily jobs list rendering
           <>
-            {jobs.length === 0 ? (
-              <div className="no-jobs-message">
-                  <>
-                    <div className="no-jobs-icon">🎉</div>
-                    <h3>All Done for Today!</h3>
-                    <p>Check back tomorrow for new tasks</p>
-                  </> 
-              </div>
+            {isJobLoading ? (
+              <LoadingJob />
             )  : (
               <DndContext
                 sensors={sensors}

@@ -8,7 +8,7 @@
   border-radius: 10px 0 0 10px;
   cursor: pointer;
   z-index: 10;
-  min-width: 0;
+  min-width: 45vw;
   user-select: none;
   flex-direction: column;
   border-left: 3px solid rgba(70, 130, 220, 0.4);

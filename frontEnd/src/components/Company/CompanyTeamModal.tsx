@@ -99,8 +99,8 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
         <h3>Team Members</h3>
         
         <div className="team-members-list">
-          {teamMembers.map(member => (
-            <div className="team-member-card"> 
+          {teamMembers.map((member, index) => (
+            <div className="team-member-card" key={index}> 
               <div className="member-avatar">
                 <i className="fa-solid fa-user"></i>
               </div>

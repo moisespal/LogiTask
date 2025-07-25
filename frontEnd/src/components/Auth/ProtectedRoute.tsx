@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import api from "../../api";
 import { REFRESH_TOKEN, ACCESS_TOKEN } from "../../constants";
 import { useUser } from "../../contexts/userContext";
+import LoadingHome from "../Loading/LoadingHome";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -149,7 +150,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   // Show loading while checking company
   if (!companyChecked) {
-    return <div>Loading company information...</div>;
+    return <LoadingHome />;
   }
 
   // Redirect to setup if no company (except on setup page)

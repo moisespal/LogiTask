@@ -1,0 +1,10 @@
+.loading-item {
+  min-height: 85px;
+  animation: pulse 1.5s ease infinite;
+}
+
+.loading-avatar {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: pulse 1.5s ease infinite;
+}
