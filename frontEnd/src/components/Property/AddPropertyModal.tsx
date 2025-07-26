@@ -137,18 +137,18 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="property-modal-overlay" onClick={onClose}>
-            <div className="property-modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="property-modal-close-btn" onClick={onClose}>
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="property-container modal-container" onClick={(e) => e.stopPropagation()}>
+                <button className="modal-close-btn" onClick={onClose}>
                     <i className="fas fa-times"></i>
                 </button>
                 
-                <h2>Add New Property</h2>
+                <h3>Add New Property</h3>
                 
                 <form onSubmit={handleSubmit}>
-                    <div className="property-form-section">
-                        <div className="property-section-title">Property Information</div>
-                        <div className="property-form-group">
+                    <div className="modal-form-section">
+                        <div className="modal-section-title">Property Information</div>
+                        <div className="form-group">
                             <input
                                 type="text"
                                 placeholder="Street Address"
@@ -159,8 +159,8 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                             />
                         </div>
                         
-                        <div className="property-form-row">
-                            <div className="property-form-group">
+                        <div className="form-row">
+                            <div className="form-group">
                                 <input
                                     type="text"
                                     placeholder="City"
@@ -171,8 +171,8 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                 />
                             </div>
                             
-                            <div className="property-state-zip-row">
-                                <div className="property-state-input">
+                            <div className="state-zip-row">
+                                <div className="state-input">
                                     <input
                                         type="text"
                                         placeholder="State"
@@ -183,7 +183,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                         required
                                     />
                                 </div>
-                                <div className="property-zip-input">
+                                <div className="zip-input">
                                     <input
                                         type="text"
                                         placeholder="ZIP Code"
@@ -198,10 +198,10 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                     </div>
                     
                     {clientData.schedules.map((prop, index) => (
-                        <div key={index} className="property-form-section property-service-section">
-                            <div className="property-section-title">Service Information</div>
-                            <div className="property-form-row">
-                                <div className="property-form-group">
+                        <div key={index} className="modal-form-section">
+                            <div className="modal-section-title">Service Information</div>
+                            <div className="form-row">
+                                <div className="form-group">
                                     <input 
                                         list="service-options"
                                         name="service"
@@ -217,7 +217,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                     </datalist>
                                 </div>
                                 
-                                <div className="property-form-group">
+                                <div className="form-group">
                                     <div className="cost-input-container">
                                         <input 
                                             type="number" 
@@ -231,8 +231,8 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                 </div>
                             </div>
                             
-                            <div className="property-form-row">
-                                <div className="property-form-group">
+                            <div className="form-row">
+                                <div className="form-group">
                                     <input 
                                         type="date" 
                                         placeholder="Start Date"
@@ -244,7 +244,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                     />
                                 </div>
                                 
-                                <div className="property-form-group">
+                                <div className="form-group">
                                     <select
                                         name="frequency"
                                         value={prop.frequency}
@@ -263,11 +263,11 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                         </div>
                     ))}
                     
-                    <div className="property-form-actions">
-                        <button type="button" className="property-btn-secondary" onClick={onClose}>
+                    <div className="modal-btn-container">
+                        <button type="button" className="modal-btn-cancel" onClick={onClose}>
                             Cancel
                         </button>
-                        <button type="submit" className="property-btn-primary">
+                        <button type="submit" className="modal-btn-submit">
                             Add Property
                         </button>
                     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../../styles/components/AddPropertyModal.css';
+import '../../styles/components/AddScheduleModal.css';
 import api from '../../api';
 import { ClientSchedule } from '../../types/interfaces';
 
@@ -120,89 +120,88 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="property-modal-overlay" onClick={() => onClose()}>
-            <div className="property-modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="property-modal-close-btn" onClick={() => onClose()}>
+        <div className="modal-overlay" onClick={() => onClose()}>
+            <div className="schedule-container modal-container" onClick={(e) => e.stopPropagation()}>
+                <button className="modal-close-btn" onClick={() => onClose()}>
                     <i className="fas fa-times"></i>
                 </button>
                 
-                <h2>Add New Schedule</h2>
+                <h3>Add New Schedule</h3>
                 
                 <form onSubmit={handleSubmit}>
-                    
-                       
-                    
-                <div className="property-form-section property-service-section">
-                    <div className="property-section-title">Service Information</div>
-                    <div className="property-form-row">
-                        <div className="property-form-group">
-                            <input 
-                                list="service-options"
-                                name="service"
-                                value={clientData.service}
-                                onChange={(e) => handleInputChange(e)}
-                                placeholder="Service Type"
-                                required
-                            />
-                                <datalist id="service-options">
-                                    {jobList.map((service, i) => (
-                                        <option key={i} value={service} />
-                                        ))}
-                                    </datalist>
-                        </div>
-                        
-                        <div className="property-form-group">
-                            <div className="cost-input-container">
+
+                    <div className="modal-form-section">
+                        <div className="modal-section-title">Service Information</div>
+                        <div className="form-row">
+                            <div className="form-group">
                                 <input 
-                                    type="number" 
-                                    placeholder="Cost" 
-                                    name="cost"
-                                    step="1.00"
-                                    value={clientData.cost}
+                                    list="service-options"
+                                    name="service"
+                                    value={clientData.service}
                                     onChange={(e) => handleInputChange(e)}
+                                    placeholder="Service Type"
                                     required
                                 />
+                                    <datalist id="service-options">
+                                        {jobList.map((service, i) => (
+                                            <option key={i} value={service} />
+                                            ))}
+                                    </datalist>
+                            </div>
+                            
+                            <div className="form-group">
+                                <div className="cost-input-container">
+                                    <input 
+                                        type="number" 
+                                        placeholder="Cost" 
+                                        name="cost"
+                                        min="1"
+                                        step="0.01"
+                                        value={clientData.cost}
+                                        onChange={(e) => handleInputChange(e)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="form-row">
+                            <div className="form-group">
+                                <input 
+                                    type="date" 
+                                    placeholder="Start Date"
+                                    name="nextDate"
+                                    value={clientData.nextDate}
+                                    onChange={(e) => handleInputChange(e)}
+                                    className='date-input'
+                                    required
+                                />
+                            </div>
+                            
+                            <div className="form-group">
+                                <select
+                                    name="frequency"
+                                    value={clientData.frequency}
+                                    onChange={(e) => handleInputChange(e)}
+                                    required
+                                >
+                                    <option value="" disabled>
+                                        How Often?
+                                    </option>
+                                    <option value="Once">Once</option>
+                                    <option value="Weekly">Weekly</option>
+                                    <option value="BiWeekly">Every 2 Weeks</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                     
-                    <div className="property-form-row">
-                        <div className="property-form-group">
-                            <input 
-                                type="date" 
-                                placeholder="Start Date"
-                                name="nextDate"
-                                value={clientData.nextDate}
-                                onChange={(e) => handleInputChange(e)}
-                                className='date-input'
-                                required
-                            />
-                        </div>
-                        
-                        <div className="property-form-group">
-                            <select
-                                name="frequency"
-                                value={clientData.frequency}
-                                onChange={(e) => handleInputChange(e)}
-                                required
-                            >
-                                <option value="" disabled>
-                                    How Often?
-                                </option>
-                                <option value="Once">Once</option>
-                                <option value="Weekly">Weekly</option>
-                                <option value="BiWeekly">Every 2 Weeks</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                    
-                    <div className="property-form-actions">
-                        <button type="button" className="property-btn-secondary" onClick={() => onClose()}>
-                            <i className="fas fa-times"></i> Cancel
+                    <div className="modal-btn-container">
+                        <button type="button" className="modal-btn-cancel" onClick={() => onClose()}>
+                            Cancel
                         </button>
-                        <button type="submit" className="property-btn-primary">
-                            <i className="fas fa-plus"></i> Add Property
+                        <button type="submit" className="modal-btn-submit">
+                            Add Schedule
                         </button>
                     </div>
                 </form>

@@ -148,12 +148,10 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
   
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Handle file upload logic here
     if (event.target.files && event.target.files.length > 0) {
       setFile(event.target.files[0]); // Store the selected file
       console.log("Selected file:", event.target.files[0].name);
   }
-    // You would typically process the file here
     
   };
 
@@ -193,18 +191,18 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
 
   const renderModeSelection = () => (
     <div className="mode-selection">
-      <h2>Add New Client(s)</h2>
-      <div className="mode-buttons">
-        <button className="btn-mode" onClick={async () => {
+      <h3>Add New Client(s)</h3>
+      <div className="client-btn-container">
+        <button className="btn-mode modal-btn" onClick={async () => {
           setMode('single');
           await getJobsNames();
         }}>
           <i className="fas fa-user-plus"></i>
-          <span>Add One Client</span>
+          <span>Add One</span>
         </button>
-        <button className="btn-mode" onClick={() => setMode('multiple')}>
+        <button className="btn-mode modal-btn" onClick={() => setMode('multiple')}>
           <i className="fas fa-users"></i>
-          <span>Add Multiple Clients</span>
+          <span>Add Multiple</span>
         </button>
       </div>
     </div>
@@ -212,11 +210,11 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
 
   const renderSingleClientForm = () => (
     <>
-      <h2>Add New Client</h2>
+      <h3>Add New Client</h3>
       <form onSubmit={handleSubmit}>
         {/* Client Information Section */}
-        <div className="form-section">
-          <div className="section-title">Client Information</div>
+        <div className="modal-form-section">
+          <div className="modal-section-title">Client Information</div>
           <div className="form-row">
             <div className="form-group">
               <input
@@ -265,9 +263,9 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
 
         {/* Property Information Section */}
         {clientData.properties.map((prop, index) => (
-          <div key={index}>
-            <div className="form-section property-section">
-              <div className="section-title">Property Information</div>
+          <React.Fragment key={index}>
+            <div className="modal-form-section">
+              <div className="modal-section-title">Property Information</div>
               <div className="form-group">
                 <input
                   type="text"
@@ -315,8 +313,8 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Service Information Section */}
-            <div className="form-section service-section">
-              <div className="section-title">Service Information</div>
+            <div className="modal-form-section">
+              <div className="modal-section-title">Service Information</div>
               <div className="form-row">
                 <div className="form-group">
                   <input
@@ -340,8 +338,8 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
                       type="number" 
                       placeholder="Cost" 
                       name='cost'
-                      min='0.00'
-                      step="1.00"
+                      min='1'
+                      step='0.01'
                       onChange={(e) => updateSchedule(index,0,"cost", parseFloat(e.target.value))}
                       required
                     />
@@ -375,14 +373,14 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </React.Fragment>
         ))}
-        <div className="form-actions">
-          <button type="button" className="btn-secondary" onClick={() => setMode('select')}>
-            <i className="fas fa-arrow-left"></i> Back
+        <div className="modal-btn-container">
+          <button type="button" className="modal-btn-cancel" onClick={() => setMode('select')}>
+             Cancel
           </button>
-          <button type="submit" className="btn-primary">
-            <i className="fas fa-plus"></i> Add Client
+          <button type="submit" className="modal-btn-submit">
+             Add Client
           </button>
         </div>
       </form>
@@ -406,18 +404,20 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
         </label>
       </div>
       {file && <p>Selected: {file.name}</p>}
-      <div className="form-actions">
+      <div className="modal-btn-container">
+
+          <button type="button" className="modal-btn-cancel" onClick={() => setMode('select')}>
+            Back
+          </button>
+
           <button 
                 type="button" 
-                className="btn-primary" 
+                className="modal-btn-submit" 
                 onClick={uploadFile}
                 disabled={uploading}
             >
-                {uploading ? "Uploading..." : "Upload File"}
-            </button>
-        <button type="button" className="btn-secondary" onClick={() => setMode('select')}>
-          <i className="fas fa-arrow-left"></i> Back
-        </button>
+              {uploading ? "Uploading..." : "Upload File"}
+          </button>
       </div>
     </>
   );
@@ -426,7 +426,7 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-container client-container" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close-btn" onClick={onClose}>
           <i className="fas fa-times"></i>
         </button>

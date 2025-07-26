@@ -85,11 +85,11 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="team-modal-overlay">
-      <div className="team-modal-container">
+    <div className="modal-overlay">
+      <div className="modal-container team-modal-container">
         <button 
           type="button"
-          className="close-modal-btn" 
+          className="modal-close-btn" 
           onClick={handleCancel}
           aria-label="Close"
         >
@@ -115,41 +115,43 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
 
         {/* Add Member Form */}
         {showAddForm ? (
-          <form onSubmit={handleAddMember} className="add-member-form">
-            <h4>Add New Team Member</h4>
+          <form onSubmit={handleAddMember} className="modal-container new-member-form">
+            <h3>Add New Team Member</h3>
             <div className="form-group">
-              <label htmlFor="member-email">Email</label>
+              <label htmlFor="member-email" className="modal-section-title">Email</label>
               <input
                 id="member-email"
                 type="email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder="Enter email"
+                autoComplete='username'
                 required
               />
             </div>
             <div className="form-group">
-              <label htmlFor="member-password">Password</label>
+              <label htmlFor="member-password" className="modal-section-title">Password</label>
               <input
                 id="member-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Enter password"
+                autoComplete='new-password'
                 required
               />
             </div>
-            <div className="form-actions">
+            <div className="modal-btn-container">
               <button 
                 type="button" 
-                className="cancel-btn"
+                className="modal-btn-cancel"
                 onClick={() => setShowAddForm(false)}
               >
                 Cancel
               </button>
               <button 
                 type="submit" 
-                className="submit-btn"
+                className="modal-btn-submit"
               >
                 Add Member
               </button>
@@ -158,7 +160,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
         ) : (
           user.role === 'BOSS' && (
             <button 
-              className="add-member-btn"
+              className="add-member-btn modal-btn"
               onClick={() => setShowAddForm(true)}
             >
               Add Team Member
