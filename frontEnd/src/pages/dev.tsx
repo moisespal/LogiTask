@@ -11,7 +11,7 @@ const Dev: React.FC = () => {
       await api.post("/api/worker/create/",  { username, password });
     };
 
-    const client_id = 11;
+    const client_id = 1;
     const getProperties = async () => {
       await api.get(`/api/client/${client_id}/properties/`,{});
     };
@@ -24,7 +24,17 @@ const Dev: React.FC = () => {
     const getPayment = async () =>{
       await api.get(`/api/daily/payments/`,{});
     };
-  
+
+    const updateClient = async () =>{
+      await api.patch(`/api/client/${client_id}/update/`,{
+        //firstName:'Joe2',
+        //lastName: 'momma',
+        phoneNumber: '911',
+       // email:'34@gmail.com'
+
+      });
+    };
+   
   return(
   <>
     <div>Dev</div>;
@@ -35,6 +45,8 @@ const Dev: React.FC = () => {
     <button onClick={getworkers}> TRY ME</button>
     <div>payments</div>
     <button onClick={getPayment}>me</button>
+    <div>update</div>
+    <button onClick={updateClient}>me</button>
     
   </>
   )

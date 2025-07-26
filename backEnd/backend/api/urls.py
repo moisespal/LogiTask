@@ -33,4 +33,5 @@ urlpatterns = [
     path('client/<int:client_id>/properties/', views.GetClientProperties.as_view(), name='get-client-properties'),
     path('user/workers/',views.getWorkers.as_view(), name='get-workers-list'),
     path('daily/payments/',views.getPayments.as_view(), name='get-todays-payments'),
+    path('client/<int:client_id>/update/',views.UpdateClient.as_view(), name='update-client-info'),
 ]
