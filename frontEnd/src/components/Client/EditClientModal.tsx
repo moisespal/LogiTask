@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { ClientDataID } from '../../types/interfaces';
+import api from '../../api';
 import '../../styles/components/EditClientModal.css';
-interface ClientData {
-    id: number;
-    firstName: string;
-    lastName: string;
-    phoneNumber: string;
-    email: string;
-}
 
 const EditClientModal: React.FC<{ 
-    client: ClientData; 
+    client: ClientDataID; 
     onClose: () => void; 
+    onClientUpdated: (updatedClient: ClientDataID) => void;
     isOpen: boolean 
-}> = ({ client, onClose, isOpen }) => {
+}> = ({ client, onClose, onClientUpdated, isOpen }) => {
     const [firstName, setFirstName] = useState(client.firstName);
     const [lastName, setLastName] = useState(client.lastName);
     const [phoneNumber, setPhoneNumber] = useState(client.phoneNumber);
@@ -28,9 +24,31 @@ const EditClientModal: React.FC<{
         );
     }, [firstName, lastName, phoneNumber, email, client]);
 
-    const handleSubmit = () => {
-        console.log('Submitting changes:', { firstName, lastName, phoneNumber, email });
-        onClose(); 
+    const handleSubmit = async(e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+            const response = await api.patch(`/api/client/${client.id}/update/`, {
+                firstName,
+                lastName,
+                phoneNumber,
+                email
+            })
+            if (response.status === 200) {
+                console.log('Client updated successfully');
+                const updatedClient = {
+                    ...client,
+                    firstName,
+                    lastName,
+                    phoneNumber,
+                    email
+                }
+                onClientUpdated(updatedClient);
+                onClose();
+            }
+        } catch (error) {
+            console.error('Error updating client:', error);
+        }
     };
 
     if (!isOpen) return null;

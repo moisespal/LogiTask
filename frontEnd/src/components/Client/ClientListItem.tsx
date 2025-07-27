@@ -10,9 +10,10 @@ interface ClientListItemProps {
     isFocused: boolean;
     onClick: (id: number) => void;
     renderStars: (count: number) => JSX.Element[];
+    onClientUpdated: (updatedClient: ClientDataID) => void;
 }
 
-const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onClick, renderStars }) => {
+const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onClick, renderStars, onClientUpdated }) => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false); 
 
@@ -45,11 +46,6 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onCl
         onClick(client.id);
         handleClientClick(); 
     };
-    
-    const getClientForModal = () => {
-        const { id, firstName, lastName, phoneNumber, email } = client;
-        return { id, firstName, lastName, phoneNumber, email };
-    }; 
     
     return (
         <>
@@ -97,8 +93,9 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onCl
             {showEditModal && (
                 <EditClientModal 
                     isOpen={showEditModal}
-                    client={getClientForModal()}
+                    client={client}
                     onClose={() => setShowEditModal(false)}
+                    onClientUpdated={onClientUpdated}
                 />
             )}
         </>

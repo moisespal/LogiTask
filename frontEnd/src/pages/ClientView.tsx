@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
 import { useLocation } from "react-router-dom";
+import { useQueryClient } from '@tanstack/react-query';
+import { updateClientInCaches } from '../utils/cacheUpdates';
 import { ClientDataID, clientViewJob, Payment } from "../types/interfaces";
 import "../styles/pages/ClientView.css";
 import { formatPhoneNumber, formatUTCtoLocal }  from "../utils/format";
@@ -10,9 +12,12 @@ import EditClientModal from "../components/Client/EditClientModal";
 
 const ClientView: React.FC = () => {
     const location = useLocation();
-    const { client } = location.state as {
+    const queryClient = useQueryClient();
+    const { client: initialClient} = location.state as {
         client: ClientDataID;
     };
+
+    const [client, setClient] = useState<ClientDataID>(initialClient);
 
     const [newBalance, setNewBalance] = useState<number>(0);
     const [allPayments, setTotalPayments] = useState<(Payment & { invoiced: boolean })[]>([]);
@@ -88,6 +93,11 @@ const ClientView: React.FC = () => {
             console.error('Error fetching jobs:', error);
         });
     }, [client.id]);
+
+    const handleClientUpdated = (updatedClient: ClientDataID) => {
+        setClient(updatedClient);
+        updateClientInCaches(queryClient, updatedClient);
+    }
 
     const getGradientFromBalance = (newBalance: number): [string, number] => {
 
@@ -275,6 +285,7 @@ const ClientView: React.FC = () => {
                 isOpen={showEditModal}
                 client={client}
                 onClose={() => setShowEditModal(false)}
+                onClientUpdated={handleClientUpdated}
             />
         </div>
     );

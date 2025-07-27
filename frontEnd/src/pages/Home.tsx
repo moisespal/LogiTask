@@ -8,6 +8,7 @@ import AddClientModal from '../components/Client/AddClientModal';
 import DailyReschedule from '../components/Daily/DailyReschedule';
 import DailyStatsModal from '../components/Daily/DailyStatsModal';
 import { ClientDataID, Job } from '../types/interfaces';
+import { updateClientInCaches } from '../utils/cacheUpdates';
 import api from "../api"
 import '../styles/pages/App.css';
 
@@ -63,6 +64,10 @@ const Home: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
+
+  const handleClientUpdated = (updatedClient: ClientDataID) => {
+    updateClientInCaches(queryClient, updatedClient);
+};
 
   // Handle job completion toggle
   const handleJobComplete = useCallback(async (jobId: number) => {
@@ -434,6 +439,7 @@ const Home: React.FC = () => {
                 isFocused={focusedItemId === client.id}
                 onClick={() => handleClientClick(client.id)}
                 renderStars={renderStars}
+                onClientUpdated={handleClientUpdated}
               />
               
               <ClientProperties 
