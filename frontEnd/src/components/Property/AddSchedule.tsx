@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../../styles/components/AddScheduleModal.css';
 import api from '../../api';
 import { ClientSchedule } from '../../types/interfaces';
@@ -27,27 +27,23 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
             nextDate: "",
             service: "",
             cost: 0.00
-        
     });
     const [jobList, setJobList] = useState<string[]>(["mow"]);
 
-    // Add keyboard event prevention for when modal is open
-    useEffect(() => {
-        if (!isOpen) return;
-        
-        const preventKeyboardEventPropagation = (e: KeyboardEvent) => {
-            // Prevent event propagation for any keyboard events when modal is open
-            e.stopPropagation();
-        };
+    const resetForm = () => {
+        setClientData({
+            frequency: "",
+            nextDate: "",
+            service: "",
+            cost: 0.00
+        });
+        onClose();
+    }
 
-        // Capture keyboard events in the capturing phase, before they bubble up
-        document.addEventListener('keydown', preventKeyboardEventPropagation, true);
-
-        return () => {
-            document.removeEventListener('keydown', preventKeyboardEventPropagation, true);
-        };
-    }, [isOpen]);
-
+    const isScheduleFormComplete = useMemo(() => {
+        return clientData.frequency && clientData.nextDate && clientData.service && clientData.cost >
+            0;
+    }, [clientData]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
             const { name, value } = e.target;
@@ -57,8 +53,6 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
             }));
         };
     
-  
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -73,17 +67,14 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
 
             if (propertyResponse.status === 201) {
                 // Reset form fields
-                alert('schedule created')
                 setClientData({
                         frequency: "",
                         nextDate: "",
                         service: "",
                         cost: 0.00
                         }
-                    
                 );
                 
-                // Close modal first
                 onClose(propertyResponse.data);
                 
             } else {
@@ -120,9 +111,9 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" onClick={() => onClose()}>
-            <div className="schedule-container modal-container" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close-btn" onClick={() => onClose()}>
+        <div className="modal-overlay">
+            <div className="schedule-container modal-container">
+                <button className="modal-close-btn" onClick={resetForm}>
                     <i className="fas fa-times"></i>
                 </button>
                 
@@ -157,7 +148,6 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
                                         name="cost"
                                         min="1"
                                         step="0.01"
-                                        value={clientData.cost}
                                         onChange={(e) => handleInputChange(e)}
                                         required
                                     />
@@ -168,12 +158,14 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
                         <div className="form-row">
                             <div className="form-group">
                                 <input 
-                                    type="date" 
-                                    placeholder="Start Date"
+                                    placeholder='Start Date'
+                                    className='date-input' 
+                                    type="text"
+                                    onFocus={(e) => e.target.type = 'date'}
+                                    onBlur={(e) => e.target.type = 'text'}
                                     name="nextDate"
                                     value={clientData.nextDate}
                                     onChange={(e) => handleInputChange(e)}
-                                    className='date-input'
                                     required
                                 />
                             </div>
@@ -197,10 +189,10 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
                     </div>
                     
                     <div className="modal-btn-container">
-                        <button type="button" className="modal-btn-cancel" onClick={() => onClose()}>
+                        <button type="button" className="modal-btn-cancel" onClick={resetForm}>
                             Cancel
                         </button>
-                        <button type="submit" className="modal-btn-submit">
+                        <button type="submit" disabled={!isScheduleFormComplete} className="modal-btn-submit">
                             Add Schedule
                         </button>
                     </div>

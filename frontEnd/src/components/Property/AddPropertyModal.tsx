@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../../styles/components/AddPropertyModal.css';
 import api from '../../api';
 import { Property_list,Schedule } from '../../types/interfaces';
@@ -38,7 +38,6 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
         
         getJobsNames();
         const preventKeyboardEventPropagation = (e: KeyboardEvent) => {
-            // Prevent event propagation for any keyboard events when modal is open
             e.stopPropagation();
         };
 
@@ -50,6 +49,29 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
         };
     }, [isOpen]);
 
+    const resetForm = () => {
+        setClientData({
+            street: "",
+            city: "",
+            state: "",
+            zipCode: "",
+            schedules: [
+                {
+                    frequency: "",
+                    nextDate: "",
+                    service: "",
+                    cost: 0.00
+                }
+            ]
+        });
+        onClose();
+    }
+
+    const isScheduleFormComplete = useMemo(() => {
+        return clientData.street && clientData.city && clientData.state && clientData.zipCode &&
+            clientData.schedules.every(schedule => 
+                schedule.frequency && schedule.nextDate && schedule.service && schedule.cost > 0);
+    }, [clientData]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -137,9 +159,9 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="property-container modal-container" onClick={(e) => e.stopPropagation()}>
-                <button className="modal-close-btn" onClick={onClose}>
+        <div className="modal-overlay">
+            <div className="property-container modal-container">
+                <button className="modal-close-btn" onClick={resetForm}>
                     <i className="fas fa-times"></i>
                 </button>
                 
@@ -233,13 +255,15 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                             
                             <div className="form-row">
                                 <div className="form-group">
-                                    <input 
-                                        type="date" 
-                                        placeholder="Start Date"
+                                    <input
+                                        placeholder='Start Date'
+                                        className='date-input' 
+                                        type="text"
+                                        onFocus={(e) => e.target.type = 'date'}
+                                        onBlur={(e) => e.target.type = 'text'}
                                         value={prop.nextDate}
                                         name='nextDate'
                                         onChange={(e) => handlePropertyChange(index, "nextDate", e.target.value)}
-                                        className='date-input'
                                         required
                                     />
                                 </div>
@@ -264,10 +288,10 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                     ))}
                     
                     <div className="modal-btn-container">
-                        <button type="button" className="modal-btn-cancel" onClick={onClose}>
+                        <button type="button" className="modal-btn-cancel" onClick={resetForm}>
                             Cancel
                         </button>
-                        <button type="submit" className="modal-btn-submit">
+                        <button type="submit" disabled={!isScheduleFormComplete} className="modal-btn-submit">
                             Add Property
                         </button>
                     </div>

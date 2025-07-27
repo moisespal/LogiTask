@@ -81,14 +81,18 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     onClose();
     setPaymentMethod('');
     setPaymentAmount(job ? job.cost.toString() : '');
-  }
+  };
+
+  const handleClearAmount = () => {
+    setPaymentAmount('');
+  };
 
   const handleDisabledSubmit = () => {
     if (!paymentMethod || paymentAmount === '') {
       return true; 
     }
     return false; 
-  }
+  };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -163,6 +167,20 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                     onClick={(e) => e.stopPropagation()}
                     placeholder="0.00"
                   />
+                  {paymentAmount && (
+                    <button
+                      type="button"
+                      className="clear-amount-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleClearAmount();
+                      }}
+                      aria-label="Clear amount"
+                      title="Clear amount"
+                    >
+                      <i className="fa-regular fa-trash-can"></i>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

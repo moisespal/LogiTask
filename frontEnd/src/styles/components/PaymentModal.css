@@ -122,3 +122,14 @@
 .payment-method-pill i.fa-money-bill-transfer {
   color: #8c4be1
 }
+
+.clear-amount-btn {
+  position: absolute;
+  left: -27px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: #999;
+  transition: all 0.2s ease;
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../../styles/components/AddClientModal.css';
 import api from '../../api';
 import { ClientData, Property_list, Schedule } from '../../types/interfaces';
@@ -123,10 +123,45 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
     }
   };
 
-   const getJobsNames = async () =>{
-    
+  const resetForm = () => {
+    setClientData({
+      firstName: "",
+      lastName: "",
+      phoneNumber: "",
+      email: "",
+      properties: [
+        {
+          street: "",
+          city: "",
+          state: "TX",
+          zipCode: "",
+          schedules: [
+            {
+              frequency: "",
+              nextDate: "",
+              service: "",
+              cost: 0.00,
+            },
+          ],
+        },
+      ],
+    });
+    setFile(null);
+    setMode('select');
+  };
+
+  const handleCancel = () => {
+      resetForm();
+  };
+
+  const handleClose = () => {
+      resetForm(); 
+      onClose();
+  };
+
+   
+  const getJobsNames = async () =>{ // TODO use react query for this to avoid multiple calls when just opening modal, it should be called once and then cached for reuse, since its just a list of jobs the user has made before.
     try {
-      // First, create the client
       const jobList = await api.get("/api/job-names/", {
         headers: {
           'Content-Type': 'application/json'
@@ -142,17 +177,11 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  
-  
-  
-  
-
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       setFile(event.target.files[0]); // Store the selected file
       console.log("Selected file:", event.target.files[0].name);
-  }
-    
+    }
   };
 
   const uploadFile = async () => {
@@ -163,7 +192,6 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
 
     const formData = new FormData();
     formData.append("file", file);
-
     setUploading(true); // Set uploading state
 
     try {
@@ -188,6 +216,29 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
     }
 };
 
+const isClientFormComplete = useMemo(() => {
+
+    if (!clientData.firstName.trim() || !clientData.phoneNumber.trim()) {
+      return false;
+    }
+
+    return clientData.properties.every(property => {
+      const hasPropertyFields = 
+        property.street.trim() &&
+        property.city.trim() &&
+        property.state.trim() &&
+        property.zipCode.trim();
+
+      const hasScheduleFields = property.schedules.every(schedule =>
+        schedule.service.trim() &&
+        schedule.frequency.trim() &&
+        schedule.nextDate.trim() &&
+        schedule.cost > 0
+      );
+
+      return hasPropertyFields && hasScheduleFields;
+    });
+  }, [clientData]);
 
   const renderModeSelection = () => (
     <div className="mode-selection">
@@ -229,11 +280,10 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
             <div className="form-group">
               <input
                 type="text"
-                placeholder="Last Name"
+                placeholder="Last Name (optional)"
                 value={clientData.lastName}
                 onChange={handleInputChange}
                 name='lastName'
-                required
               />
             </div>
           </div>
@@ -241,7 +291,7 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
             <div className="form-group">
               <input
                 type="tel"
-                placeholder="Phone"
+                placeholder="Phone Number"
                 value={clientData.phoneNumber}
                 onChange={handleInputChange}
                 name='phoneNumber'
@@ -251,11 +301,10 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
             <div className="form-group">
               <input
                 type="email"
-                placeholder="Email"
+                placeholder="Email (optional)"
                 value={clientData.email}
                 onChange={handleInputChange}
                 name='email'
-                required
               />
             </div>
           </div>
@@ -349,12 +398,13 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
               <div className="form-row">
                 <div className="form-group">
                   <input 
-                    type="date" 
-                    placeholder="Start Date"
-                    value={prop.schedules[0].nextDate}
+                    placeholder='Start Date'
+                    className='date-input' 
+                    type="text"
+                    onFocus={(e) => e.target.type = 'date'}
+                    onBlur={(e) => e.target.type = 'text'}
                     name='nextDate'
                     onChange={(e)=> updateSchedule(index,0,"nextDate",e.target.value)}
-                    className='date-input'
                     required
                   />
                 </div>
@@ -376,10 +426,10 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
           </React.Fragment>
         ))}
         <div className="modal-btn-container">
-          <button type="button" className="modal-btn-cancel" onClick={() => setMode('select')}>
+          <button type="button" className="modal-btn-cancel" onClick={handleCancel}>
              Cancel
           </button>
-          <button type="submit" className="modal-btn-submit">
+          <button type="submit" disabled={!isClientFormComplete} className="modal-btn-submit">
              Add Client
           </button>
         </div>
@@ -406,8 +456,8 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
       {file && <p>Selected: {file.name}</p>}
       <div className="modal-btn-container">
 
-          <button type="button" className="modal-btn-cancel" onClick={() => setMode('select')}>
-            Back
+          <button type="button" className="modal-btn-cancel" onClick={handleCancel}>
+            Cancel
           </button>
 
           <button 
@@ -425,9 +475,9 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay">
       <div className="modal-container client-container" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose}>
+        <button className="modal-close-btn" onClick={handleClose}>
           <i className="fas fa-times"></i>
         </button>
         {mode === 'select' && renderModeSelection()}

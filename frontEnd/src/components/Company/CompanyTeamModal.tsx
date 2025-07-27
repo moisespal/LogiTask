@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../../styles/components/TeamModal.css';
 import api from '../../api';
 import { useUser } from '../../contexts/userContext';
@@ -30,6 +30,20 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
       document.body.style.overflow = 'auto';
     };
   }, [isOpen]);
+
+  useEffect(() => {
+      if (!isOpen) return;
+      
+      const preventKeyboardEventPropagation = (e: KeyboardEvent) => {
+          e.stopPropagation();
+      };
+  
+      document.addEventListener('keydown', preventKeyboardEventPropagation, true);
+  
+      return () => {
+          document.removeEventListener('keydown', preventKeyboardEventPropagation, true);
+      };
+    }, [isOpen]);
 
 
   useEffect(() => {
@@ -75,12 +89,23 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
     setShowAddForm(false);
   };
 
-  const handleCancel = () => {
-    setShowAddForm(false);
+  const clearForm = () => {
     setNewEmail('');
     setNewPassword('');
+  }
+  const handleClose = () => {
+    clearForm();
     onClose();
   };
+
+  const handleCancel = () => {
+    setShowAddForm(false)
+    clearForm();
+  };
+
+  const isTeamModalFormComplete = useMemo(() => {
+    return newEmail.trim() !== '' && newPassword.trim() !== '';
+      }, [newEmail, newPassword]);
 
   if (!isOpen) return null;
 
@@ -90,7 +115,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
         <button 
           type="button"
           className="modal-close-btn" 
-          onClick={handleCancel}
+          onClick={handleClose}
           aria-label="Close"
         >
           <i className="fas fa-xmark"></i>
@@ -145,12 +170,13 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
               <button 
                 type="button" 
                 className="modal-btn-cancel"
-                onClick={() => setShowAddForm(false)}
+                onClick={handleCancel}
               >
                 Cancel
               </button>
               <button 
-                type="submit" 
+                type="submit"
+                disabled={!isTeamModalFormComplete} 
                 className="modal-btn-submit"
               >
                 Add Member
