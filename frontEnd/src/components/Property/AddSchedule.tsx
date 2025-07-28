@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import '../../styles/components/AddScheduleModal.css';
 import api from '../../api';
 import { ClientSchedule } from '../../types/interfaces';
+import { validateCurrencyInput } from '../../utils/format';
 
 interface AddPropertyModalProps {
     isOpen: boolean;
@@ -52,6 +53,17 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
               [name]: value,
             }));
         };
+    
+    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        const currentCost = clientData.cost.toString();
+        const validValue = validateCurrencyInput(newValue, currentCost);
+        
+        setClientData((prevData) => ({
+            ...prevData,
+            cost: parseFloat(validValue) || 0
+        }));
+    };
     
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -148,7 +160,8 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
                                         name="cost"
                                         min="1"
                                         step="0.01"
-                                        onChange={(e) => handleInputChange(e)}
+                                        value={clientData.cost === 0 ? '' : clientData.cost.toString()}
+                                        onChange={handleAmountChange}
                                         required
                                     />
                                 </div>

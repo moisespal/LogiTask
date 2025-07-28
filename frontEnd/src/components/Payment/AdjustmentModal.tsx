@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from "react";
 import { ClientDataID } from "../../types/interfaces";
 import "../../styles/components/AdjustmentModal.css";
 import api from "../../api";
+import { validateCurrencyInput } from '../../utils/format';
 
 interface AdjustmentModalProps {
     isOpen: boolean;
@@ -43,6 +44,12 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
         }
         onClose();
   };
+
+    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        const validValue = validateCurrencyInput(newValue, value);
+        setValue(validValue);
+    };
 
 
     const handleAdjustmentMethodSelect = (method: string) => {
@@ -123,7 +130,7 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
                                     name="payment-amount"
                                     type="number"
                                     value={value}
-                                    onChange={(e) => setValue(e.target.value)}
+                                    onChange={handleAmountChange}
                                     min="1"
                                     step="0.01"
                                     onClick={(e) => e.stopPropagation()}

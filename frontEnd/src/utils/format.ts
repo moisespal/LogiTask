@@ -102,3 +102,32 @@ export const formatCapitalized = (str: string): string => {
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
 }
+
+export const normalizeInput = (value: string, previousValue: string = '') => {
+  if (!value) return '';
+  
+  const currentValue = value.replace(/[^\d]/g, '');
+  const cvLength = currentValue.length;
+  
+  if (previousValue && value.length < previousValue.length) {
+    if (cvLength < 4) return currentValue;
+    if (cvLength < 7) return `(${currentValue.slice(0, 3)}) ${currentValue.slice(3)}`;
+    return `(${currentValue.slice(0, 3)}) ${currentValue.slice(3, 6)}-${currentValue.slice(6, 10)}`;
+  }
+  
+  if (cvLength < 4) return currentValue;
+  if (cvLength < 7) return `(${currentValue.slice(0, 3)}) ${currentValue.slice(3)}`;
+  return `(${currentValue.slice(0, 3)}) ${currentValue.slice(3, 6)}-${currentValue.slice(6, 10)}`;
+};
+
+export const getPhoneDigits = (phoneNumber: string): string => {
+  return phoneNumber.replace(/[^\d]/g, '');
+};
+
+export const validateCurrencyInput = (newValue: string, currentValue: string): string => {
+  if (newValue === '' || /^\d*\.?\d{0,2}$/.test(newValue)) {
+    return newValue;
+  }
+  // Return current value if new value is invalid
+  return currentValue;
+};

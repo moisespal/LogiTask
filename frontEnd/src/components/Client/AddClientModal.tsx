@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import '../../styles/components/AddClientModal.css';
 import api from '../../api';
 import { ClientData, Property_list, Schedule } from '../../types/interfaces';
-
+import { normalizeInput, getPhoneDigits, validateCurrencyInput } from '../../utils/format';
 
 interface AddClientModelProps {
   isOpen: boolean;
@@ -63,6 +63,18 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
     }));
   };
 
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const previousValue = clientData.phoneNumber;
+
+    const formattedValue = normalizeInput(value, previousValue);
+
+    setClientData((prevData) => ({
+      ...prevData,
+      phoneNumber: formattedValue,
+    }));
+  };
+
   const handlePropertyChange = (index: number, field: keyof Property_list, value: string) => {
     setClientData((prev) => {
       const updatedProperties = [...prev.properties];
@@ -76,7 +88,15 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
       };
     });
   };
-  
+
+  const handleAmountChange = (propertyIndex: number, scheduleIndex: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    const currentCost = clientData.properties[propertyIndex].schedules[scheduleIndex].cost.toString();
+    const validValue = validateCurrencyInput(newValue, currentCost);
+    
+    updateSchedule(propertyIndex, scheduleIndex, "cost", parseFloat(validValue) || 0);
+  };
+
   const updateSchedule = (propertyIndex: number, scheduleIndex: number, field: keyof Schedule, value: string | number) => {
     setClientData((prev) => {
       const updatedProperties = [...prev.properties];
@@ -104,9 +124,15 @@ const AddClientModal: React.FC<AddClientModelProps> = ({ isOpen, onClose }) => {
   const handleSubmit = async (e:React.FormEvent) =>{
     e.preventDefault();
     try {
-      // First, create the client
-      console.log(JSON.stringify(clientData));
-      const clientResponse = await api.post("/api/clientPropertySetUp/", clientData, {
+
+      const cleanedData = {
+        ...clientData,
+        phoneNumber: getPhoneDigits(clientData.phoneNumber),
+        email: clientData.email.trim() === '' ? null : clientData.email,
+        lastName: clientData.lastName.trim() === '' ? null : clientData.lastName
+      };
+
+      const clientResponse = await api.post("/api/clientPropertySetUp/", cleanedData, {
         headers: {
           'Content-Type': 'application/json'
         }
@@ -293,8 +319,9 @@ const isClientFormComplete = useMemo(() => {
                 type="tel"
                 placeholder="Phone Number"
                 value={clientData.phoneNumber}
-                onChange={handleInputChange}
+                onChange={handlePhoneChange}
                 name='phoneNumber'
+                maxLength={14}
                 required
               />
             </div>
@@ -389,7 +416,8 @@ const isClientFormComplete = useMemo(() => {
                       name='cost'
                       min='1'
                       step='0.01'
-                      onChange={(e) => updateSchedule(index,0,"cost", parseFloat(e.target.value))}
+                      value={prop.schedules[0].cost > 0 ? prop.schedules[0].cost.toString() : ''}
+                      onChange={handleAmountChange(index, 0)}
                       required
                     />
                   </div>
@@ -439,7 +467,7 @@ const isClientFormComplete = useMemo(() => {
 
   const renderMultipleClientsUpload = () => (
     <>
-      <h2>Add Multiple Clients</h2>
+      <h3>Add Multiple Clients</h3>
       <div className="file-upload-container">
         <input
           type="file"

@@ -3,6 +3,7 @@ import '../../styles/components/AddPropertyModal.css';
 import api from '../../api';
 import { Property_list,Schedule } from '../../types/interfaces';
 import { useQueryClient } from '@tanstack/react-query';
+import { validateCurrencyInput } from '../../utils/format';
 
 interface AddPropertyModalProps {
     isOpen: boolean;
@@ -93,6 +94,14 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
         schedules: updatedProperties,
         };
       });
+    };
+
+    const handleAmountChange = (index: number, field: keyof Schedule) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        const currentCost = clientData.schedules[index].cost.toString();
+        const validValue = validateCurrencyInput(newValue, currentCost);
+        
+        handlePropertyChange(index, field, parseFloat(validValue) || 0);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -246,7 +255,8 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                             placeholder="Cost" 
                                             name='cost'
                                             step="1.00"
-                                            onChange={(e) => handlePropertyChange(index, "cost", parseFloat(e.target.value))}
+                                            value = {prop.cost > 0 ? prop.cost.toString() : ''}
+                                            onChange={(handleAmountChange(index, "cost"))}
                                             required
                                         />
                                     </div>
