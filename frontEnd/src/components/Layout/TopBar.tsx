@@ -77,7 +77,11 @@ const TopBar: React.FC<TopBarProps> = ({
               </div>
               <div className="client-item">
                 <i className="fa-solid fa-envelope"></i>
-                <span>{selectedClient.email}</span>
+                  {selectedClient.email ? (
+                    <span>{selectedClient.email}</span>
+                   ) : ( 
+                    <span className="noEmail">No email provided</span>
+                   )} 
               </div>
           </div>
         ) : mode === 'Daily' && selectedJob && focusedItemId !== null ? (
