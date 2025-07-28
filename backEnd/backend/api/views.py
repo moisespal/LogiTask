@@ -507,3 +507,15 @@ class UpdateClient(UpdateAPIView):
     serializer_class = OnlyClientSerializer
     queryset = Client.objects.all()
     lookup_url_kwarg = 'client_id'
+
+    def partial_update(self, request, *args, **kwargs):
+        data = request.data.copy()
+
+        nullable_fields = ['email', 'lastName']
+
+        for field in nullable_fields:
+            if field in data and data[field].strip() == "":
+                data[field] = None
+        
+        request._full_data = data
+        return super().partial_update(request, *args, **kwargs)
