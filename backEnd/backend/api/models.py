@@ -45,9 +45,9 @@ class userProfile(models.Model):
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='BOSS')
 class Client(models.Model):
     firstName = models.CharField(max_length=100)
-    lastName = models.CharField(max_length=100)
+    lastName = models.CharField(max_length=100, null=True, blank=True)
     phoneNumber = models.CharField(max_length=15)
-    email = models.EmailField(max_length=254, unique=True)
+    email = models.EmailField(max_length=254, unique=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     author  = models.ForeignKey(User, on_delete=models.CASCADE, related_name="clients")
     company = models.ForeignKey(Company,on_delete=models.CASCADE)

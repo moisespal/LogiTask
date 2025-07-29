@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from "react";
 import { ClientDataID } from "../../types/interfaces";
 import "../../styles/components/AdjustmentModal.css";
 import api from "../../api";
+import { validateCurrencyInput } from '../../utils/format';
 
 interface AdjustmentModalProps {
     isOpen: boolean;
@@ -44,6 +45,12 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
         onClose();
   };
 
+    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        const validValue = validateCurrencyInput(newValue, value);
+        setValue(validValue);
+    };
+
 
     const handleAdjustmentMethodSelect = (method: string) => {
         setAdjustmentMethod(method);
@@ -72,19 +79,20 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
             return true; 
         }
             return false; 
-  }
+    }
+
     if (!isOpen) {
         return null; 
     }
 
     return (
-        <div className="payment-modal-overlay">
+        <div className="modal-overlay">
             <div 
-                className="payment-modal-container" 
+                className="modal-container" 
             >
                 <button 
                     type="button"
-                    className="close-modal-btn" 
+                    className="modal-close-btn" 
                     onClick={(e) => {
                         e.stopPropagation();
                         onClose();
@@ -99,8 +107,8 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
 
                 <h3>Adjust Balance</h3>
                 <form onSubmit={handleSubmit}>
-                    <div className="payment-form-section">
-                        <div className="payment-section-title">
+                    <div className="modal-form-section">
+                        <div className="modal-section-title">
                             {'Client Information'}
                         </div>
                         <div className="payment-client-info">
@@ -112,106 +120,109 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
                     </div>
 
 
-                    <div className="payment-form-section">
-                        <label htmlFor="payment-amount" className="payment-section-title">Adjustment {adjustmentMethod}</label>
+                    <div className="modal-form-section">
+                        <label htmlFor="payment-amount" className="modal-section-title">Adjustment {adjustmentMethod}</label>
                         <div className="payment-amount-container">
                             <div className="payment-amount-input-container">
-                  <span className="dollar-sign">$</span>
-                  <input
-                    id="payment-amount"
-                    name="payment-amount"
-                    type="number"
-                    value={value}
-                    onChange={(e) => setValue(e.target.value)}
-                    min="0"
-                    step="0.01"
-                    required
-                    onClick={(e) => e.stopPropagation()}
-                    placeholder="Amount"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="payment-form-section">
-                <div className="payment-section-title">Adjustment Method</div>
-                    <div className="payment-method-options" role="radiogroup">
-                        <button
-                            type="button"
-                            className={`payment-method-pill ${adjustmentMethod === 'credit' ? 'active' : ''}`}
-                            onClick={(e) => {
-                            e.stopPropagation();
-                                handleAdjustmentMethodSelect('credit');
-                            }}
-                                aria-pressed={adjustmentMethod === 'credit'}
-                        >
-                            <i className="fa-solid fa-arrow-up"></i> <span>Credit</span>
-                        </button>
+                                <span className="dollar-sign">$</span>
+                                <input
+                                    id="payment-amount"
+                                    name="payment-amount"
+                                    type="number"
+                                    value={value}
+                                    onChange={handleAmountChange}
+                                    min="1"
+                                    step="0.01"
+                                    onClick={(e) => e.stopPropagation()}
+                                    placeholder="Amount"
+                                    required
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="modal-form-section">
+                        <div className="modal-section-title">Adjustment Method</div>
+                            <div className="payment-method-options" role="radiogroup">
+                                <button
+                                    type="button"
+                                    className={`payment-method-pill ${adjustmentMethod === 'credit' ? 'active' : ''}`}
+                                    onClick={(e) => {
+                                    e.stopPropagation();
+                                        handleAdjustmentMethodSelect('credit');
+                                    }}
+                                        aria-pressed={adjustmentMethod === 'credit'}
+                                >
+                                    <i className="fa-solid fa-arrow-up"></i> <span>Credit</span>
+                                </button>
 
-                        <button
-                            type="button"
-                            className={`payment-method-pill ${adjustmentMethod === 'debit' ? 'active' : ''}`}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleAdjustmentMethodSelect('debit');
+                                <button
+                                    type="button"
+                                    className={`payment-method-pill ${adjustmentMethod === 'debit' ? 'active' : ''}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAdjustmentMethodSelect('debit');
+                                    }}
+                                    aria-pressed={adjustmentMethod === 'debit'}
+                                >
+                                    <i className="fa-solid fa-arrow-down"></i> <span>Debit</span>
+                                </button>
+                            </div>
+
+                            <input 
+                                type="hidden" 
+                                name="payment-method" 
+                                value={adjustmentMethod} 
+                                required
+                            />
+                    </div>
+                    <div className="adjustment-form-section">
+                        <label htmlFor="adjustment-notes" className="modal-section-title">Notes
+                        </label>
+                        <span className="optional-text">(optional)</span>
+                        <textarea
+                            id="adjustment-notes"
+                            name="adjustment-notes"
+                            rows={1}
+                            placeholder="Add reason here..."
+                            value={notes}
+                            onChange={(e) => {
+                                setNotes(e.target.value);
+                                setTimeout(() => autoResizeTextarea(), 0);
                             }}
-                            aria-pressed={adjustmentMethod === 'debit'}
-                        >
-                            <i className="fa-solid fa-arrow-down"></i> <span>Debit</span>
-                        </button>
+                            className="adjustment-notes"
+                            ref={notesTextareaRef}
+                        ></textarea>
                     </div>
 
-                    <input 
-                        type="hidden" 
-                        name="payment-method" 
-                        value={adjustmentMethod} 
-                        required
-                    />
-            </div>
-            <div className="payment-form-section">
-                <label htmlFor="payment-notes" className="payment-section-title">Notes</label>
-                <textarea
-                    id="payment-notes"
-                    name="payment-notes"
-                    rows={1}
-                    placeholder="Add reason here..."
-                    value={notes}
-                    onChange={(e) => {
-                        setNotes(e.target.value);
-                        setTimeout(() => autoResizeTextarea(), 0);
-                    }}
-                    ref={notesTextareaRef}
-                ></textarea>
-            </div>
+                    <div className="modal-btn-container">
+                        <button 
+                            type="button"
+                            className="modal-btn-cancel" 
+                            onClick={(e) => {
+                                setAdjustmentMethod('');
+                                setValue('');
+                                setNotes('');
+                                onClose();
+                                e.stopPropagation();
+                            }}
+                        >
+                            Cancel
+                        </button>
 
-            <div className="payment-form-actions">
-              <button 
-                type="button"
-                className="property-btn-secondary" 
-                onClick={(e) => {
-                    setAdjustmentMethod('');
-                    setValue('');
-                    setNotes('');
-                    onClose();
-                    e.stopPropagation();
-                }}
-              >
-                Cancel
-              </button>
-
-              <button 
-                type="submit"
-                className="record-payment-btn" 
-                disabled={handleDisabledSubmit()}
-                onClick={(e) => e.stopPropagation()}
-              >
-                 Adjust
-              </button>
-              
+                        <button 
+                            type="submit"
+                            className="modal-btn-submit" 
+                            disabled={handleDisabledSubmit()}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            Adjust
+                        </button>
+                    
+                    </div>
+                </form>
             </div>
-        </form>
         </div>
-    </div>
     );
 };
 

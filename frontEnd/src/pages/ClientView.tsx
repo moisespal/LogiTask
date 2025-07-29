@@ -1,23 +1,30 @@
 import React, { useEffect, useState } from "react";
 import api from "../api";
 import { useLocation } from "react-router-dom";
+import { useQueryClient } from '@tanstack/react-query';
+import { updateClientInCaches } from '../utils/cacheUpdates';
 import { ClientDataID, clientViewJob, Payment } from "../types/interfaces";
 import "../styles/pages/ClientView.css";
 import { formatPhoneNumber, formatUTCtoLocal }  from "../utils/format";
 import PaymentModal from '../components/Payment/PaymentModal';
 import AdjustmentModal from '../components/Payment/AdjustmentModal';
+import EditClientModal from "../components/Client/EditClientModal";
 
 const ClientView: React.FC = () => {
     const location = useLocation();
-    const { client } = location.state as {
+    const queryClient = useQueryClient();
+    const { client: initialClient} = location.state as {
         client: ClientDataID;
     };
+
+    const [client, setClient] = useState<ClientDataID>(initialClient);
 
     const [newBalance, setNewBalance] = useState<number>(0);
     const [allPayments, setTotalPayments] = useState<(Payment & { invoiced: boolean })[]>([]);
     const [allPaymentsTotal, setAllPaymentsTotal] = useState<number>(0);
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [allJobsCompleted, setAllJobsCompleted] = useState<(clientViewJob & { invoiced: boolean })[]>([]);
     const [allJobsTotal, setAllJobsTotal] = useState<number>(0);
 
@@ -87,6 +94,11 @@ const ClientView: React.FC = () => {
         });
     }, [client.id]);
 
+    const handleClientUpdated = (updatedClient: ClientDataID) => {
+        setClient(updatedClient);
+        updateClientInCaches(queryClient, updatedClient);
+    }
+
     const getGradientFromBalance = (newBalance: number): [string, number] => {
 
         if (newBalance >= 0 || allJobsTotal === 0) {
@@ -108,6 +120,11 @@ const ClientView: React.FC = () => {
 
     const gradientAndPercentage = getGradientFromBalance(newBalance);
 
+    const handleEditClick = (e: React.MouseEvent) => {
+            e.stopPropagation();
+            setShowEditModal(true);
+    };
+
 
     return (
         <div className="client-view-container">
@@ -120,22 +137,28 @@ const ClientView: React.FC = () => {
             <div className="client-header-section">
                 {/* Client Info Card */}
                 <div className="client-info-card">
-                    <div className="client-avatar">
-                        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="Client avatar" />
-                    </div>
-                    <div className="client-details">
-                        <h2 className="client-name">{client.firstName} {client.lastName}</h2>
-                        <div className="client-contact">
-                            <div className="contact-item">
-                                <i className="fa-solid fa-phone"></i>
-                                <span>{formatPhoneNumber(client.phoneNumber)}</span>
-                            </div>
-                            <div className="contact-item">
-                                <i className="fa-solid fa-envelope"></i>
-                                <span>{client.email}</span>
+                    <div className="client-avatar-and-details">
+                        <div className="client-avatar">
+                            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="Client avatar" />
+                        </div>
+                    
+                        <div className="client-details">
+                            <h2 className="client-name">{client.firstName} {client.lastName}</h2>
+                            <div className="client-contact">
+                                <div className="contact-item">
+                                    <i className="fa-solid fa-phone"></i>
+                                    <span>{formatPhoneNumber(client.phoneNumber)}</span>
+                                </div>
+                                <div className="contact-item">
+                                    <i className="fa-solid fa-envelope"></i>
+                                    <span>{client.email}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <button className="client-settings-button gear-button" onClick={handleEditClick} title="Edit Client Information">
+                        <i className="fas fa-cog"></i>
+                    </button>
                 </div>
                 
                 {/* Balance Card */}
@@ -257,6 +280,12 @@ const ClientView: React.FC = () => {
                 isOpen={showAdjustmentModal}
                 client={client}
                 onClose={() => setShowAdjustmentModal(false)}
+            />
+            <EditClientModal 
+                isOpen={showEditModal}
+                client={client}
+                onClose={() => setShowEditModal(false)}
+                onClientUpdated={handleClientUpdated}
             />
         </div>
     );

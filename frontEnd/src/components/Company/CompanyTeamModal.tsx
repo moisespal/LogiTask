@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../../styles/components/TeamModal.css';
 import api from '../../api';
 import { useUser } from '../../contexts/userContext';
@@ -30,6 +30,20 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
       document.body.style.overflow = 'auto';
     };
   }, [isOpen]);
+
+  useEffect(() => {
+      if (!isOpen) return;
+      
+      const preventKeyboardEventPropagation = (e: KeyboardEvent) => {
+          e.stopPropagation();
+      };
+  
+      document.addEventListener('keydown', preventKeyboardEventPropagation, true);
+  
+      return () => {
+          document.removeEventListener('keydown', preventKeyboardEventPropagation, true);
+      };
+    }, [isOpen]);
 
 
   useEffect(() => {
@@ -75,22 +89,33 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
     setShowAddForm(false);
   };
 
-  const handleCancel = () => {
-    setShowAddForm(false);
+  const clearForm = () => {
     setNewEmail('');
     setNewPassword('');
+  }
+  const handleClose = () => {
+    clearForm();
     onClose();
   };
+
+  const handleCancel = () => {
+    setShowAddForm(false)
+    clearForm();
+  };
+
+  const isTeamModalFormComplete = useMemo(() => {
+    return newEmail.trim() !== '' && newPassword.trim() !== '';
+      }, [newEmail, newPassword]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="team-modal-overlay">
-      <div className="team-modal-container">
+    <div className="modal-overlay">
+      <div className="modal-container team-modal-container">
         <button 
           type="button"
-          className="close-modal-btn" 
-          onClick={handleCancel}
+          className="modal-close-btn" 
+          onClick={handleClose}
           aria-label="Close"
         >
           <i className="fas fa-xmark"></i>
@@ -115,41 +140,44 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
 
         {/* Add Member Form */}
         {showAddForm ? (
-          <form onSubmit={handleAddMember} className="add-member-form">
-            <h4>Add New Team Member</h4>
+          <form onSubmit={handleAddMember} className="modal-container new-member-form">
+            <h3>Add New Team Member</h3>
             <div className="form-group">
-              <label htmlFor="member-email">Email</label>
+              <label htmlFor="member-email" className="modal-section-title">Email</label>
               <input
                 id="member-email"
                 type="email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
                 placeholder="Enter email"
+                autoComplete='username'
                 required
               />
             </div>
             <div className="form-group">
-              <label htmlFor="member-password">Password</label>
+              <label htmlFor="member-password" className="modal-section-title">Password</label>
               <input
                 id="member-password"
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Enter password"
+                autoComplete='new-password'
                 required
               />
             </div>
-            <div className="form-actions">
+            <div className="modal-btn-container">
               <button 
                 type="button" 
-                className="cancel-btn"
-                onClick={() => setShowAddForm(false)}
+                className="modal-btn-cancel"
+                onClick={handleCancel}
               >
                 Cancel
               </button>
               <button 
-                type="submit" 
-                className="submit-btn"
+                type="submit"
+                disabled={!isTeamModalFormComplete} 
+                className="modal-btn-submit"
               >
                 Add Member
               </button>
@@ -158,7 +186,7 @@ const TeamModal: React.FC<TeamModalProps> = ({ isOpen, onClose }) => {
         ) : (
           user.role === 'BOSS' && (
             <button 
-              className="add-member-btn"
+              className="add-member-btn modal-btn"
               onClick={() => setShowAddForm(true)}
             >
               Add Team Member

@@ -3,20 +3,28 @@ import { ClientDataID } from '../../types/interfaces';
 import PaymentModal from '../Payment/PaymentModal';
 import { useNavigate } from "react-router-dom";
 import '../../styles/components/ClientListItem.css';
+import EditClientModal from './EditClientModal';
 
 interface ClientListItemProps {
     client: ClientDataID;
     isFocused: boolean;
     onClick: (id: number) => void;
     renderStars: (count: number) => JSX.Element[];
+    onClientUpdated: (updatedClient: ClientDataID) => void;
 }
 
-const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onClick, renderStars }) => {
+const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onClick, renderStars, onClientUpdated }) => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false); 
 
     const handlePayClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         setShowPaymentModal(true);
+    };
+
+    const handleEditClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setShowEditModal(true);
     };
 
     const handlePaymentSubmit = (amount: string, method: string) => {
@@ -65,8 +73,8 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onCl
                             </button>
                             <button
                                 className="gear-button"
-                                onClick={(e) => { e.stopPropagation();}}
-                                title="More options"
+                                onClick={handleEditClick}
+                                title="Edit Client Information"
                             >
                                 <i className="fas fa-cog"></i>
                             </button>
@@ -82,6 +90,14 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onCl
                 client={client}
                 onPaymentSubmit={handlePaymentSubmit}
             />
+            {showEditModal && (
+                <EditClientModal 
+                    isOpen={showEditModal}
+                    client={client}
+                    onClose={() => setShowEditModal(false)}
+                    onClientUpdated={onClientUpdated}
+                />
+            )}
         </>
     );
 };

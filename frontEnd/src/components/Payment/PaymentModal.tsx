@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Job, ClientDataID } from '../../types/interfaces';
 import '../../styles/components/PaymentModal.css';
+import '../../styles/components/Modal.css';
 import api from '../../api';
+
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -79,28 +81,39 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     onClose();
     setPaymentMethod('');
     setPaymentAmount(job ? job.cost.toString() : '');
-  }
+  };
+
+  const handleClearAmount = () => {
+    setPaymentAmount('');
+  };
 
   const handleDisabledSubmit = () => {
     if (!paymentMethod || paymentAmount === '') {
       return true; 
     }
     return false; 
-  }
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+        setPaymentAmount(value);
+    }
+  };
     
 
   if (!isOpen) return null;
   
   return (
     <div 
-      className="payment-modal-overlay" 
+      className="modal-overlay" 
     >
       <div 
-        className="payment-modal-container" 
+        className="payment-modal-container modal-container" 
       >
         <button 
           type="button"
-          className="close-modal-btn" 
+          className="modal-close-btn" 
           onClick={(e) => {
             e.stopPropagation();
             onClose();
@@ -114,8 +127,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         <h3>Record Payment</h3>
         
         <form onSubmit={handleSubmit}>
-            <div className="payment-form-section">
-              <div className="payment-section-title">
+            <div className="modal-form-section">
+              <div className="modal-section-title">
                 {job ? 'Property Information' : 'Client Information'}
               </div>
               
@@ -136,8 +149,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               </div>
             </div>
             
-            <div className="payment-form-section">
-              <label htmlFor="payment-amount" className="payment-section-title">Payment Amount</label>
+            <div className="modal-form-section">
+              <label htmlFor="payment-amount" className="modal-section-title">Payment Amount</label>
               <div className="payment-amount-container">
                 <div className="payment-amount-input-container">
                   <span className="dollar-sign">$</span>
@@ -146,19 +159,34 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                     name="payment-amount"
                     type="number"
                     value={paymentAmount}
-                    onChange={(e) => setPaymentAmount(e.target.value)}
-                    min="0"
+                    onChange={handleAmountChange}
+                    min="1"
                     step="0.01"
+                    pattern="[0-9]+(\.[0-9]{1,2})?"
                     required
                     onClick={(e) => e.stopPropagation()}
-                    placeholder="Amount"
+                    placeholder="0.00"
                   />
+                  {paymentAmount && (
+                    <button
+                      type="button"
+                      className="clear-amount-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleClearAmount();
+                      }}
+                      aria-label="Clear amount"
+                      title="Clear amount"
+                    >
+                      <i className="fa-regular fa-trash-can"></i>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
             
-            <div className="payment-form-section">
-              <div className="payment-section-title">Payment Method</div>
+            <div className="modal-form-section">
+              <div className="modal-section-title">Payment Method</div>
               <div className="payment-method-options" role="radiogroup">
           <button
             type="button"
@@ -215,10 +243,10 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       </div>
             </div>
             
-            <div className="payment-form-actions">
+            <div className="modal-btn-container ">
               <button 
                 type="button"
-                className="property-btn-secondary" 
+                className="modal-btn-cancel" 
               onClick={(e) => {
                 e.stopPropagation();
                 handleCancel(e);
@@ -228,7 +256,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               </button>
               <button 
                 type="submit"
-                className="record-payment-btn" 
+                className="modal-btn-submit" 
                 disabled={handleDisabledSubmit()}
                 onClick={(e) => e.stopPropagation()} // Ensure this does not block form submission
               >

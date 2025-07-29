@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../../styles/components/AddPropertyModal.css';
 import api from '../../api';
 import { Property_list,Schedule } from '../../types/interfaces';
 import { useQueryClient } from '@tanstack/react-query';
+import { validateCurrencyInput } from '../../utils/format';
 
 interface AddPropertyModalProps {
     isOpen: boolean;
@@ -38,7 +39,6 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
         
         getJobsNames();
         const preventKeyboardEventPropagation = (e: KeyboardEvent) => {
-            // Prevent event propagation for any keyboard events when modal is open
             e.stopPropagation();
         };
 
@@ -50,6 +50,29 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
         };
     }, [isOpen]);
 
+    const resetForm = () => {
+        setClientData({
+            street: "",
+            city: "",
+            state: "",
+            zipCode: "",
+            schedules: [
+                {
+                    frequency: "",
+                    nextDate: "",
+                    service: "",
+                    cost: 0.00
+                }
+            ]
+        });
+        onClose();
+    }
+
+    const isScheduleFormComplete = useMemo(() => {
+        return clientData.street && clientData.city && clientData.state && clientData.zipCode &&
+            clientData.schedules.every(schedule => 
+                schedule.frequency && schedule.nextDate && schedule.service && schedule.cost > 0);
+    }, [clientData]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -71,6 +94,14 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
         schedules: updatedProperties,
         };
       });
+    };
+
+    const handleAmountChange = (index: number, field: keyof Schedule) => (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        const currentCost = clientData.schedules[index].cost.toString();
+        const validValue = validateCurrencyInput(newValue, currentCost);
+        
+        handlePropertyChange(index, field, parseFloat(validValue) || 0);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -137,18 +168,18 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="property-modal-overlay" onClick={onClose}>
-            <div className="property-modal-content" onClick={(e) => e.stopPropagation()}>
-                <button className="property-modal-close-btn" onClick={onClose}>
+        <div className="modal-overlay">
+            <div className="property-container modal-container">
+                <button className="modal-close-btn" onClick={resetForm}>
                     <i className="fas fa-times"></i>
                 </button>
                 
-                <h2>Add New Property</h2>
+                <h3>Add New Property</h3>
                 
                 <form onSubmit={handleSubmit}>
-                    <div className="property-form-section">
-                        <div className="property-section-title">Property Information</div>
-                        <div className="property-form-group">
+                    <div className="modal-form-section">
+                        <div className="modal-section-title">Property Information</div>
+                        <div className="form-group">
                             <input
                                 type="text"
                                 placeholder="Street Address"
@@ -159,8 +190,8 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                             />
                         </div>
                         
-                        <div className="property-form-row">
-                            <div className="property-form-group">
+                        <div className="form-row">
+                            <div className="form-group">
                                 <input
                                     type="text"
                                     placeholder="City"
@@ -171,8 +202,8 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                 />
                             </div>
                             
-                            <div className="property-state-zip-row">
-                                <div className="property-state-input">
+                            <div className="state-zip-row">
+                                <div className="state-input">
                                     <input
                                         type="text"
                                         placeholder="State"
@@ -183,7 +214,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                         required
                                     />
                                 </div>
-                                <div className="property-zip-input">
+                                <div className="zip-input">
                                     <input
                                         type="text"
                                         placeholder="ZIP Code"
@@ -198,10 +229,10 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                     </div>
                     
                     {clientData.schedules.map((prop, index) => (
-                        <div key={index} className="property-form-section property-service-section">
-                            <div className="property-section-title">Service Information</div>
-                            <div className="property-form-row">
-                                <div className="property-form-group">
+                        <div key={index} className="modal-form-section">
+                            <div className="modal-section-title">Service Information</div>
+                            <div className="form-row">
+                                <div className="form-group">
                                     <input 
                                         list="service-options"
                                         name="service"
@@ -217,34 +248,37 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                     </datalist>
                                 </div>
                                 
-                                <div className="property-form-group">
+                                <div className="form-group">
                                     <div className="cost-input-container">
                                         <input 
                                             type="number" 
                                             placeholder="Cost" 
                                             name='cost'
                                             step="1.00"
-                                            onChange={(e) => handlePropertyChange(index, "cost", parseFloat(e.target.value))}
+                                            value = {prop.cost > 0 ? prop.cost.toString() : ''}
+                                            onChange={(handleAmountChange(index, "cost"))}
                                             required
                                         />
                                     </div>
                                 </div>
                             </div>
                             
-                            <div className="property-form-row">
-                                <div className="property-form-group">
-                                    <input 
-                                        type="date" 
-                                        placeholder="Start Date"
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <input
+                                        placeholder='Start Date'
+                                        className='date-input' 
+                                        type="text"
+                                        onFocus={(e) => e.target.type = 'date'}
+                                        onBlur={(e) => e.target.type = 'text'}
                                         value={prop.nextDate}
                                         name='nextDate'
                                         onChange={(e) => handlePropertyChange(index, "nextDate", e.target.value)}
-                                        className='date-input'
                                         required
                                     />
                                 </div>
                                 
-                                <div className="property-form-group">
+                                <div className="form-group">
                                     <select
                                         name="frequency"
                                         value={prop.frequency}
@@ -263,11 +297,11 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                         </div>
                     ))}
                     
-                    <div className="property-form-actions">
-                        <button type="button" className="property-btn-secondary" onClick={onClose}>
+                    <div className="modal-btn-container">
+                        <button type="button" className="modal-btn-cancel" onClick={resetForm}>
                             Cancel
                         </button>
-                        <button type="submit" className="property-btn-primary">
+                        <button type="submit" disabled={!isScheduleFormComplete} className="modal-btn-submit">
                             Add Property
                         </button>
                     </div>

@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer,OnlyClientSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -500,3 +500,22 @@ class getPayments(APIView):
         serializer = PaymentInfoSerializer(payments,many=True)
 
         return Response({'payments': list(serializer.data)},status=status.HTTP_200_OK)
+
+
+class UpdateClient(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OnlyClientSerializer
+    queryset = Client.objects.all()
+    lookup_url_kwarg = 'client_id'
+
+    def partial_update(self, request, *args, **kwargs):
+        data = request.data.copy()
+
+        nullable_fields = ['email', 'lastName']
+
+        for field in nullable_fields:
+            if field in data and data[field].strip() == "":
+                data[field] = None
+        
+        request._full_data = data
+        return super().partial_update(request, *args, **kwargs)

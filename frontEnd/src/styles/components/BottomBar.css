@@ -50,7 +50,6 @@
 }
 
 .action-button:hover {
-    border-radius: 20px;
     transform: scale(1.05);
     background-color: rgb(45, 45, 48);
 }
