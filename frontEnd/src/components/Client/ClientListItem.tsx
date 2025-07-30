@@ -61,7 +61,7 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onCl
                         className="profile-pic"
                         />
                     </div>
-                    <div className="list-item-name">{`${client.firstName} ${client.lastName}`}</div>
+                    <div className="list-item-name">{`${client.firstName} ${client.lastName || ''}`}</div>
                     {isFocused && (
                         <div className="client-action-buttons">
                             <button

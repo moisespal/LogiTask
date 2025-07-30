@@ -125,7 +125,6 @@ const TopBar: React.FC<TopBarProps> = ({
         <div className="sort-dropdown">
           <button onClick={() => handleSortChange('none')}>None</button>
           <button onClick={() => handleSortChange('firstName')}>First Name</button>
-          <button onClick={() => handleSortChange('lastName')}>Last Name</button>
           <button onClick={() => handleSortChange('phoneNumber')}>Phone Number</button>
         </div>
       </div>

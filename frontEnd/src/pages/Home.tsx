@@ -148,7 +148,6 @@ const Home: React.FC = () => {
     [...clients].sort((a, b) => {
       switch (sortOption) {
         case 'firstName': return a.firstName.localeCompare(b.firstName);
-        case 'lastName': return a.lastName.localeCompare(b.lastName);
         case 'phoneNumber': return a.phoneNumber.localeCompare(b.phoneNumber);
         default: return 0;
       }
