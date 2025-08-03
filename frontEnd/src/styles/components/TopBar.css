@@ -209,6 +209,29 @@
   transform: translateY(-1px);
 }
 
+.cost-pill-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.cost-pill-container .balance-info {
+  left: -25%;
+  margin-top: .5rem;
+  min-width: 165px;
+  z-index: 1000;
+  font-weight: 500;
+  text-shadow: #150303 0px 0px 10px;
+}
+
+.balance-negative {
+  color: #e91717;
+}
+
+.balance-positive {
+  color: #54cf58;
+}
+
 /* Sort Controls
 ------------------------------------------*/
 .sort-button-container {

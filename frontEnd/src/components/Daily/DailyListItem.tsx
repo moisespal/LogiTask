@@ -3,6 +3,7 @@ import { Job } from '../../types/interfaces';
 import PaymentModal from '../Payment/PaymentModal';
 import '../../styles/components/DailyListItem.css';
 import '../../styles/components/listItem.css';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface DailyListItemProps {
   job: Job;
@@ -25,12 +26,19 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
     }
   };
 
-  const handleIconClick = (e: React.MouseEvent) => {
+  const queryClient = useQueryClient();
+
+  const handleIconClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
     if (isFocused && onComplete) {
-      // If already focused, complete it
-      onComplete(job.id);
+      try {
+        onComplete(job.id);
+        
+        queryClient.removeQueries({ queryKey: ['balance', job.client.id] });
+    } catch (error) {
+        console.error('Error completing job:', error);
+    }
     } else {
       // If not focused, focus it
       onClick(job.id);

@@ -1,5 +1,5 @@
-import React from 'react';
-import { ClientDataID, Job } from '../../types/interfaces';
+import React, { useState }from 'react';
+import { ClientDataID, Job, Balance } from '../../types/interfaces';
 import '../../styles/components/TopBar.css';
 import { formatCapitalized, formatPhoneNumber } from '../../utils/format';
 import { useNavigate } from "react-router-dom";
@@ -28,6 +28,48 @@ const TopBar: React.FC<TopBarProps> = ({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const [showBalance, setShowBalance] = useState(false);
+  const [balance, setBalance] = useState<Balance>();
+
+  React.useEffect(() => {
+    setShowBalance(false);
+  }, [focusedItemId]);
+
+  const handleBalanceClick = async () => {
+    if (!selectedJob || !selectedJob.client || !selectedJob.client.id) {
+      return;
+    }
+
+    if (showBalance) {
+      setShowBalance(false);
+      return;
+    }
+
+    const clientId = selectedJob.client.id;
+
+    // Check cache first
+    const cachedBalance = queryClient.getQueryData<Balance>(['balance', clientId]);
+
+    if (cachedBalance) {
+      setBalance(cachedBalance);
+      setShowBalance(true);
+      return;
+    }
+
+    try {
+      const response = await api.get(`/api/get_estimated_balance/${clientId}/`);
+      if (response.status === 200) {
+        setBalance(response.data);
+        setShowBalance(true);
+        queryClient.setQueryData(['balance', clientId], response.data);
+      } else {
+        console.error('Failed to fetch balance');
+      }
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+    }
+  }
+
   const handleClientClick = async () => {
   
     if (mode !== 'Daily' || !selectedJob?.client?.id) {
@@ -45,7 +87,7 @@ const TopBar: React.FC<TopBarProps> = ({
       });
       return;
     }
-
+ 
     try {
       const response = await api.get(`/api/client/${clientId}/properties/`);
       
@@ -111,9 +153,25 @@ const TopBar: React.FC<TopBarProps> = ({
                 <i className="fa-solid fa-calendar-days" />
                 {formatCapitalized(selectedJob.schedule.frequency)}
               </div>
-              <div className="cost-pill service-item pill-container">
-                <i className="fa-solid fa-dollar-sign" />
-                {Math.floor(selectedJob.cost)}
+              <div className="cost-pill-container">
+                <div className="cost-pill service-item pill-container" onClick={handleBalanceClick} title={showBalance ? 'Hide Balance' : 'Show Balance'}>
+                  <i className="fa-solid fa-dollar-sign" />
+                  {Math.floor(selectedJob.cost)}
+                </div>
+                <div className={`balance-info ${showBalance ? 'show' : ''}`}>
+                  <div className="outstanding-balance">
+                    <span>
+                      {balance && parseFloat(balance.estimated_balance) < 0 ? 'Balance: ' : 'Credit: '}
+                    </span>
+                    <span 
+                      className={balance && parseFloat(balance.estimated_balance) < 0 ? 'balance-negative' : 'balance-positive'}
+                    >
+                      {balance && parseFloat(balance.estimated_balance) < 0
+                        ? `$${Math.abs(parseFloat(balance.estimated_balance)).toFixed(2)}` 
+                        : `$${parseFloat(balance?.estimated_balance || '0').toFixed(2)}`}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

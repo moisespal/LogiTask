@@ -127,3 +127,11 @@ export interface PaymentWithClient {
 export interface TodaysPaymentsResponse {
   payments: PaymentWithClient[];
 }
+
+export interface Balance {
+  id: number;
+  balance_adjustment: string;
+  current_balance: string;
+  update_at: Date;
+  estimated_balance:string;
+}
