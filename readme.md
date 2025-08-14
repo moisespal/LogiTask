@@ -1,7 +1,47 @@
-## BackEnd
+# Logitask
 
-### Setup Virtual Environment
+Logitask helps lawn care and property maintenance companies replace spreadsheets with automated daily job lists for recurring clients.
 
+## Features
+
+- Automatically generating daily job lists
+- Tracking payments and job completions  
+- Providing role-based access for the owner and workers
+- Maintaining detailed client history pages and property pages
+
+## Screenshots
+
+![Daily Job Management](images/daily-job-menu.png)
+*Daily job management interface showing automated job lists and completion tracking*
+
+![Client Menu](images/client-menu.png)
+*Client management dashboard*
+
+![Client Payment History](images/client-payment-history.png)
+*Detailed client payment and service history tracking*
+
+## Tech Stack
+
+- Django
+- PostgreSQL
+- TypeScript
+- React.js
+- Microsoft Azure
+
+## Prerequisites
+
+- Python 3.8+ 
+- Node.js 18+ 
+- npm 8+ 
+- Git
+
+**Note:** PostgreSQL is only required for production deployment. This project uses SQLite for local development.
+
+## Installation
+
+### Backend
+
+#### Setup Virtual Environment
 1. **Navigate to the Backend Directory:**
    - Ensure you are in the directory containing `manage.py`.
 
@@ -17,44 +57,40 @@
      - **Mac/Linux:** `source venv/bin/activate`
 
 3. **Install Dependencies:**
-   - Run:
-     ```bash
-     pip install -r requirements.txt
-     ```
-     ### updates requirements if you install new packages 
-     pip freeze > requirements.txt
+   ```bash
+   pip install -r requirements.txt
+   ```
+   
+   *Note: To update requirements after installing new packages, run:*
+   ```bash
+   pip freeze > requirements.txt
+   ```
 
-### Running the Server
+#### Running the Server
+Start the Django server:
+```bash
+python manage.py runserver
+```
 
-- Start the Django server:
-  ```bash
-  python manage.py runserver
-  ```
+#### Making Changes to Models
+After modifying models, run:
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
 
-### Making Changes to Models
+### Frontend
 
-- After modifying models, run:
-  ```bash
-  python manage.py makemigrations
-  python manage.py migrate
-  ```
-
-## FrontEnd
-
-### Running the Frontend
-
+#### Running the Frontend
 1. **Navigate to the Frontend Directory:**
    - Ensure you are in the directory containing `package.json`.
 
 2. **Install Dependencies:**
-   - Run:
-     ```bash
-     npm install
-     ```
+   ```bash
+   npm install
+   ```
 
 3. **Start the Development Server:**
-   - Run:
-     ```bash
-     npm run dev
-     ```
-
+   ```bash
+   npm run dev
+   ```
