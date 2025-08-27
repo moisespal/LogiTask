@@ -45,6 +45,8 @@ const Dev: React.FC = () => {
     <button onClick={getworkers}> TRY ME</button>
     <div>payments</div>
     <button onClick={getPayment}>me</button>
+    <button onClick={getPayment}>me</button>
+    <button onClick={getPayment}>me</button>
     <div>update</div>
     <button onClick={updateClient}>me</button>
     
