@@ -269,7 +269,19 @@ class ScheduleCreate(generics.CreateAPIView):
         property_id =  self.request.data.get('property_id')
         if property_id:
             property_obj = Property.objects.get(id=property_id)
-            serializer.save(property= property_obj)
+            new_schedule = serializer.save(property= property_obj)
+            profile = userProfile.objects.get(user=self.request.user)
+            user_timezone = profile.timezone
+            try:
+                user_timezone = pytz.timezone(user_timezone)
+            except pytz.exceptions.UnknownTimeZoneError:
+                user_timezone = pytz.UTC
+            utc_now = timezone.now()
+            local_now = utc_now.astimezone(user_timezone)
+            today_in_user_tz = local_now.date()
+            if new_schedule.nextDate == today_in_user_tz:
+                new_schedule.generate_jobs()
+
         else:
             print(serializer.errors)
 
