@@ -81,6 +81,25 @@ class Note(models.Model):
 
 
 class Schedule(models.Model):
+    MONDAY = "Monday"
+    TUESDAY = "Tuesday"
+    WEDNESDAY = "Wednesday"
+    THURSDAY = "Thursday"
+    FRIDAY = "Friday"
+    SATURDAY = "Saturday"
+    SUNDAY = "Sunday"
+
+    WEEKDAY_CHOICES = [
+        (MONDAY, "Monday"),
+        (TUESDAY, "Tuesday"),
+        (WEDNESDAY, "Wednesday"),
+        (THURSDAY, "Thursday"),
+        (FRIDAY, "Friday"),
+        (SATURDAY, "Saturday"),
+        (SUNDAY, "Sunday"),
+    ]
+    
+    
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="schedules")
     frequency = models.CharField(max_length=50)
     nextDate = models.DateField(null=False,blank=False)
@@ -88,7 +107,12 @@ class Schedule(models.Model):
     service = models.CharField(max_length=50)
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     isActive = models.BooleanField(default=True)
+    schedule_day = models.CharField(max_length=9,choices=WEEKDAY_CHOICES, default=MONDAY)
+    order = models.PositiveIntegerField(default=0, db_index=True)
     
+    class Meta:
+        ordering = ["schedule_day", "order"]  
+
     @classmethod
     def generate_jobs(cls, user=None):
         if user:
@@ -116,7 +140,7 @@ class Schedule(models.Model):
                 nextDate=today_in_user_tz,
                 isActive=True,
                 property__client__company=profile.company
-            )
+            ).order_by("order")
             count = 1
             for schedule in schedules:
                 Job.objects.create(
@@ -141,7 +165,14 @@ class Schedule(models.Model):
                         schedule.endDate = today_in_user_tz
 
                 schedule.save()
-
+    
+                    
+    def save(self, *args, **kwargs):
+        if self.nextDate:
+            # Use strftime to get full weekday name
+            self.schedule_day = self.nextDate.strftime("%A")
+        super().save(*args, **kwargs)
+    
     def __str__(self):
         return f"{self.service} - {self.nextDate}"
 

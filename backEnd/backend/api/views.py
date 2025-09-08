@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer,OnlyClientSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer,OnlyClientSerializer,ScheduleManagementSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -531,3 +531,30 @@ class UpdateClient(UpdateAPIView):
         
         request._full_data = data
         return super().partial_update(request, *args, **kwargs)
+
+
+class get_schedules(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request):
+        
+        date_param = request.query_params.get("date",None)
+
+        if date_param==None:
+            profile = userProfile.objects.get(user=self.request.user)
+            user_timezone = profile.timezone
+            try:
+                user_timezone = pytz.timezone(user_timezone)
+            except pytz.exceptions.UnknownTimeZoneError:
+                user_timezone = pytz.UTC
+            utc_now = timezone.now()
+            local_now = utc_now.astimezone(user_timezone)
+            today_in_user_tz = local_now.date()
+            day_of = today_in_user_tz.strftime("%A")
+        schedules = Schedule.objects.filter(
+            schedule_day = day_of,
+            isActive=True,
+            property__client__company=profile.company
+        )
+        serializer = ScheduleManagementSerializer(schedules,many=True)
+        return Response({'schedules': list(serializer.data)},status=status.HTTP_200_OK)

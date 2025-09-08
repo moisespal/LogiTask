@@ -29,11 +29,31 @@ class ClientSerializer(serializers.ModelSerializer):
             "created_at": {"read_only":True}
         }
 
+class ClientOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = ["id", "firstName", "lastName", "phoneNumber", "email"]
+        extra_kwargs = {
+            "created_at": {"read_only":True}
+        }
+
 class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive"]
+        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day"]
+
+class PropertyandClientSerializer(serializers.ModelSerializer):
+    client = ClientOnlySerializer()
+    class Meta:
+        model = Property
+        fields = ["id", "street", "city", "state", "zipCode","client"]
+
+class ScheduleManagementSerializer(serializers.ModelSerializer):
+    property = PropertyandClientSerializer()
+    class Meta:
+        model = Schedule
+        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day","property"]
 
 class PropertyAndSchedule(serializers.ModelSerializer):
     schedules = ScheduleSerializer(many=True)

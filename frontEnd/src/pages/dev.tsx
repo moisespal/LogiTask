@@ -34,7 +34,12 @@ const Dev: React.FC = () => {
 
       });
     };
-   
+    const date='Tuesday'    
+    const getSchedules = async () =>{
+      await api.get(`/api/schedules/management/?${date}/`,{
+       
+      });
+    };
   return(
   <>
     <div>Dev</div>;
@@ -49,6 +54,8 @@ const Dev: React.FC = () => {
     <button onClick={getPayment}>me</button>
     <div>update</div>
     <button onClick={updateClient}>me</button>
+    <div>schedules</div>
+    <button onClick={getSchedules}>me</button>
     
   </>
   )
