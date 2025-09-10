@@ -34,5 +34,7 @@ urlpatterns = [
     path('user/workers/',views.getWorkers.as_view(), name='get-workers-list'),
     path('daily/payments/',views.getPayments.as_view(), name='get-todays-payments'),
     path('client/<int:client_id>/update/',views.UpdateClient.as_view(), name='update-client-info'),
-    path( 'schedules/management/', views.get_schedules.as_view(), name='update-schedule-order'),
+    path( 'schedules/management/', views.get_schedules.as_view(), name='view-schedule-order'),
+    path('schedules/reorder/', views.update_schedules.as_view(), name='update-scheudle-order'),
+    path('jobs/update-order/',views.update_Jobs_Order.as_view(), name='update-job-order'),
 ]

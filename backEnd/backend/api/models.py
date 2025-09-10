@@ -134,23 +134,23 @@ class Schedule(models.Model):
             user = profile.user
             local_now = timezone.now().astimezone(user_timezone)
             today_in_user_tz = local_now.date()
-            total_jobs = Job.objects.filter(jobDate=today_in_user_tz).count()
+            
             
             schedules = cls.objects.filter(
                 nextDate=today_in_user_tz,
                 isActive=True,
                 property__client__company=profile.company
             ).order_by("order")
-            count = 1
+           
             for schedule in schedules:
                 Job.objects.create(
                     schedule=schedule,
                     cost=schedule.cost,
                     jobDate=schedule.nextDate,
                     client=schedule.property.client,
-                    order = total_jobs+count
+                    order = schedule.order
                 )
-                count+=1
+                
                 if schedule.endDate and schedule.nextDate > schedule.endDate:
                     schedule.isActive = False
                 else:
