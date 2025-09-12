@@ -108,7 +108,7 @@ class Schedule(models.Model):
     cost = models.DecimalField(max_digits=10, decimal_places=2)
     isActive = models.BooleanField(default=True)
     schedule_day = models.CharField(max_length=9,choices=WEEKDAY_CHOICES, default=MONDAY)
-    order = models.PositiveIntegerField(default=0, db_index=True)
+    order = models.PositiveIntegerField(default=999, db_index=True) # Default to a high number to push unsorted items to the end
     
     class Meta:
         ordering = ["schedule_day", "order"]  

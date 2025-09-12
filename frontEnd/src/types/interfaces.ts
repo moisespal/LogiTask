@@ -127,3 +127,33 @@ export interface PaymentWithClient {
 export interface TodaysPaymentsResponse {
   payments: PaymentWithClient[];
 }
+
+export interface ScheduleClient {
+  id: number;
+  firstName: string;
+  lastName: string | null;
+  phoneNumber: string;
+  email: string | null;
+}
+
+export interface ScheduleProperty {
+  id: number;
+  street: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  client: ScheduleClient;
+}
+
+export interface ScheduleForManagement {
+  id: number;
+  frequency: string;
+  nextDate: string;
+  endDate: string | null;
+  service: string;
+  cost: number;
+  isActive: boolean;
+  priority: number;
+  dayOfWeek: number;
+  property: ScheduleProperty;
+} 

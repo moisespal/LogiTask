@@ -1,8 +1,10 @@
 import React from 'react';
 import { FaExchangeAlt, FaUserPlus } from 'react-icons/fa';
+import { FaRankingStar } from "react-icons/fa6";
 import '../../styles/components/BottomBar.css';
 import { CompanyCard } from '../Company/CompanyCard';
 import { useUser } from '../../contexts/userContext';
+import { useNavigate } from 'react-router-dom';
 
 interface BottomBarProps {
     isModeRotated: boolean;
@@ -17,6 +19,11 @@ interface BottomBarProps {
 const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, openAddClientModal, onTeamModalOpen, onStatsToggle, modeType, showStats = false}) => {
     const user = useUser();
 
+    const navigate = useNavigate();
+
+    const handleScheduleManagement = () => {
+        navigate('/schedule-management/');
+    }
     return (
         <div className="bottom-menu">
             <div className="bottom-menu-container">
@@ -30,9 +37,13 @@ const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, o
                             >
                                 <FaExchangeAlt />
                             </button>
-                            {modeType === 'Client' && (
+                            {modeType === 'Client' ? (
                                 <button className="action-button" onClick={openAddClientModal} title="Add Client">
                                     <FaUserPlus />
+                                </button>
+                            ) : (
+                                <button className="action-button" onClick={handleScheduleManagement} title="Manage Schedules">
+                                    <FaRankingStar />
                                 </button>
                             )}
                         </>

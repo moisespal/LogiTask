@@ -14,6 +14,7 @@ import Dev from "./pages/dev";
 import { CompanySetUp } from "./pages/CompanySetUp";
 import PropertyView from "./pages/PropertyView";
 import ClientView from "./pages/ClientView";
+import ScheduleManagement from "./pages/ScheduleManagement";
 import { QueryClient, useQueryClient } from "@tanstack/react-query";
 
 
@@ -72,6 +73,15 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <ClientView />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route 
+          path="/schedule-management/"
+          element={
+            <ProtectedRoute>
+              <ScheduleManagement/>
             </ProtectedRoute>
           }
         />

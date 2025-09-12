@@ -1,0 +1,441 @@
+.jo-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: rgba(40, 40, 43, 1);
+  color: var(--text-primary, rgba(255, 255, 255, 0.95));
+  font-family: 'Outfit', sans-serif;
+  user-select: none;
+  padding-bottom: 100px;
+  position: relative; 
+}
+
+.jo-content-wrapper {
+  width: 100%;
+  max-width: 800px; 
+  padding: 40px clamp(20px, 5vw, 50px);
+  display: flex;
+  flex-direction: column;
+  overflow: scroll; 
+  height: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.back-button {
+  position: absolute;
+  top: 5vh;
+  left: 5vw;
+  z-index: 100;
+}
+
+.jo-header {
+  margin-bottom: 20px;
+  text-align: center;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.jo-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 0.7px;
+}
+
+.jo-subtitle {
+  margin: 2px 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+}
+
+/* Day selection navigation */
+.jo-day-selector {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: rgb(33, 33, 36);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.jo-day-button {
+  flex: 1;
+  padding: 12px 5px;
+  cursor: pointer;
+  font-weight: 250;
+  transition: all 0.2s ease;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.85));
+  position: relative;
+}
+
+.jo-day-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: #ffde7a;
+}
+
+.jo-day-button:hover {
+  background-color: rgba(40, 40, 43, 1);
+  color: #ffde7a;
+  font-weight: 400;
+}
+
+.jo-day-button.jo-day-selected {
+  background-color: rgba(40, 40, 43, 1);
+  color: var(--color-focused, #ffca28);
+  font-weight: 600;
+  transition: width 0.3s ease;
+}
+
+.jo-day-button.jo-day-selected::after {
+  width: 100%;
+  background-color: var(--color-focused, #ffca28);
+}
+
+/* Loading state */
+.jo-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.85));
+}
+
+.jo-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--color-focused, #ffca28);
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Content area */
+.jo-content {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.4s ease-out;
+  width: 100%; 
+  max-height: 78vh; 
+  overflow-y: auto; 
+  overflow-x: hidden;
+  padding-left: 10px; 
+}
+
+/* No schedules message */
+.jo-no-schedules {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.jo-no-schedules i {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: var(--color-focused, #ffca28);
+}
+
+/* Schedules header */
+.jo-schedules-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.jo-schedules-header h2 {
+  animation: fadeIn 0.4s ease-out;
+  font-size: 1.2rem;
+  color: rgb(225, 224, 224);
+  padding-left: 10px;
+}
+
+h2 span {
+  color: var(--color-focused, #ffca28);
+  font-weight: 600;
+}
+
+/* Save button container */
+.jo-action-button-container {
+  position: fixed;
+  bottom: 80px; 
+  right: 10vw;
+  z-index: 1000;
+}
+
+.jo-schedules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 200px;
+  list-style-type: none;
+}
+
+.jo-schedules-list li,
+.sortable-schedule-wrapper li {
+  list-style: none;
+  list-style-type: none;
+}
+
+.sch-name-address {
+  display: flex;
+  gap: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(0.8rem, 1rem, 1.25rem);
+  color: var(--text-primary, rgba(255, 255, 255, 0.95));
+}
+
+/* Schedule List Item Styling */
+.list-item.sch-item {
+  border-left-color: #5b585d;
+}
+
+.sch-item:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  background: rgba(70, 68, 68, 0.323);
+}
+
+/* Item header with client name and priority badge */
+.sch-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.sch-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sch-client-name {
+  font-weight: 250;
+  gap: 5px;
+  display: flex;
+  align-items: center; 
+}
+
+/* Priority badge styling */
+.sch-priority {
+  display: flex;
+  color: rgba(231, 187, 42, 0.932);
+  font-weight: 700;
+  font-size: 1.2rem;
+  width: 24px;
+  height: 24px;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.768);
+}
+
+.sch-address-inline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+
+.sch-address i {
+  color: #fc574ed4;
+  font-size: 0.8rem;
+}
+
+.sch-client i {
+  color: #64b5f6;
+  font-size: 0.8rem;
+}
+
+/* List item content layout */
+
+.sch-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: nowrap;
+}
+
+.sch-header-row {
+  display: flex;
+  align-items: center;
+}
+
+.sch-service-pill {
+  background: rgba(255, 152, 0, 0.15);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  color: #ffb74d;
+}
+
+.sch-frequency-pill {
+  background: rgba(169, 107, 181, 0.15);
+  border: 1px solid rgba(169, 107, 181, 0.3);
+  color: #c48fd0;
+}
+
+.sch-cost-pill {
+  background-color: rgba(76, 175, 80, 0.2);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  color: #81c784;
+  gap: 3px !important;
+}
+
+.sch-status-pill {
+  background-color: rgba(158, 158, 158, 0.2);
+  color: #9e9e9e;
+}
+
+.sch-service-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sch-service-tags .pill-container {
+  padding: 2px 6px;
+  font-size: 0.8rem;
+}
+
+
+.sch-service-tags .pill-container i {
+  font-size: 0.7rem;
+}
+
+.sch-next-date-pill {
+  background-color: rgba(26, 26, 25, 0.2);
+  border: 1px solid rgba(131, 131, 132, 0.397);
+  color: #fdfdfebc;
+}
+
+
+.jo-content::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(
+    transparent,
+    rgba(40, 40, 43, 0.8)
+  );
+  pointer-events: none;
+  opacity: var(--scroll-indicator-opacity, 0);
+}
+
+
+.jo-content::-webkit-scrollbar {
+  display: none;
+}
+
+.sch-dragging .list-item {
+  list-style: none;
+}
+
+@media (max-width: 768px) {
+  .jo-day-button {
+    padding: 10px 5px;
+    font-size: 0.9rem;
+  }
+  
+  .jo-action-button-container {
+    bottom: 70px;
+    right: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .jo-day-button {
+    font-size: 0.8rem;
+    padding: 8px 2px;
+  }
+  
+  .jo-title {
+    font-size: 1.3rem;
+  }
+  
+  .jo-subtitle {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sch-item {
+    padding: clamp(8px, 2vw, 12px) clamp(10px, 3vw, 14px);
+  }
+  
+  .sch-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .sch-client-name {
+    font-size: clamp(0.85rem, 1vw, 1rem);
+  }
+  
+  .sch-priority {
+    width: 20px;
+    height: 20px;
+    font-size: 0.75rem;
+  }
+  
+  .back-button {
+    top: 4vh;
+    left: 3vw;
+  }
+}
+
+@media (max-width: 850px) {
+  .sch-item {
+    padding: clamp(10px, 2vw, 14px) clamp(12px, 3vw, 16px);
+  }
+  
+  .sch-client-name {
+    font-size: clamp(0.9rem, 1.1vw, 1.1rem);
+  }
+  
+  .sch-details {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .sch-pill {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+  }
+}
