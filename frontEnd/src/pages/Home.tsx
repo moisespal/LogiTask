@@ -461,7 +461,15 @@ const Home: React.FC = () => {
           <>
             {isJobLoading ? (
               <LoadingJob />
-            )  : (
+            )  : filteredJobs.length === 0 ? (
+              // No jobs message
+              
+                <div className="no-jobs-message">
+                  <i className="fa-solid fa-clipboard-list no-jobs-icon"></i>
+                  <h3>No Jobs to Display</h3>
+                  <p>{searchTerm ? "Try different search terms" : "Your schedule is clear for now"}</p>
+                </div>
+            ) : (
               <DndContext
                 sensors={sensors}
                 collisionDetection={pointerWithin}

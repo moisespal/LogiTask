@@ -223,6 +223,7 @@ h2 span {
 /* Schedule List Item Styling */
 .list-item.sch-item {
   border-left-color: #5b585d;
+  min-width: 0;
 }
 
 .sch-item:hover {

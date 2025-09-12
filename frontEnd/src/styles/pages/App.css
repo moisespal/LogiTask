@@ -96,9 +96,11 @@ body, html, #root {
 
 .no-jobs-message {
   position: absolute;
-  top: 40%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 450;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -116,5 +118,5 @@ body, html, #root {
 .no-jobs-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: #4caf50;
+  color: #dd6c16;
 }
