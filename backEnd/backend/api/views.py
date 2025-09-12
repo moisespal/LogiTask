@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer,OnlyClientSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer,OnlyClientSerializer,ScheduleManagementSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
 from rest_framework.generics import ListAPIView,UpdateAPIView
@@ -111,7 +111,7 @@ class GetTodaysJobs(ListAPIView):
         return Job.objects.filter(
             jobDate=today_in_user_tz,
             client__company=self.request.user.userprofile.company
-        )
+        ).order_by("order")
 
 class PropertyListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -269,7 +269,19 @@ class ScheduleCreate(generics.CreateAPIView):
         property_id =  self.request.data.get('property_id')
         if property_id:
             property_obj = Property.objects.get(id=property_id)
-            serializer.save(property= property_obj)
+            new_schedule = serializer.save(property= property_obj)
+            profile = userProfile.objects.get(user=self.request.user)
+            user_timezone = profile.timezone
+            try:
+                user_timezone = pytz.timezone(user_timezone)
+            except pytz.exceptions.UnknownTimeZoneError:
+                user_timezone = pytz.UTC
+            utc_now = timezone.now()
+            local_now = utc_now.astimezone(user_timezone)
+            today_in_user_tz = local_now.date()
+            if new_schedule.nextDate == today_in_user_tz:
+                new_schedule.generate_jobs()
+
         else:
             print(serializer.errors)
 
@@ -519,3 +531,106 @@ class UpdateClient(UpdateAPIView):
         
         request._full_data = data
         return super().partial_update(request, *args, **kwargs)
+
+
+class get_schedules(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,*args, **kwargs):
+        
+        date_param = request.query_params.get("date",None)
+
+        profile = userProfile.objects.get(user=self.request.user)
+        if date_param is None:
+            user_timezone = profile.timezone
+            try:
+                user_timezone = pytz.timezone(user_timezone)
+            except pytz.exceptions.UnknownTimeZoneError:
+                user_timezone = pytz.UTC
+            utc_now = timezone.now()
+            local_now = utc_now.astimezone(user_timezone)
+            today_in_user_tz = local_now.date()
+            date_param = today_in_user_tz.strftime("%A")
+        schedules = Schedule.objects.filter(
+            schedule_day = date_param,
+            isActive=True,
+            property__client__company=profile.company
+        ).order_by("order")
+        serializer = ScheduleManagementSerializer(schedules,many=True)
+        return Response({'schedules': list(serializer.data)},status=status.HTTP_200_OK)
+
+class update_schedules(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        schedule_ids = request.data.get("schedules", [])
+        if not schedule_ids:
+            return Response({"error": "No schedules provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        profile = userProfile.objects.get(user=self.request.user)
+
+        # Start transaction so either ALL succeed or NONE
+        with transaction.atomic():
+            schedules = Schedule.objects.filter(
+                id__in=schedule_ids,
+                property__client__company=profile.company  # safeguard: only schedules for this company
+            )
+
+            # Verify the user didn't try to reorder schedules outside their company
+            if schedules.count() != len(schedule_ids):
+                return Response(
+                    {"error": "One or more schedules not found or not accessible"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Map id → instance for quick access
+            schedule_map = {s.id: s for s in schedules}
+
+            updated = []
+            for index, schedule_id in enumerate(schedule_ids, start=1):
+                schedule = schedule_map.get(schedule_id)
+                if schedule:
+                    schedule.order = index
+                    updated.append(schedule)
+
+            Schedule.objects.bulk_update(updated, ["order"])
+
+        return Response({"status": "success"}, status=status.HTTP_200_OK)
+
+class update_Jobs_Order(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        job_ids = request.data.get("jobs", [])
+        if not job_ids:
+            return Response({"error": "No schedules provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        profile = userProfile.objects.get(user=self.request.user)
+
+        # Start transaction so either ALL succeed or NONE
+        with transaction.atomic():
+            jobs = Job.objects.filter(
+                id__in=job_ids,
+                schedule__property__client__company=profile.company  # safeguard: only schedules for this company
+            )
+
+            # Verify the user didn't try to reorder schedules outside their company
+            if jobs.count() != len(job_ids):
+                return Response(
+                    {"error": "One or more schedules not found or not accessible"},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Map id → instance for quick access
+            job_map = {s.id: s for s in jobs}
+
+            updated = []
+            for index, job_id in enumerate(job_ids, start=1):
+                job = job_map.get(job_id)
+                if job:
+                    job.order = index
+                    updated.append(job)
+
+            Job.objects.bulk_update(updated, ["order"])
+
+        return Response({"status": "success"}, status=status.HTTP_200_OK)

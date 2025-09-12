@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment,userProfile
 from django.utils import timezone
 from datetime import timedelta
-
+import pytz
 class userSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -29,11 +29,31 @@ class ClientSerializer(serializers.ModelSerializer):
             "created_at": {"read_only":True}
         }
 
+class ClientOnlySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = ["id", "firstName", "lastName", "phoneNumber", "email"]
+        extra_kwargs = {
+            "created_at": {"read_only":True}
+        }
+
 class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive"]
+        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day"]
+
+class PropertyandClientSerializer(serializers.ModelSerializer):
+    client = ClientOnlySerializer()
+    class Meta:
+        model = Property
+        fields = ["id", "street", "city", "state", "zipCode","client"]
+
+class ScheduleManagementSerializer(serializers.ModelSerializer):
+    property = PropertyandClientSerializer()
+    class Meta:
+        model = Schedule
+        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day","property"]
 
 class PropertyAndSchedule(serializers.ModelSerializer):
     schedules = ScheduleSerializer(many=True)
@@ -63,7 +83,17 @@ class ClientPropertySetUpSerializer(serializers.ModelSerializer):
                 schedules_data = property_data.pop('schedules', [])
                 property_instance = Property.objects.create(client=client, **property_data)
                 for schedule_data in schedules_data:
-                    Schedule.objects.create(property=property_instance ,**schedule_data)
+                    new_schedule = Schedule.objects.create(property=property_instance ,**schedule_data)
+                    user_profile = getattr(new_schedule.property.client.company.user, "userprofile", None)
+                    tz_name = user_profile.timezone if user_profile else "America/Chicago"
+                    user_tz = pytz.timezone(tz_name)
+
+                    # Localize current time
+                    local_now = timezone.now().astimezone(user_tz)
+                    today_in_user_tz = local_now.date()
+
+                    if new_schedule.nextDate == today_in_user_tz:  
+                        new_schedule.generate_jobs()
             except Exception as e:
                 client.delete()
                 raise serializers.ValidationError(f"Error Creating Property or Schedule")
@@ -114,7 +144,17 @@ class PropertyAndScheduleSetUp(serializers.ModelSerializer):
         property_instance = Property.objects.create(client=client,**validated_data)
         
         for schedule_data in schedules_data:
-            Schedule.objects.create(property=property_instance, **schedule_data)
+            new_schedule = Schedule.objects.create(property=property_instance, **schedule_data)
+            user_profile = getattr(new_schedule.property.client.company.user, "userprofile", None)
+            tz_name = user_profile.timezone if user_profile else "America/Chicago"
+            user_tz = pytz.timezone(tz_name)
+
+                    # Localize current time
+            local_now = timezone.now().astimezone(user_tz)
+            today_in_user_tz = local_now.date()
+
+            if new_schedule.nextDate == today_in_user_tz:  
+                new_schedule.generate_jobs()
         return property_instance
 
 class PaymentSerializer(serializers.ModelSerializer):

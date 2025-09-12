@@ -48,7 +48,7 @@
   color: white;
   display: flex;
   flex-direction: column;
-  gap: clamp(20px, 1.5vw, 25px);
+  gap: clamp(20px, 1.4vw, 25px);
 }
 
 .client-item, .service-item, .service-tags, .job-client {
@@ -134,7 +134,7 @@
 .job-info .service-tags {
   display: flex;
   margin-left: clamp(-8px, -5px, -10px);
-  margin-top: clamp(-4px, 2vw, -8px); /* Adjusted for better alignment */
+  margin-top: clamp(-15px, 2vw, -8px);
 }
 
 .service-item span {
