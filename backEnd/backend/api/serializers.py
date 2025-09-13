@@ -42,6 +42,19 @@ class ScheduleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
         fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day"]
+    
+    def update(self, instance, validated_data):
+        instance = super().update(instance, validated_data)
+        user_profile = getattr(instance.property.client.company.user, "userprofile", None)
+        tz_name = user_profile.timezone if user_profile else "America/Chicago"
+        user_tz = pytz.timezone(tz_name)
+
+                    # Localize current time
+        local_now = timezone.now().astimezone(user_tz)
+        today_in_user_tz = local_now.date()
+        if instance.nextDate == today_in_user_tz:
+            instance.generate_jobs()
+        return instance
 
 class PropertyandClientSerializer(serializers.ModelSerializer):
     client = ClientOnlySerializer()
@@ -183,6 +196,7 @@ class JobOnlySerializer(serializers.ModelSerializer):
         model = Job
         fields = ['id', 'jobDate', 'status', 'cost','complete_date','order']
 
+   
 class ScheduleJobsSerializer(serializers.ModelSerializer):
     jobs = JobOnlySerializer(source='job_set',many=True,read_only=True)
 

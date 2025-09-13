@@ -275,7 +275,7 @@ class ScheduleCreate(generics.CreateAPIView):
             try:
                 user_timezone = pytz.timezone(user_timezone)
             except pytz.exceptions.UnknownTimeZoneError:
-                user_timezone = pytz.UTC
+                pass
             utc_now = timezone.now()
             local_now = utc_now.astimezone(user_timezone)
             today_in_user_tz = local_now.date()
