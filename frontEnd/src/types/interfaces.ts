@@ -1,4 +1,6 @@
 // interfaces.ts
+import { PropertyNote, ScheduleNote } from "./noteTypes";
+
 export interface Property {
   id: number;
   street: string;
@@ -55,11 +57,13 @@ export interface Job {
     city: string;
     state: string;
     zipCode: string;
+    note?: PropertyNote;
   };
   schedule: {
     id: number;
     frequency: string;
     service: string;
+    note?: ScheduleNote;
   };
   client: {
     id: number;
