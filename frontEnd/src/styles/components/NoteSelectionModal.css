@@ -1,0 +1,19 @@
+.note-type-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 25px 60px;
+}
+
+.note-type-btn i {
+    font-size: 2rem;
+}
+
+.property-note-btn i {
+    color: #72d876cb;
+}
+
+.schedule-note-btn i {
+    color: #ca94e9d9;
+}

@@ -1,0 +1,4 @@
+.note-form-container {
+    width: clamp(250px, 90%, 350px);
+    height: auto;
+}
