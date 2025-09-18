@@ -33,9 +33,10 @@ class JobNoteSerializer(serializers.ModelSerializer):
         model = JobNote
         fields = ["id","title","content","created_at"]
 class PropertySerializer(serializers.ModelSerializer):
+    propertynote = PropertyNoteSerializer(read_only=True)
     class Meta:
         model = Property
-        fields = ["id", "street", "city", "state", "zipCode"]
+        fields = ["id", "street", "city", "state", "zipCode","propertynote"]
 
 class ClientSerializer(serializers.ModelSerializer):
     properties = PropertySerializer(many=True, read_only=True)
@@ -144,10 +145,10 @@ class JobSerializer(serializers.ModelSerializer):
     property = serializers.SerializerMethodField()
     schedule = ScheduleSerializer()
     client = OnlyClientSerializer()
-    jobnote = JobNoteSerializer(read_only=True)
+    
     class Meta:
         model = Job
-        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule', 'client','order','jobnote']
+        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule', 'client','order']
         
     def get_property(self, obj):
         property_obj = obj.schedule.property
