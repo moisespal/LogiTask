@@ -1,9 +1,9 @@
 from django.shortcuts import render,get_object_or_404
 from django.contrib.auth.models import User
 from rest_framework import generics, status
-from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer,OnlyClientSerializer,ScheduleManagementSerializer
+from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer,OnlyClientSerializer,ScheduleManagementSerializer,ScheduleNoteSerializer,JobNoteSerializer,PropertyNoteSerializer    
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment
+from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment,NoteTemplate,ScheduleNote,PropertyNote,JobNote
 from rest_framework.generics import ListAPIView,UpdateAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
@@ -634,3 +634,65 @@ class update_Jobs_Order(UpdateAPIView):
             Job.objects.bulk_update(updated, ["order"])
 
         return Response({"status": "success"}, status=status.HTTP_200_OK)
+
+class ScheduleNoteListCreate(generics.ListCreateAPIView):
+    serializer_class = ScheduleNoteSerializer
+    permission_classes = [IsAuthenticated]
+
+    #retrive notes
+    def get_queryset(self):
+        schedule_id = self.kwargs.get("schedule_id")
+        return ScheduleNote.objects.filter(schedule_id=schedule_id)
+        
+    #creating note
+    def perform_create(self, serializer):
+        schedule_id = self.kwargs.get("schedule_id")
+        user=self.request.user
+        try:
+            schedule = Schedule.objects.get(id=schedule_id)
+            serializer.save(schedule=schedule, author=user)
+        except Schedule.DoesNotExist:
+            return Response ({'NO MATCHING SCHEDULE'}, status=status.HTTP_401_UNAUTHORIZED)
+class PropertyNoteListCreate(generics.ListCreateAPIView):
+    serializer_class = PropertyNoteSerializer
+    permission_classes = [IsAuthenticated]
+
+    #retrive notes
+    def get_queryset(self):
+        property_id = self.kwargs.get("property_id")
+        return PropertyNote.objects.filter(property_id=property_id)
+        
+    #creating note
+    def perform_create(self, serializer):
+        property_id = self.kwargs.get("property_id")
+        user=self.request.user
+        try:
+            property = Property.objects.get(id=property_id)
+            serializer.save(property=property, author=user)
+        except Schedule.DoesNotExist:
+            return Response ({'NO MATCHING PROPERTY'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class JobNoteListCreate(generics.ListCreateAPIView):
+    serializer_class = JobNoteSerializer
+    permission_classes = [IsAuthenticated]
+
+    #retrive notes
+    def get_queryset(self):
+        job_id = self.kwargs.get("job_id")
+        return JobNote.objects.filter(job_id=job_id)
+        
+    #creating note
+    def perform_create(self, serializer):
+        job_id = self.kwargs.get("job_id")
+        user=self.request.user
+        try:
+            job = Job.objects.get(id=job_id)
+            serializer.save(job=job, author=user)
+        except Schedule.DoesNotExist:
+            return Response ({'NO MATCHING JOB'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class ScheduleNoteDetailView(UpdateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = ScheduleNote.objects.all()
+    serializer_class = ScheduleNoteSerializer

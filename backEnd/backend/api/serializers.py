@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment,userProfile
+from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment,userProfile,NoteTemplate,ScheduleNote,PropertyNote,JobNote
 from django.utils import timezone
 from datetime import timedelta
 import pytz
@@ -310,3 +310,19 @@ class PaymentInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model=Payment
         fields = ["id","amount","paymentType","paymentDate","client"]
+
+class PropertyNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyNote
+        fields = ["id","title","content","created_at"]
+
+class ScheduleNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduleNote
+        fields = ["id","title","content","created_at"]
+  
+class JobNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobNote
+        fields = ["id","title","content","created_at"]
+  
