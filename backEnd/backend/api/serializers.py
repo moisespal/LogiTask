@@ -15,6 +15,20 @@ class userSerializer(serializers.ModelSerializer):
         userProfile.objects.create(user=user)
         return user
 
+class PropertyNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyNote
+        fields = ["id","title","content","created_at"]
+
+class ScheduleNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduleNote
+        fields = ["id","title","content","created_at"]
+  
+class JobNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobNote
+        fields = ["id","title","content","created_at"]
 class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
@@ -38,10 +52,10 @@ class ClientOnlySerializer(serializers.ModelSerializer):
         }
 
 class ScheduleSerializer(serializers.ModelSerializer):
-
+    schedulenote = ScheduleNoteSerializer()
     class Meta:
         model = Schedule
-        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day"]
+        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day",'schedulenote']
     
     def update(self, instance, validated_data):
         instance = super().update(instance, validated_data)
@@ -122,20 +136,7 @@ class OnlyClientSerializer(serializers.ModelSerializer):
             "created_at": {"read_only":True}
         }
 
-class PropertyNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PropertyNote
-        fields = ["id","title","content","created_at"]
 
-class ScheduleNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ScheduleNote
-        fields = ["id","title","content","created_at"]
-  
-class JobNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = JobNote
-        fields = ["id","title","content","created_at"]
 class JobSerializer(serializers.ModelSerializer):
     property = serializers.SerializerMethodField()
     schedule = ScheduleSerializer()
