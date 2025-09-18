@@ -308,7 +308,7 @@ class BalanceHistory(models.Model):
     
 class NoteTemplate(models.Model):
     title = models.CharField(max_length=100,null=True,blank=True)
-    content = models.TextField()
+    content = models.TextField(max_length=100,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     

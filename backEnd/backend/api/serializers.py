@@ -16,9 +16,12 @@ class userSerializer(serializers.ModelSerializer):
         return user
 
 class PropertyNoteSerializer(serializers.ModelSerializer):
+   
     class Meta:
         model = PropertyNote
         fields = ["id","title","content","created_at"]
+        extra_kwargs = {"id": {"read_only":True},
+                        "created_at": {"read_only":True}}
 
 class ScheduleNoteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,7 +55,7 @@ class ClientOnlySerializer(serializers.ModelSerializer):
         }
 
 class ScheduleSerializer(serializers.ModelSerializer):
-    schedulenote = ScheduleNoteSerializer()
+    schedulenote = ScheduleNoteSerializer(read_only=True)
     class Meta:
         model = Schedule
         fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day",'schedulenote']
@@ -141,7 +144,7 @@ class JobSerializer(serializers.ModelSerializer):
     property = serializers.SerializerMethodField()
     schedule = ScheduleSerializer()
     client = OnlyClientSerializer()
-    jobnote = JobNoteSerializer()
+    jobnote = JobNoteSerializer(read_only=True)
     class Meta:
         model = Job
         fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule', 'client','order','jobnote']
