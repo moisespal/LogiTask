@@ -316,10 +316,10 @@ class NoteTemplate(models.Model):
         abstract = True
 
 class ScheduleNote(NoteTemplate):
-    schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE)
+    schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE)
 
 class PropertyNote(NoteTemplate):
-    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    property = models.OneToOneField(Property, on_delete=models.CASCADE)
 
 class JobNote(NoteTemplate):
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    job = models.OneToOneField(Job, on_delete=models.CASCADE)

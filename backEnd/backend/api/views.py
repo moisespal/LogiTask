@@ -690,6 +690,20 @@ class JobNoteListCreate(generics.ListCreateAPIView):
             serializer.save(job=job, author=user)
         except Schedule.DoesNotExist:
             return Response ({'NO MATCHING JOB'}, status=status.HTTP_401_UNAUTHORIZED)
+class GetScheduleNote(generics.RetrieveAPIView):
+    serializer_class = PropertyNoteSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = ScheduleNote.objects.all()
+
+class GetPropertyNote(generics.RetrieveAPIView):
+    serializer_class = PropertyNoteSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = PropertyNote.objects.all()
+
+class GetJobNote(generics.RetrieveAPIView):
+    serializer_class = PropertyNoteSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = JobNote.objects.all()
 
 
 class ScheduleNoteDetailView(UpdateAPIView):
