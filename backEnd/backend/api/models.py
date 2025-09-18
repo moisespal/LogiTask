@@ -305,3 +305,21 @@ class BalanceHistory(models.Model):
 
     def __str__(self):
         return f"Change of {self.delta} on {self.created_at.date()}"
+    
+class NoteTemplate(models.Model):
+    title = models.CharField(max_length=100,null=True,blank=True)
+    content = models.TextField(max_length=100,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    class Meta:
+        abstract = True
+
+class ScheduleNote(NoteTemplate):
+    schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE)
+
+class PropertyNote(NoteTemplate):
+    property = models.OneToOneField(Property, on_delete=models.CASCADE)
+
+class JobNote(NoteTemplate):
+    job = models.OneToOneField(Job, on_delete=models.CASCADE)

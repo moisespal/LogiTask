@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment,userProfile
+from .models import Client, Property,Schedule,Job,Payment,Company,Balance,BalanceHistory,BalanceAdjustment,userProfile,NoteTemplate,ScheduleNote,PropertyNote,JobNote
 from django.utils import timezone
 from datetime import timedelta
 import pytz
@@ -15,10 +15,28 @@ class userSerializer(serializers.ModelSerializer):
         userProfile.objects.create(user=user)
         return user
 
+class PropertyNoteSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model = PropertyNote
+        fields = ["id","title","content","created_at"]
+        extra_kwargs = {"id": {"read_only":True},
+                        "created_at": {"read_only":True}}
+
+class ScheduleNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduleNote
+        fields = ["id","title","content","created_at"]
+  
+class JobNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobNote
+        fields = ["id","title","content","created_at"]
 class PropertySerializer(serializers.ModelSerializer):
+    propertynote = PropertyNoteSerializer(read_only=True)
     class Meta:
         model = Property
-        fields = ["id", "street", "city", "state", "zipCode"]
+        fields = ["id", "street", "city", "state", "zipCode","propertynote"]
 
 class ClientSerializer(serializers.ModelSerializer):
     properties = PropertySerializer(many=True, read_only=True)
@@ -38,10 +56,10 @@ class ClientOnlySerializer(serializers.ModelSerializer):
         }
 
 class ScheduleSerializer(serializers.ModelSerializer):
-
+    schedulenote = ScheduleNoteSerializer(read_only=True)
     class Meta:
         model = Schedule
-        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day"]
+        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day",'schedulenote']
     
     def update(self, instance, validated_data):
         instance = super().update(instance, validated_data)
@@ -127,7 +145,7 @@ class JobSerializer(serializers.ModelSerializer):
     property = serializers.SerializerMethodField()
     schedule = ScheduleSerializer()
     client = OnlyClientSerializer()
-
+    
     class Meta:
         model = Job
         fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule', 'client','order']
@@ -310,3 +328,6 @@ class PaymentInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model=Payment
         fields = ["id","amount","paymentType","paymentDate","client"]
+
+
+  
