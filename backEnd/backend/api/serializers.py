@@ -122,15 +122,28 @@ class OnlyClientSerializer(serializers.ModelSerializer):
             "created_at": {"read_only":True}
         }
 
+class PropertyNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyNote
+        fields = ["id","title","content","created_at"]
 
+class ScheduleNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduleNote
+        fields = ["id","title","content","created_at"]
+  
+class JobNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobNote
+        fields = ["id","title","content","created_at"]
 class JobSerializer(serializers.ModelSerializer):
     property = serializers.SerializerMethodField()
     schedule = ScheduleSerializer()
     client = OnlyClientSerializer()
-
+    jobnote = JobNoteSerializer()
     class Meta:
         model = Job
-        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule', 'client','order']
+        fields = ['id', 'jobDate', 'status', 'cost','complete_date', 'property', 'schedule', 'client','order','jobnote']
         
     def get_property(self, obj):
         property_obj = obj.schedule.property
@@ -311,18 +324,5 @@ class PaymentInfoSerializer(serializers.ModelSerializer):
         model=Payment
         fields = ["id","amount","paymentType","paymentDate","client"]
 
-class PropertyNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PropertyNote
-        fields = ["id","title","content","created_at"]
 
-class ScheduleNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ScheduleNote
-        fields = ["id","title","content","created_at"]
-  
-class JobNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = JobNote
-        fields = ["id","title","content","created_at"]
   

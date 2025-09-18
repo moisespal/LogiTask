@@ -307,7 +307,7 @@ class BalanceHistory(models.Model):
         return f"Change of {self.delta} on {self.created_at.date()}"
     
 class NoteTemplate(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100,null=True,blank=True)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
