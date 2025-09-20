@@ -57,13 +57,13 @@ export interface Job {
     city: string;
     state: string;
     zipCode: string;
-    note?: PropertyNote;
+    propertynote?: PropertyNote;
   };
   schedule: {
     id: number;
     frequency: string;
     service: string;
-    note?: ScheduleNote;
+    schedulenote?: ScheduleNote;
   };
   client: {
     id: number;

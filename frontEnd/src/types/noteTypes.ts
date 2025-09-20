@@ -1,22 +1,12 @@
-export interface NoteBase {
+export interface BaseNote {
   id: number;
+  title: string;
   content: string;
-  createdAt: string;
-  lastModified: string;
-  createdBy: string;
+  created_at: string; 
 }
 
-export interface PropertyNote extends NoteBase {
-  propertyId: number;
-}
-
-export interface ScheduleNote extends NoteBase {
-  scheduleId: number;
-}
-
-//TODO: Notes field for jobs in case of issues on site, can be useful when looking back at past jobs.
-export interface JobNote extends NoteBase {
-  jobId: number;
-}
+export interface PropertyNote extends BaseNote {}
+export interface ScheduleNote extends BaseNote {}
+export interface JobNote extends BaseNote {}
 
 export type Note = PropertyNote | ScheduleNote | JobNote;

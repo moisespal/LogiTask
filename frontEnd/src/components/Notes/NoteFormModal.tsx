@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef} from 'react';
 import { PropertyNote, ScheduleNote } from '../../types/noteTypes';
 import '../../styles/components/modal.css';
 import '../../styles/components/NoteFormModal.css';
+import api from '../../api';
+import { formatUTCtoLocal } from '../../utils/format';
 
 export type NoteType = 'property' | 'schedule';
 
@@ -11,13 +13,6 @@ interface NoteFormModalProps {
   noteType: NoteType;
   targetId: number;
   existingNote?: PropertyNote | ScheduleNote | null;
-
-  onSave: (
-    noteType: NoteType,
-    targetId: number,
-    content: string,
-    noteId?: number 
-  ) => void;
 }
 
 const NoteFormModal: React.FC<NoteFormModalProps> = ({
@@ -25,18 +20,16 @@ const NoteFormModal: React.FC<NoteFormModalProps> = ({
   onClose,
   noteType,
   targetId,
-  existingNote,
-  onSave,
+  existingNote
 }) => {
   const [content, setContent] = useState('');
   const notesTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const userTimeZone = localStorage.getItem("userTimeZone") ?? "UTC";
 
     useEffect(() => {
-        if (existingNote) {
+        if (existingNote?.content) {
         setContent(existingNote.content);
-        } else {
-        setContent('');
-        }
+        } 
     }, [existingNote]);
 
     useEffect(() => {
@@ -70,7 +63,12 @@ const NoteFormModal: React.FC<NoteFormModalProps> = ({
         setContent('');
     }
 
-
+    
+    const createNote = async (noteType : string) => {
+      await api.post(`/api/${noteType}/${targetId}/notes/`,  { title: "title", content:content});
+      handleClose();
+    };
+   
 
   if (!isOpen) return null;
 
@@ -82,7 +80,9 @@ const NoteFormModal: React.FC<NoteFormModalProps> = ({
         </button>
 
         <h3>{existingNote ? `Edit ${noteType} Note` : `Create ${noteType} Note`}</h3>
-
+        {existingNote && (
+          <h4> {existingNote.created_at ? formatUTCtoLocal(existingNote.created_at, userTimeZone) : ""}</h4>
+        )}
         <textarea
           className="adjustment-notes"
           value={content}
@@ -97,14 +97,14 @@ const NoteFormModal: React.FC<NoteFormModalProps> = ({
         />
 
         <div className="modal-btn-container">
-          <button className="modal-btn modal-btn-cancel" onClick={onClose}>
+          <button className="modal-btn modal-btn-cancel" onClick={handleClose}>
             Cancel
           </button>
           <button
             className="modal-btn modal-btn-submit"
             disabled={content.trim().length === 0}
             onClick={() =>
-              onSave(noteType, targetId, content, existingNote?.id)
+              createNote(noteType)
             }
           >
             {existingNote ? 'Update' : 'Create'}

@@ -34,39 +34,29 @@ const TopBar: React.FC<TopBarProps> = ({
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);
 
   const [noteFormData, setNoteFormData] = useState<{
-  type: "property" | "schedule" | null;
-  id?: number;
-  note?: PropertyNote | ScheduleNote;
-}>({ type: null });
+    type: "property" | "schedule" | null;
+    id?: number;
+    note?: PropertyNote | ScheduleNote;
+  }>({ type: null });
 
   const handleSelectNoteType = (noteType: "property" | "schedule") => {
-  if (!selectedJob) return;
+    if (!selectedJob) return;
 
-  if (noteType === "property") {
-    setNoteFormData({
-      type: "property",
-      id: selectedJob.property.id,
-      note: selectedJob.property.note,
-    });
-  } else {
-    setNoteFormData({
-      type: "schedule",
-      id: selectedJob.schedule.id,
-      note: selectedJob.schedule.note,
-    });
-  }
+    if (noteType === "property") {
+      setNoteFormData({
+        type: "property",
+        id: selectedJob.property.id,
+        note: selectedJob.property.propertynote,
+      });
+    } else {
+      setNoteFormData({
+        type: "schedule",
+        id: selectedJob.schedule.id,
+        note: selectedJob.schedule.schedulenote,
+      });
+    }
 
-  setIsNoteModalOpen(false);
-};
-
-  const handleSaveNote = (
-    noteType: "property" | "schedule",
-    targetId: number,
-    content: string,
-    noteId?: number
-  ) => {
-    console.log("Saving note:", { noteType, targetId, content, noteId });
-    setNoteFormData({ type: null }); 
+    setIsNoteModalOpen(false);
   };
 
   const handleClientClick = async () => {
@@ -184,7 +174,6 @@ const TopBar: React.FC<TopBarProps> = ({
         noteType={noteFormData.type as "property" | "schedule"}
         targetId={noteFormData.id!}
         existingNote={noteFormData.note}
-        onSave={handleSaveNote}
       />
 
     </div>
