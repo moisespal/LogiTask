@@ -19,19 +19,19 @@ class PropertyNoteSerializer(serializers.ModelSerializer):
    
     class Meta:
         model = PropertyNote
-        fields = ["id","title","content","created_at"]
+        fields = ["id","title","content","created_at","last_modified"]
         extra_kwargs = {"id": {"read_only":True},
                         "created_at": {"read_only":True}}
 
 class ScheduleNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScheduleNote
-        fields = ["id","title","content","created_at"]
+        fields = ["id","title","content","created_at","last_modified"]
   
 class JobNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobNote
-        fields = ["id","title","content","created_at"]
+        fields = ["id","title","content","created_at","last_modified"]
 class PropertySerializer(serializers.ModelSerializer):
     propertynote = PropertyNoteSerializer(read_only=True)
     class Meta:

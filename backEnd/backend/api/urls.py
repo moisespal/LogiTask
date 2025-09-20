@@ -43,5 +43,8 @@ urlpatterns = [
     path("schedule-note/<int:pk>/", views.GetScheduleNote.as_view(), name='schedule-note'),
     path("property-note/<int:pk>/", views.GetPropertyNote.as_view(), name='schedule-note'),
     path("job-note/<int:pk>/", views.GetJobNote.as_view(), name='schedule-note'),
+    path("schedule-note/modify/<int:pk>/", views.ScheduleNoteDetailView.as_view(), name='schedule-note-modify'),
+    path("property-note/modify/<int:pk>/", views.PropertyNoteDetailView.as_view(), name='property-note-modify'),
+    path("job-note/modify/<int:pk>/", views.JobNoteDetailView.as_view(), name='job-note-modify'),
     
 ]

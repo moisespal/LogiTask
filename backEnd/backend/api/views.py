@@ -4,7 +4,7 @@ from rest_framework import generics, status
 from .serializers import ClientSerializer, userSerializer, PropertySerializer, ClientPropertySetUpSerializer, JobSerializer ,PropertyAndScheduleSetUp, ScheduleSerializer ,PaymentSerializer,CompanySerializer,ScheduleJobsSerializer,PropertyServiceInfoSerializer, BalanceSerializer,BalanceHistorySerializer,BalanceAdjustmentSerializer,UserProfileSerializer,JobInfoSerializer,JobOnlySerializer,ClientPropertiesSerializer,PaymentInfoSerializer,OnlyClientSerializer,ScheduleManagementSerializer,ScheduleNoteSerializer,JobNoteSerializer,PropertyNoteSerializer    
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Client, Property, Schedule, Job,Payment,Company,userProfile, Balance, BalanceHistory,BalanceAdjustment,NoteTemplate,ScheduleNote,PropertyNote,JobNote
-from rest_framework.generics import ListAPIView,UpdateAPIView
+from rest_framework.generics import ListAPIView,UpdateAPIView, RetrieveUpdateDestroyAPIView
 from django.http import JsonResponse
 from django.utils.timezone import now
 from rest_framework.views import APIView
@@ -706,7 +706,18 @@ class GetJobNote(generics.RetrieveAPIView):
     queryset = JobNote.objects.all()
 
 
-class ScheduleNoteDetailView(UpdateAPIView):
+class ScheduleNoteDetailView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     queryset = ScheduleNote.objects.all()
     serializer_class = ScheduleNoteSerializer
+
+class PropertyNoteDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = PropertyNote.objects.all()
+    serializer_class = PropertyNoteSerializer
+
+class JobNoteDetailView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = JobNote.objects.all()
+    serializer_class = JobNoteSerializer
+
