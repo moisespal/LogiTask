@@ -205,20 +205,11 @@ class Balance(models.Model):
 
     def recalculate_balance(self):
         with transaction.atomic():
-            unapplied_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete',schedule__monthly_pricing=False)
+            unapplied_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete')
             unapplied_payments = Payment.objects.filter(client=self.client, is_applied_to_balance=False)
             unapplied_adjustments = BalanceAdjustment.objects.filter(client=self.client, is_applied_to_balance=False)
             
-            monthly_pricing_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete',schedule__monthly_pricing=True)
-            if monthly_pricing_jobs and len(monthly_pricing_jobs)>1:
-                seen_names = []
-                result = []
-                for job in monthly_pricing_jobs:
-                    if job.schedule.service not in seen_names:
-                        result.append(job)
-                    seen_names.append(job.schedule.service)
-                    
-            total_montly_jobs = result.aggregate(Sum("cost"))["cost__sum"] or 0
+           
             total_jobs = unapplied_jobs.aggregate(Sum("cost"))["cost__sum"] or 0
             total_payments = unapplied_payments.aggregate(Sum("amount"))["amount__sum"] or 0
             total_adjustments = unapplied_adjustments.aggregate(Sum("amount"))["amount__sum"] or 0
@@ -226,9 +217,9 @@ class Balance(models.Model):
             total_jobs = Decimal(total_jobs)
             total_payments = Decimal(total_payments)
             total_adjustments= Decimal(total_adjustments)
-            total_montly_jobs = Decimal(total_montly_jobs)
             
-            delta = total_payments - total_jobs + total_adjustments + total_montly_jobs
+            
+            delta = total_payments - total_jobs + total_adjustments 
 
             self.current_balance += delta
 
@@ -263,20 +254,10 @@ class Balance(models.Model):
         return self.current_balance
     
     def calculate_estimated_balace(self):
-        unapplied_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete',schedule__monthly_pricing=False)
+        unapplied_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete')
         unapplied_payments = Payment.objects.filter(client=self.client, is_applied_to_balance=False)
         unapplied_adjustments = BalanceAdjustment.objects.filter(client=self.client, is_applied_to_balance=False)
             
-        monthly_pricing_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete',schedule__monthly_pricing=True)
-        if monthly_pricing_jobs and len(monthly_pricing_jobs)>1:
-                seen_names = []
-                result = []
-                for job in monthly_pricing_jobs:
-                    if job.schedule.service not in seen_names:
-                        result.append(job)
-                    seen_names.append(job.schedule.service)
-                    
-        total_montly_jobs = result.aggregate(Sum("cost"))["cost__sum"] or 0
         total_jobs = unapplied_jobs.aggregate(Sum("cost"))["cost__sum"] or 0
         total_payments = unapplied_payments.aggregate(Sum("amount"))["amount__sum"] or 0
         total_adjustments = unapplied_adjustments.aggregate(Sum("amount"))["amount__sum"] or 0
@@ -284,10 +265,8 @@ class Balance(models.Model):
         total_jobs = Decimal(total_jobs)
         total_payments = Decimal(total_payments)
         total_adjustments= Decimal(total_adjustments)
-        total_montly_jobs = Decimal(total_montly_jobs)
             
-        delta = total_payments - total_jobs + total_adjustments + total_montly_jobs
-
+        delta = total_payments - total_jobs + total_adjustments
 
         return self.current_balance + delta
         
