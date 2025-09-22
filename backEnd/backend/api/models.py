@@ -109,7 +109,7 @@ class Schedule(models.Model):
     isActive = models.BooleanField(default=True)
     schedule_day = models.CharField(max_length=9,choices=WEEKDAY_CHOICES, default=MONDAY)
     order = models.PositiveIntegerField(default=999, db_index=True) # Default to a high number to push unsorted items to the end
-    
+    monthly_pricing = models.BooleanField(default=False)
     class Meta:
         ordering = ["schedule_day", "order"]  
 
@@ -209,6 +209,7 @@ class Balance(models.Model):
             unapplied_payments = Payment.objects.filter(client=self.client, is_applied_to_balance=False)
             unapplied_adjustments = BalanceAdjustment.objects.filter(client=self.client, is_applied_to_balance=False)
             
+           
             total_jobs = unapplied_jobs.aggregate(Sum("cost"))["cost__sum"] or 0
             total_payments = unapplied_payments.aggregate(Sum("amount"))["amount__sum"] or 0
             total_adjustments = unapplied_adjustments.aggregate(Sum("amount"))["amount__sum"] or 0
@@ -217,7 +218,8 @@ class Balance(models.Model):
             total_payments = Decimal(total_payments)
             total_adjustments= Decimal(total_adjustments)
             
-            delta = total_payments - total_jobs + total_adjustments
+            
+            delta = total_payments - total_jobs + total_adjustments 
 
             self.current_balance += delta
 
@@ -255,7 +257,7 @@ class Balance(models.Model):
         unapplied_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete')
         unapplied_payments = Payment.objects.filter(client=self.client, is_applied_to_balance=False)
         unapplied_adjustments = BalanceAdjustment.objects.filter(client=self.client, is_applied_to_balance=False)
-
+            
         total_jobs = unapplied_jobs.aggregate(Sum("cost"))["cost__sum"] or 0
         total_payments = unapplied_payments.aggregate(Sum("amount"))["amount__sum"] or 0
         total_adjustments = unapplied_adjustments.aggregate(Sum("amount"))["amount__sum"] or 0
@@ -263,7 +265,7 @@ class Balance(models.Model):
         total_jobs = Decimal(total_jobs)
         total_payments = Decimal(total_payments)
         total_adjustments= Decimal(total_adjustments)
-
+            
         delta = total_payments - total_jobs + total_adjustments
 
         return self.current_balance + delta
@@ -311,7 +313,7 @@ class NoteTemplate(models.Model):
     content = models.TextField(max_length=100,null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    
+    last_modified = models.DateTimeField(auto_now=True)
     class Meta:
         abstract = True
 
