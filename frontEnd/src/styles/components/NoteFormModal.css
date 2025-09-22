@@ -2,3 +2,14 @@
     width: clamp(250px, 90%, 350px);
     height: auto;
 }
+
+.note-timestamp {
+    font-size: 0.8rem;
+    color: rgb(212, 212, 212);
+    margin-bottom: 10px;
+}
+
+.note-timestamp i {
+    color: rgb(165, 165, 165);
+    font-weight: 300;
+}

@@ -3,6 +3,7 @@ export interface BaseNote {
   title: string;
   content: string;
   created_at: string; 
+  last_modified: string;
 }
 
 export interface PropertyNote extends BaseNote {}

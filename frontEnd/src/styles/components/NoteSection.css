@@ -10,16 +10,11 @@
   opacity: 1;
 }
 
-.notes-section.fade-out {
-  opacity: 0;
-  pointer-events: none;
-}
-
 .note-card { 
   border-radius: 8px;
   box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
   width: 200px;
-  height: 200px;
+  height: fit-content;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -39,12 +34,18 @@
   color: white;
 }
 
+.note-header span i {
+  margin-right: 6px;
+}
+
 .note-card.property .note-header {
-  background: #59b45ccb;
+  background: #c2433cd7;
+  border: 1px solid #b90a01d4;
 }
 
 .note-card.schedule .note-header {
-  background: #a44bd8d9;
+  background: #c481d4;
+  border: 1px solid #7a4b81d4;
 }
 
 .note-edit-btn {
@@ -60,14 +61,26 @@
 }
 
 .note-content {
-  padding: 0.75rem;
-  font-size: 1.2rem;
-  color: #505050;
+  padding: 6px 0.75rem;
   flex-grow: 1;
-  font-family: "Nunito", sans-serif;
+  font-family: "Outfit", sans-serif;
 }
 
-@media (max-width: 768px) {
+.note-content h1 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 0.3rem 0;
+  color: #333;
+}
+v
+.note-content p {
+  font-size: 0.9rem;
+  color: #555;            
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 850px) {
   .notes-section {
     flex-direction: column;
     margin: 1rem;
