@@ -156,7 +156,9 @@
 }
 
 .job-info .service-pill:hover,
-.job-info .frequency-pill:hover {
+.job-info .frequency-pill:hover,
+.job-info .cost-pill:hover,
+.job-info .note-pill:hover {
   transform: translateY(-1px);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
@@ -207,6 +209,23 @@
 .job-info .cost-pill:hover {
   background: rgba(76, 175, 80, 0.25);
   transform: translateY(-1px);
+}
+
+/* Note Button Pill */
+.job-info .note-pill {  
+  color: #feff9c;
+  background: #fdff9c28;
+  border: 1px solid #fdff9c33;
+  user-select: none;
+}
+
+.job-info .note-pill i {
+  color: #feff9c;
+}
+
+.job-info .note-pill:hover {
+  background: rgba(226, 217, 139, 0.25);
+  cursor: pointer;
 }
 
 /* Sort Controls

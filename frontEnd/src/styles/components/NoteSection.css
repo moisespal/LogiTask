@@ -1,7 +1,7 @@
 .notes-section {
   position: absolute;
   top: 250px;
-  left: 100px;
+  left: 4vw;
   display: flex;
   flex-direction: row;
   gap: 2rem;
@@ -12,26 +12,24 @@
 
 .note-card { 
   border-radius: 8px;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.15);
-  width: 200px;
-  height: fit-content;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  width: clamp(200px, 18vw, 220px);
+  background: #f5f1cf;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  background: #faf7e6;
   overflow: hidden;
-  transition: transform 0.1s ease-in-out, width 0.3s ease, height 0.3s ease;
 }
 
 .note-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.8rem;
-  font-weight: bold;
-  background: rgba(0,0,0,0.7);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: white;
+  border-radius: 6px 6px 0 0;
+  user-select: none;
 }
 
 .note-header span i {
@@ -39,13 +37,11 @@
 }
 
 .note-card.property .note-header {
-  background: #c2433cd7;
-  border: 1px solid #b90a01d4;
+  background: #c2433c;
 }
 
 .note-card.schedule .note-header {
-  background: #c481d4;
-  border: 1px solid #7a4b81d4;
+  background: #a44bd8;
 }
 
 .note-edit-btn {
@@ -64,17 +60,20 @@
   padding: 6px 0.75rem;
   flex-grow: 1;
   font-family: "Outfit", sans-serif;
+  font-size: clamp(0.85rem, 1.5vw, 0.95rem);
+  color: #333;
 }
 
 .note-content h1 {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   margin: 0 0 0.3rem 0;
   color: #333;
 }
 v
 .note-content p {
   font-size: 0.9rem;
+  font-weight: 300;
   color: #555;            
   margin: 0;
   line-height: 1.4;
@@ -83,10 +82,6 @@ v
 @media (max-width: 850px) {
   .notes-section {
     flex-direction: column;
-    margin: 1rem;
-  }
-
-  .note-card {
-    max-width: 400px;
+    top: 180px;
   }
 }

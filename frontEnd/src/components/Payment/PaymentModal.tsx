@@ -143,9 +143,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               <div className="payment-client-info">
                 <i className="fa-solid fa-user"></i>
                 <span>
-                  {job ? `${job.client.firstName} ${job.client.lastName}` : 
-                    client ? `${client.firstName} ${client.lastName}` : 'Client'}
-                </span>
+                  {(() => {
+                    const person = job?.client ?? client;
+                    if (!person) return "No client selected";
+                    return `${person.firstName ?? ""} ${person.lastName ?? ""}`.trim();
+                  })()}
+              </span>
               </div>
             </div>
             

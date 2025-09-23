@@ -151,7 +151,11 @@ const ClientView: React.FC = () => {
                                 </div>
                                 <div className="contact-item">
                                     <i className="fa-solid fa-envelope"></i>
-                                    <span>{client.email}</span>
+                                    {client.email ? (
+                                        <span>{client.email}</span>
+                                    ) : (
+                                        <span className="noEmail">No email provided</span>
+                                    )}
                                 </div>
                             </div>
                         </div>

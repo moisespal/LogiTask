@@ -146,9 +146,10 @@ const TopBar: React.FC<TopBarProps> = ({
                 <i className="fa-solid fa-dollar-sign" />
                 {Math.floor(selectedJob.cost)}
               </div>
-              <button className="note-pill service-item pill-container" onClick={() => setIsNoteModalOpen(true)}>
+              <div className="note-pill service-item pill-container" onClick={() => setIsNoteModalOpen(true)}>
                 <i className="fa-solid fa-sticky-note" />
-              </button>
+                +
+              </div>
             </div>
           </div>
         ) : null}

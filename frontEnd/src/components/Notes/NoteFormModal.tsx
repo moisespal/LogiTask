@@ -98,6 +98,23 @@ const NoteFormModal: React.FC<NoteFormModalProps> = ({
     }
     return content.trim().length > 0;
   };
+
+  const handleDelete = async () => {
+    if (!existingNote) return;
+    try {
+      if (window.confirm('Are you sure you want to delete this note?')){
+        await api.delete(`/api/${noteType}-note/modify/${existingNote.id}/`);
+        queryClient.invalidateQueries({ queryKey: ['todaysJobs'] });
+        handleClose();
+      }
+      else {
+        return;
+      }
+
+    } catch (error) {
+      console.error('Error deleting note:', error);
+    }
+  }
    
 
   if (!isOpen) return null;
@@ -108,6 +125,11 @@ const NoteFormModal: React.FC<NoteFormModalProps> = ({
         <button className="modal-close-btn" onClick={handleClose}>
           <i className="fa-solid fa-xmark"></i>
         </button>
+        {existingNote && (
+          <button className="note-btn-delete" onClick={handleDelete} title="Delete Note">
+            <i className="fa-solid fa-trash"></i>
+          </button>
+        )}
 
         <h3>{existingNote ? `Edit ${noteType} Note` : `Create ${noteType} Note`}</h3>
 

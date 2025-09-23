@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Job } from "../../types/interfaces";
 import "../../styles/components/NoteSection.css";
 import NoteFormModal from "./NoteFormModal";
+import DraggableCard from "./DraggableCard";
 
 
 interface NotesSectionProps {
@@ -19,32 +20,36 @@ const NotesSection: React.FC<NotesSectionProps> = ({ selectedJob }) => {
   return (
     <div className={`notes-section`}>
       {propertyNote && (
-        <div className="note-card property">
-          <div className="note-header">
-            <span><i className="fa-solid fa-house-user"></i>Property</span>
-            <button className="note-edit-btn" onClick={() => setEditingType("property")}>
-              <i className="fa-solid fa-pen"></i>
-            </button>
+        <DraggableCard className="note-wrapper">
+          <div className="note-card property">
+            <div className="note-header">
+              <span><i className="fa-solid fa-house-user"></i>Property</span>
+              <button className="note-edit-btn" onClick={() => setEditingType("property")}>
+                <i className="fa-solid fa-pen"></i>
+              </button>
+            </div>
+            <div className="note-content">
+              <h1>{propertyNote.title}</h1>
+              <p>{propertyNote.content}</p>
+            </div>
           </div>
-          <div className="note-content">
-            <h1>{propertyNote.title}</h1>
-            <p>{propertyNote.content}</p>
-          </div>
-        </div>
+        </DraggableCard>
       )}
       {scheduleNote && (
-        <div className="note-card schedule">
-          <div className="note-header">
-            <span><i className="fa-solid fa-calendar-days"></i>Schedule</span>
-            <button className="note-edit-btn" onClick={() => setEditingType("schedule")}>
-              <i className="fa-solid fa-pen"></i>
-            </button>
+        <DraggableCard className="note-wrapper">
+          <div className="note-card schedule">
+            <div className="note-header">
+              <span><i className="fa-solid fa-calendar-days"></i>Schedule</span>
+              <button className="note-edit-btn" onClick={() => setEditingType("schedule")}>
+                <i className="fa-solid fa-pen"></i>
+              </button>
+            </div>
+            <div className="note-content">
+              <h1>{scheduleNote.title}</h1>
+              <p>{scheduleNote.content}</p>
+            </div>
           </div>
-          <div className="note-content">
-            <h1>{scheduleNote.title}</h1>
-            <p>{scheduleNote.content}</p>
-          </div>
-        </div>
+        </DraggableCard>
       )}
       <NoteFormModal
         isOpen={!!editingType}

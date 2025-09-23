@@ -13,3 +13,19 @@
     color: rgb(165, 165, 165);
     font-weight: 300;
 }
+
+.note-btn-delete {
+    left: 12px;
+    top: 12px;
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    font-size: 1.2rem;
+    color: rgb(131, 131, 131);
+    transition: all 0.2s ease;
+}
+
+.note-btn-delete:hover {
+    color: rgb(214, 85, 85);
+    transform: scale(1.1);
+}
