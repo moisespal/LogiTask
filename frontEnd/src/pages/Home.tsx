@@ -68,6 +68,7 @@ const Home: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleClientUpdated = (updatedClient: ClientDataID) => {
     updateClientInCaches(queryClient, updatedClient);
@@ -321,7 +322,8 @@ const Home: React.FC = () => {
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveJobId(null);
-
+    setIsDragging(false);
+    
     if (!over) return;
     if (active.id === over.id) {
       console.log('Dropped on itself, no action taken');
@@ -386,6 +388,7 @@ const Home: React.FC = () => {
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
     setActiveJobId(active.id as number)
+    setIsDragging(true);
   }, []);
 
   const toggleDraggingEnabled = useCallback((isDisabled: boolean) => {
@@ -528,6 +531,7 @@ const Home: React.FC = () => {
                 </DndContext>
                 <NoteSection 
                   selectedJob={selectedJob} 
+                  isDragging={isDragging}
                 />
               </>
             )}

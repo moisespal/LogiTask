@@ -213,7 +213,7 @@
 
 /* Note Button Pill */
 .job-info .note-pill {  
-  color: #feff9c;
+  color: #fdff9cb7;
   background: #fdff9c28;
   border: 1px solid #fdff9c33;
   user-select: none;
@@ -327,9 +327,9 @@
   .info-container {
     padding: clamp(18px, 19px, 20px) clamp(15px, 18px, 20px);
   }
-  .pill-container .job-client {
-    padding: 4px 8px;
-    font-size: clamp(0.75rem, 1.2vw, 0.85rem);
+  .pill-container {
+    padding: 4px 6px;
+    font-size: clamp(10px, 2vw, 11px);
   }
 }
 
@@ -341,9 +341,5 @@
   .info-container {
     padding: clamp(19px, 2vw, 21px) 0px 0px clamp(15px, 3vw, 20px);
     font-size: clamp(12px, 2vw, 14px);
-  }
-  .pill-container {
-    padding: 4px 6px;
-    font-size: clamp(10px, 2vw, 11px);
   }
 }

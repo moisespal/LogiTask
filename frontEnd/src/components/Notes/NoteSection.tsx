@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { Job } from "../../types/interfaces";
 import "../../styles/components/NoteSection.css";
 import NoteFormModal from "./NoteFormModal";
-import DraggableCard from "./DraggableCard";
-
 
 interface NotesSectionProps {
   selectedJob: Job | null;
+  isDragging?: boolean;
 }
 
-const NotesSection: React.FC<NotesSectionProps> = ({ selectedJob }) => {
+const NotesSection: React.FC<NotesSectionProps> = ({ selectedJob, isDragging }) => {
   const [editingType, setEditingType] = useState<"property" | "schedule" | null>(null);
 
   if (!selectedJob) return null;
@@ -20,8 +19,7 @@ const NotesSection: React.FC<NotesSectionProps> = ({ selectedJob }) => {
   return (
     <div className={`notes-section`}>
       {propertyNote && (
-        <DraggableCard className="note-wrapper">
-          <div className="note-card property">
+          <div className={`note-card${isDragging ? " hide" : ""} property`}>
             <div className="note-header">
               <span><i className="fa-solid fa-house-user"></i>Property</span>
               <button className="note-edit-btn" onClick={() => setEditingType("property")}>
@@ -33,11 +31,9 @@ const NotesSection: React.FC<NotesSectionProps> = ({ selectedJob }) => {
               <p>{propertyNote.content}</p>
             </div>
           </div>
-        </DraggableCard>
       )}
       {scheduleNote && (
-        <DraggableCard className="note-wrapper">
-          <div className="note-card schedule">
+          <div className={`note-card${isDragging ? " hide" : ""} schedule`}>
             <div className="note-header">
               <span><i className="fa-solid fa-calendar-days"></i>Schedule</span>
               <button className="note-edit-btn" onClick={() => setEditingType("schedule")}>
@@ -49,7 +45,6 @@ const NotesSection: React.FC<NotesSectionProps> = ({ selectedJob }) => {
               <p>{scheduleNote.content}</p>
             </div>
           </div>
-        </DraggableCard>
       )}
       <NoteFormModal
         isOpen={!!editingType}

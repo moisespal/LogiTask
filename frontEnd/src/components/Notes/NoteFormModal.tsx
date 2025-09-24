@@ -136,7 +136,10 @@ const NoteFormModal: React.FC<NoteFormModalProps> = ({
         {existingNote && (
           <div className="note-timestamp">
             Last modified: <i>{formatUTCtoLocal(existingNote.last_modified, userTimeZone)}</i>
+            <br />
+            Created: <i>{formatUTCtoLocal(existingNote.created_at, userTimeZone)}</i>
           </div>
+          
         )}
         <div modal-form-section>
           <div className="note-input-title">

@@ -1,23 +1,35 @@
 .notes-section {
   position: absolute;
-  top: 250px;
+  top: 200px;
   left: 4vw;
   display: flex;
   flex-direction: row;
-  gap: 2rem;
+  gap: 1.5rem;
   z-index: 10;
   transition: opacity 0.3s ease-in-out;
-  opacity: 1;
 }
 
 .note-card { 
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.12);
   width: clamp(200px, 18vw, 220px);
-  background: #f5f1cf;
+  height: auto;
+  background: #b1b1b12c;
+  backdrop-filter: blur(5px);
   display: flex;
+  align-self: flex-start;
   flex-direction: column;
   overflow: hidden;
+  opacity: 1;
+  transform: translateY(0);
+  transition: 
+    opacity 0.25s cubic-bezier(.4,0,.2,1),
+    transform 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+.note-card.hide {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .note-header {
@@ -83,5 +95,13 @@ v
   .notes-section {
     flex-direction: column;
     top: 180px;
+    left: 7vw;
   }
+}
+
+@media screen and (max-width: 480px) {
+  .note-card {
+    width: clamp(150px, 40vw, 200px);
+  }
+  
 }
