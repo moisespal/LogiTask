@@ -22,6 +22,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   // If job is provided, use its set cost, otherwise default to empty string so inputs are more user-friendly
   const [paymentAmount, setPaymentAmount] = useState(job ? job.cost.toString() : '');
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [balance, setBalance] = useState<number | null>(null);
+  const [revealed, setRevealed] = useState(false);
 
   // Reset payment amount when job or client changes
   useEffect(() => {
@@ -81,6 +83,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     onClose();
     setPaymentMethod('');
     setPaymentAmount(job ? job.cost.toString() : '');
+    setBalance(null);
+    setRevealed(false);
   };
 
   const handleClearAmount = () => {
@@ -100,6 +104,31 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         setPaymentAmount(value);
     }
   };
+
+  const handleEstimatedBalance = async () => {
+    try {
+      const balanceResponse = await api.get(
+        `/api/get_estimated_balance/${client?.id || job?.client.id}/`
+      );
+
+      if (balanceResponse.status === 200) {
+        setBalance(balanceResponse.data.estimated_balance);
+        setRevealed(true);
+      } else {
+        alert("Failed to get balance.");
+      }
+    } catch (err) {
+      console.error("Error fetching balance:", err);
+      alert(`Error: ${err}`);
+    }
+  };
+
+  const getBalanceLabel = (balance: number | null): string => {
+    if (balance === null) return "Balance unavailable";
+    if (balance < 0) return `Balance Due: $${Math.abs(balance)}`;
+    if (balance > 0) return `Credit: $${balance}`;
+    return "No balance due";
+  }
     
 
   if (!isOpen) return null;
@@ -150,6 +179,20 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                   })()}
               </span>
               </div>
+              <button
+                type="button"
+                className="payment-balance-btn"
+                onClick={handleEstimatedBalance}
+                title="Get Estimated Balance"
+              >
+                <i className="fa-solid fa-money-bills"></i>
+                <span className={!revealed ? "not-revealed" : "revealed"}>
+                  {!revealed 
+                    ? "Click to view Balance" 
+                    : getBalanceLabel(balance)
+                  }
+                </span>
+              </button>
             </div>
             
             <div className="modal-form-section">
