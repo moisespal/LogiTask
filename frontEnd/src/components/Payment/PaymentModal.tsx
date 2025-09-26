@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Job, ClientDataID } from '../../types/interfaces';
 import '../../styles/components/PaymentModal.css';
-import '../../styles/components/Modal.css';
+import '../../styles/components/modal.css';
 import api from '../../api';
 
 interface PaymentModalProps {
