@@ -3,7 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ScheduleForManagement } from '../../types/interfaces';
 import ScheduleListItem from './ScheduleListItem';
-import { motion } from 'framer-motion';
+import { isDragging, motion } from 'framer-motion';
 
 interface SortableScheduleItemProps {
   schedule: ScheduleForManagement;
@@ -127,7 +127,7 @@ const SortableScheduleItem: React.FC<SortableScheduleItemProps> = ({
       {...listeners}  
     >
       <motion.div 
-        className="sortable-schedule-wrapper"
+        className={`sortable-schedule-wrapper${isDragging ? ' draggable' : ''}`}
         animate={dragStyle}
         transition={{
           rotate: {

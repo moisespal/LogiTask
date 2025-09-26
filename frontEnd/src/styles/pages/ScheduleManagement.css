@@ -440,3 +440,9 @@ h2 span {
     font-size: 0.75rem;
   }
 }
+
+.sortable-schedule-wrapper.draggable {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}

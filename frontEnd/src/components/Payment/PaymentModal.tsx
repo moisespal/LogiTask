@@ -304,7 +304,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 type="submit"
                 className="modal-btn-submit" 
                 disabled={handleDisabledSubmit()}
-                onClick={(e) => e.stopPropagation()} // Ensure this does not block form submission
+                onClick={(e) => e.stopPropagation()}
               >
                  Record Payment
               </button>
