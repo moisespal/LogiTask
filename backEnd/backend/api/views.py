@@ -523,10 +523,13 @@ class UpdateClient(UpdateAPIView):
     def partial_update(self, request, *args, **kwargs):
         data = request.data.copy()
 
+        
         nullable_fields = ['email', 'lastName']
 
         for field in nullable_fields:
-            if field in data and data[field].strip() == "":
+            if data[field] == None:
+                pass
+            elif field in data and data[field].strip() == "":
                 data[field] = None
         
         request._full_data = data

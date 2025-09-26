@@ -4,6 +4,20 @@ from .models import Client, Property,Schedule,Job,Payment,Company,Balance,Balanc
 from django.utils import timezone
 from datetime import timedelta
 import pytz
+
+
+
+class StrippedSerializer(serializers.ModelSerializer):
+    """
+    Base serializer that trims whitespace from all string fields.
+    Safe for None values.
+    """
+    def to_internal_value(self, data):
+        data = data.copy()  # make a mutable copy
+        for field, value in data.items():
+            if isinstance(value, str):  # only strip strings, ignore None/other types
+                data[field] = value.strip()
+        return super().to_internal_value(data)
 class userSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -54,6 +68,8 @@ class ClientOnlySerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "created_at": {"read_only":True}
         }
+    
+    
 
 class ScheduleSerializer(serializers.ModelSerializer):
     schedulenote = ScheduleNoteSerializer(read_only=True)
@@ -217,10 +233,10 @@ class JobOnlySerializer(serializers.ModelSerializer):
    
 class ScheduleJobsSerializer(serializers.ModelSerializer):
     jobs = JobOnlySerializer(source='job_set',many=True,read_only=True)
-
+    schedulenote = ScheduleNoteSerializer(read_only=True)
     class Meta:
         model = Schedule
-        fields = fields = ["id", "frequency","service","cost","nextDate","endDate","isActive","jobs"]
+        fields = fields = ["id", "frequency","service","cost","nextDate","endDate","isActive","jobs","schedulenote"]
 
 class PropertyServiceInfoSerializer(serializers.ModelSerializer):
     schedules = ScheduleJobsSerializer(many=True,read_only=True)

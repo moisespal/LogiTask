@@ -160,6 +160,10 @@ class Schedule(models.Model):
                         schedule.nextDate += timedelta(weeks=1)
                     elif schedule.frequency.lower() == "biweekly":
                         schedule.nextDate += timedelta(weeks=2)
+                    elif schedule.frequency.lower() == "triweekly":
+                        schedule.nextDate += timedelta(weeks=3)
+                    elif schedule.frequency.lower() == "monthly":
+                        schedule.nextDate += timedelta(weeks=4)
                     elif schedule.frequency.lower() == "once":
                         schedule.isActive = False
                         schedule.endDate = today_in_user_tz
@@ -299,7 +303,8 @@ class BalanceHistory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     service_month = models.PositiveSmallIntegerField(null=True,blank=True)
     service_year = models.PositiveSmallIntegerField(null=True,blank=True)
-
+    
+    
     # Store related job/payment IDs for traceability
     jobs = models.ManyToManyField("Job")
     payments = models.ManyToManyField("Payment")
