@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import api from '../api';
 
 const Dev: React.FC = () => {
