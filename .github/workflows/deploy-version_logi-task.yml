@@ -7,7 +7,7 @@ name: Build and deploy Python app to Azure Web App - Logi-Task
 on:
   push:
     branches:
-      - deploy-version
+      - staging
   workflow_dispatch:
 
 jobs:
