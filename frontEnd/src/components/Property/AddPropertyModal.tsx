@@ -291,6 +291,8 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                         <option value="Once">Once</option>
                                         <option value="Weekly">Weekly</option>
                                         <option value="BiWeekly">Every 2 Weeks</option>
+                                        <option value="TriWeekly">Every 3 Weeks</option>
+                                        <option value="Monthly">Monthly</option>
                                     </select>
                                 </div>
                             </div>
