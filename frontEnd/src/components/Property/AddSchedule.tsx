@@ -173,9 +173,7 @@ const AddSchedule: React.FC<AddPropertyModalProps> = ({
                                 <input 
                                     placeholder='Start Date'
                                     className='date-input' 
-                                    type="text"
-                                    onFocus={(e) => e.target.type = 'date'}
-                                    onBlur={(e) => e.target.type = 'text'}
+                                    type="date"
                                     name="nextDate"
                                     value={clientData.nextDate}
                                     onChange={(e) => handleInputChange(e)}

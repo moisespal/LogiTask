@@ -268,9 +268,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                     <input
                                         placeholder='Start Date'
                                         className='date-input' 
-                                        type="text"
-                                        onFocus={(e) => e.target.type = 'date'}
-                                        onBlur={(e) => e.target.type = 'text'}
+                                        type="date"
                                         value={prop.nextDate}
                                         name='nextDate'
                                         onChange={(e) => handlePropertyChange(index, "nextDate", e.target.value)}
@@ -291,6 +289,7 @@ const AddPropertyModal: React.FC<AddPropertyModalProps> = ({
                                         <option value="Once">Once</option>
                                         <option value="Weekly">Weekly</option>
                                         <option value="BiWeekly">Every 2 Weeks</option>
+                                        
                                     </select>
                                 </div>
                             </div>

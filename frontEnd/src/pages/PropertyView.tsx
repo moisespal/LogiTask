@@ -6,7 +6,7 @@ import "../styles/pages/PropertyView.css";
 import ConfirmationDialog  from "../components/Dialog/ConfirmationDialog";
 import AddSchedule from "../components/Property/AddSchedule";
 import SelectButtons from "../components/Dialog/SelectButtons";
-import { formatDateLocal, formatDayOfTheWeek, daysUntilNextJob, getTodayInUserTimezone, formatCurrency } from "../utils/format";
+import { formatDateLocal, formatDayOfTheWeek, daysUntilNextJob, getTodayInUserTimezone, formatCurrency, formatPhoneNumber } from "../utils/format";
 
 const PropertyView: React.FC = () => {
   const location = useLocation();
@@ -317,26 +317,26 @@ const handleNextDateConfirm = async() => {
           </h2>
 
           <div className="client-info-container">
-            <div className="client-header">
+            <div className="client-avatar-and-details">
               <div className="client-avatar">
                 <div className="avatar-placeholder"></div>
-                <img
-                  src={
-                    "https://i.pinimg.com/736x/c0/74/9b/c0749b7cc401421662ae901ec8f9f660.jpg"
-                  }
-                  alt="Client Avatar"
-                />
+                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="Client avatar" />
               </div>
               <div className="client-details">
                 <h3>
                   {client.firstName} {client.lastName}
                 </h3>
-                <div className="contact-icons">
-                  <i className="fa-solid fa-phone"></i>
-                  <span>{client.phoneNumber}</span>
-
-                  <i className="fa-solid fa-envelope"></i>
-                  <span>{client.email}</span>
+                <div className="contact-contact">
+                  <div className="contact-item">                                  
+                    <span>{formatPhoneNumber(client.phoneNumber)}</span>
+                  </div>
+                  <div className="contact-item">
+                      {client.email ? (
+                          <span>{client.email}</span>
+                      ) : (
+                          <span className="noEmail">No email provided</span>
+                      )}
+                  </div>
                 </div>
               </div>
             </div>

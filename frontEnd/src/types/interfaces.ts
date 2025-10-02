@@ -161,3 +161,11 @@ export interface ScheduleForManagement {
   dayOfWeek: number;
   property: ScheduleProperty;
 } 
+
+export interface Adjustment {
+  id: number;
+  amount: string;
+  reason: string;
+  created_at: string;
+  adjustment_type: string;
+}

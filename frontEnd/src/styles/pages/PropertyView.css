@@ -1071,7 +1071,7 @@
   transform: scale(1.1);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .property-view-container {
     padding: 20px;
   }
@@ -1095,8 +1095,8 @@
   }
 
   .client-info-container {
+    min-width: 200px;
     width: 100%;
-    align-self: center;
   }
 
   .content-layout {

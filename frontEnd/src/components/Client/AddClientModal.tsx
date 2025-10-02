@@ -428,9 +428,7 @@ const isClientFormComplete = useMemo(() => {
                   <input 
                     placeholder='Start Date'
                     className='date-input' 
-                    type="text"
-                    onFocus={(e) => e.target.type = 'date'}
-                    onBlur={(e) => e.target.type = 'text'}
+                    type="date"
                     name='nextDate'
                     onChange={(e)=> updateSchedule(index,0,"nextDate",e.target.value)}
                     required
