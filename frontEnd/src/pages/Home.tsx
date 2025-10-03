@@ -425,6 +425,8 @@ const Home: React.FC = () => {
             value={searchTerm}
             onChange={handleChange}
             placeholder={modeType === 'Client' ? "Search clients..." : "Search jobs..."}
+            spellCheck={false}
+            inputMode='text'
           />
       </div>
     

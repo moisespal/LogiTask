@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/components/CompanyCard.css';
-import { FaCog, FaSignOutAlt, FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { FaCog, FaSignOutAlt, FaChevronUp, FaChevronDown,  } from 'react-icons/fa';
+import { RiCalendarScheduleFill } from "react-icons/ri";
 import { BsPeopleFill } from "react-icons/bs";
 import { Company } from '../../types/interfaces';
 
@@ -50,6 +51,14 @@ const CompanyCard: React.FC<Company> = ({image, name, level, onTeamModalOpen }) 
                 >
                     <BsPeopleFill  />
                     <span>Team</span>
+                </button>
+
+                <button 
+                    className="popup-menu-button schedules-button"
+                    onClick={() => {navigate('/schedule-management/'); setShowMenu(false);}}
+                >
+                    <RiCalendarScheduleFill />
+                    <span>Schedule</span>
                 </button>
 
                 <button 

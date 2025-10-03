@@ -329,7 +329,6 @@
   }
   .pill-container {
     padding: 4px 6px;
-    font-size: clamp(10px, 2vw, 11px);
   }
 }
 
@@ -341,5 +340,10 @@
   .info-container {
     padding: clamp(19px, 2vw, 21px) 0px 0px clamp(15px, 3vw, 20px);
     font-size: clamp(12px, 2vw, 14px);
+  }
+
+  .pill-container {
+    font-size: clamp(0.75rem, 1vw, 0.9rem);
+    padding: 3px 5px;
   }
 }
