@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { FaExchangeAlt, FaUserPlus } from 'react-icons/fa';
 import '../../styles/components/BottomBar.css';
 import { CompanyCard } from '../Company/CompanyCard';
@@ -14,7 +14,7 @@ interface BottomBarProps {
     showStats?: boolean;
 }
 
-const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, openAddClientModal, onTeamModalOpen, onStatsToggle, modeType, showStats = false}) => {
+const BottomBarComponent: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, openAddClientModal, onTeamModalOpen, onStatsToggle, modeType, showStats = false}) => {
     const user = useUser();
 
     return (
@@ -59,5 +59,7 @@ const BottomBar: React.FC<BottomBarProps> = ({ isModeRotated, handleModeClick, o
         </div>
     )
 }
+
+const BottomBar = memo(BottomBarComponent);
 
 export default BottomBar;

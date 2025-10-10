@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useCallback, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/components/CompanyCard.css';
 import { FaCog, FaSignOutAlt, FaChevronUp, FaChevronDown,  } from 'react-icons/fa';
@@ -6,40 +6,40 @@ import { RiCalendarScheduleFill } from "react-icons/ri";
 import { BsPeopleFill } from "react-icons/bs";
 import { Company } from '../../types/interfaces';
 
-const CompanyCard: React.FC<Company> = ({image, name, level, onTeamModalOpen }) => {
+const CompanyCardComponent: React.FC<Company> = ({image, name, level, onTeamModalOpen }) => {
     const [showMenu, setShowMenu] = useState(false);
     const navigate = useNavigate();
 
-    const toggleMenu = (e: React.MouseEvent) => {
+    const toggleMenu = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
-        setShowMenu(!showMenu);
-    };
+        setShowMenu(prev => !prev);
+    }, []);
 
-    const handleLogout = () => {
+    const handleLogout = useCallback(() => {
         navigate('/logout');
-    };
+    }, [navigate]);
 
-    const handleTeamClick = () => {
+    const handleTeamClick = useCallback(() => {
         onTeamModalOpen();
         setShowMenu(false);
-    }
+    }, [onTeamModalOpen]);
 
-    const handleSettings = () => {
+    const handleSettings = useCallback(() => {
         console.log('Settings clicked');
         setShowMenu(false);
-    };
+    }, []);
 
     const storedLogo = localStorage.getItem("companyLogo");
 
-    let logoSrc = image;
-    
-    if (storedLogo) {
-        if (storedLogo.startsWith("http")) {
-            logoSrc = storedLogo;
-        } else {
-            logoSrc = `${import.meta.env.VITE_MEDIA_URL}${storedLogo}`;
+    const logoSrc = useMemo(() => {
+        if (!storedLogo) {
+            return image;
         }
-    }
+        if (storedLogo.startsWith("http")) {
+            return storedLogo;
+        }
+        return `${import.meta.env.VITE_MEDIA_URL}${storedLogo}`;
+    }, [image, storedLogo]);
     
 
     return (
@@ -108,4 +108,6 @@ const CompanyCard: React.FC<Company> = ({image, name, level, onTeamModalOpen }) 
     );
 };
 
-export {CompanyCard};
+const CompanyCard = memo(CompanyCardComponent);
+
+export { CompanyCard };

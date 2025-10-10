@@ -70,9 +70,9 @@ const Home: React.FC = () => {
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleClientUpdated = (updatedClient: ClientDataID) => {
+  const handleClientUpdated = useCallback((updatedClient: ClientDataID) => {
     updateClientInCaches(queryClient, updatedClient);
-};
+  }, [queryClient]);
 
   // Handle job completion toggle
   const handleJobComplete = useCallback(async (jobId: number) => {
@@ -126,6 +126,14 @@ const Home: React.FC = () => {
 
   const handleStatsToggle = useCallback(() => {
     setShowDailyStats(prev => !prev);
+  }, []);
+
+  const openAddClientModal = useCallback(() => {
+    setIsAddClientModalOpen(true);
+  }, []);
+
+  const closeAddClientModal = useCallback(() => {
+    setIsAddClientModalOpen(false);
   }, []);
 
   // Memoized filtering and sorting functions
@@ -446,17 +454,13 @@ const Home: React.FC = () => {
               <ClientListItem
                 client={client}
                 isFocused={focusedItemId === client.id}
-                onClick={() => handleClientClick(client.id)}
+                onClick={handleClientClick}
                 renderStars={renderStars}
                 onClientUpdated={handleClientUpdated}
               />
               
               <ClientProperties 
-                client={{
-                  ...client,
-                  phoneNumber: client.phoneNumber || '',
-                  properties: client.properties || []
-                }} 
+                client={client} 
                 visible={focusedItemId === client.id}
                 onPropertyModalStateChange={handlePropertyModalStateChange}
               />
@@ -544,7 +548,7 @@ const Home: React.FC = () => {
       <BottomBar
         isModeRotated={isModeRotated}
         handleModeClick={handleModeClick}
-        openAddClientModal={() => setIsAddClientModalOpen(true)}
+        openAddClientModal={openAddClientModal}
         onTeamModalOpen={handleTeamModalOpen}
         onStatsToggle={handleStatsToggle}
         modeType={modeType}
@@ -553,7 +557,7 @@ const Home: React.FC = () => {
             
       <AddClientModal
         isOpen={isAddClientModalOpen}
-        onClose={() => setIsAddClientModalOpen(false)}
+        onClose={closeAddClientModal}
       />
       <TeamModal
         isOpen={isTeamModalOpen}
