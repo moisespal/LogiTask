@@ -9,6 +9,8 @@ import { formatPhoneNumber, formatUTCtoLocal }  from "../utils/format";
 import PaymentModal from '../components/Payment/PaymentModal';
 import AdjustmentModal from '../components/Payment/AdjustmentModal';
 import EditClientModal from "../components/Client/EditClientModal";
+import { useNavigate } from "react-router-dom";
+
 
 const ClientView: React.FC = () => {
     const location = useLocation();
@@ -33,6 +35,8 @@ const ClientView: React.FC = () => {
     
 
     const timezone = localStorage.getItem("userTimeZone") || "UTC";
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const combinedJobs: (clientViewJob & { invoiced: boolean })[] = [];
@@ -151,15 +155,20 @@ const ClientView: React.FC = () => {
             setShowEditModal(true);
     };
 
+    const handlePropertyClick = (propertyIndex: number) => {
+        const property = client.properties[propertyIndex];
+        navigate(`/property-view/`, { state: { property, client } });
+    }
 
     return (
         <div className="client-view-container">
             {/* Top Section */}
-            <div className="back-button-container">
+            <div className="return-button-container">
                 <button className="return-button" onClick={() => window.history.back()}>
                     <i className="fa-solid fa-arrow-left"></i> Back
                 </button>
             </div>
+
             <div className="client-header-section">
                 {/* Client Info Card */}
                 <div className="client-info-card">
@@ -172,12 +181,11 @@ const ClientView: React.FC = () => {
                             <h2 className="client-name">{client.firstName} {client.lastName}</h2>
                             <div className="client-contact">
                                 <div className="contact-item">
-                                    
-                                    <span>{formatPhoneNumber(client.phoneNumber)}</span>
+                                    <span><a href={`tel:${formatPhoneNumber(client.phoneNumber)}`}>{formatPhoneNumber(client.phoneNumber)}</a></span>
                                 </div>
                                 <div className="contact-item">
                                     {client.email ? (
-                                        <span>{client.email}</span>
+                                        <span><a href={`mailto:${client.email}`}>{client.email}</a></span>
                                     ) : (
                                         <span className="noEmail">No email provided</span>
                                     )}
@@ -240,8 +248,8 @@ const ClientView: React.FC = () => {
                     <h3 className="panel-header">Addresses</h3>
                     <ul className="address-list">
                         {client.properties.map((property, i) => (
-                            <li key={i} className="client-address-item">
-                                {property.street}
+                            <li key={i} className="client-address-item" onClick={() => handlePropertyClick(i)}>
+                                    {property.street}
                             </li>
                         ))}
                     </ul>

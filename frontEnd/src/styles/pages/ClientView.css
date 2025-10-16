@@ -1,5 +1,9 @@
+html, body {
+  background-color: rgba(40, 40, 43, 1); 
+}
+
 .client-view-container {
-    display: flex;
+    display: fixed;
     flex-direction: column;
     gap: 20px;
     padding: 30px 50px 100px;
@@ -7,8 +11,11 @@
     color: white;
     height: 100vh;
     overflow-y: auto;
+    overflow-x: hidden;
     font-family: 'Outfit', sans-serif;
     user-select: none;
+    touch-action: pan-y; 
+    -webkit-overflow-scrolling: touch; 
 }
 
 .client-info-card, .client-balance-card {
@@ -21,6 +28,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     align-items: center;
+    margin-bottom: 20px;
 }
 
 .client-info-card, .client-balance-card {
@@ -83,6 +91,16 @@
     align-items: center;
     gap: 20px;
     color: #e0e0e0;
+}
+
+.contact-item a {
+    font-size: clamp(0.85rem, 1vw + 0.5rem, 1rem);
+    color: #b0b0b0;
+}
+
+.contact-item a:hover {
+    color: #d4d4d4;
+    text-decoration: underline;
 }
 
 .client-settings-button {
@@ -301,6 +319,10 @@
 
 /* Responsive adjustments */
 @media (max-width: 992px) {
+
+    .client-view-container {
+        padding: 20px 15px 200px;
+    }
     
     .client-header-section,
     .client-details-section {
@@ -358,10 +380,7 @@
 }
 
 @media (max-width: 460px) {
-    .client-view-container {
-        padding: 20px 15px 200px;
-    }
-
+    
     .client-info-card, .client-balance-card, .client-panel {
         min-width: calc(100vw - 30px);
     }
