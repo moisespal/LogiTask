@@ -75,7 +75,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     schedulenote = ScheduleNoteSerializer(read_only=True)
     class Meta:
         model = Schedule
-        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day",'schedulenote']
+        fields = ["id", "frequency","nextDate","endDate","service","cost","isActive","order","schedule_day",'schedulenote', "monthly_pricing"]
     
     def update(self, instance, validated_data):
         instance = super().update(instance, validated_data)

@@ -36,6 +36,7 @@ export interface Schedule {
   nextDate: string;
   service: string;
   cost: number;
+  monthly_pricing?: boolean;
 }
 
 export interface Property_list {
