@@ -139,13 +139,22 @@ class UploadExcelView(APIView):
         try:
             df = pd.read_excel(file)  # Read Excel file
             for _, row in df.iterrows():
+                # handle optional fields that may be blank/NaN in the Excel file
+                last_name = row.get('lastName', None)
+                if pd.isna(last_name) or str(last_name).strip() == "":
+                    last_name = None
+
+                email = row.get('email', None)
+                if pd.isna(email) or str(email).strip() == "":
+                    email = None
+
                 client = Client.objects.create(
                     firstName=row['firstName'],
-                    lastName=row['lastName'],  # Change column names based on Excel file
-                    email=row['email'],
-                    phoneNumber=row['phoneNumber'],
+                    lastName=last_name,
+                    email=email,
+                    phoneNumber=row.get('phoneNumber', None),
                     author=self.request.user,
-                    company = self.request.user.userprofile.company
+                    company=self.request.user.userprofile.company
                 )
                 property_obj = Property.objects.create(
                     street=row['street'],
@@ -162,7 +171,7 @@ class UploadExcelView(APIView):
                     cost=row['cost'],
                     monthly_pricing=row["monthly_pricing"]
                 )
-
+            Schedule.generate_jobs()
 
             return JsonResponse({"message": "Clients uploaded successfully"}, status=201)
         except Exception as e:
