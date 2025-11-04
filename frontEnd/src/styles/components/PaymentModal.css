@@ -9,6 +9,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  transition: all 0.2s ease;
 }
 
 .payment-property-info i {
@@ -135,14 +136,14 @@
 }
 
 .payment-balance-btn span.not-revealed {
-  color: #a7a8a8;
+  color: #a0bcf0;
   text-decoration: underline;
 }
 
 .payment-balance-btn span.not-revealed:hover {
-  color: #bebcbc;
+  color: #82a8ee;
 }
 
-.paymnet-balance-btn span.revealed {
-  color: #a7a8a8;
+.payment-balance-btn span.revealed {
+  color: #e4e4f1f5;
 }

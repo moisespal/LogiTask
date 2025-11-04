@@ -114,7 +114,7 @@ const AdjustmentModal: React.FC<AdjustmentModalProps> = ({ client, onClose, isOp
                         <div className="payment-client-info">
                             <i className="fa-solid fa-user"></i>
                             <span>
-                            {client ? `${client.firstName} ${client.lastName}` : 'Client'}
+                                {client ? `${client.firstName} ${client.lastName ?? ""}` : "No client selected"}
                             </span>
                         </div>
                     </div>

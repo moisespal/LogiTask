@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from '@tanstack/react-query';
 import api from '../../api';
 import { useUser } from '../../contexts/userContext.tsx';
+import { toGoogleMapsLink } from '../../utils/googleMapsLink';
 
 interface TopBarProps {
   focusedItemId: number | null;
@@ -104,12 +105,12 @@ const TopBar: React.FC<TopBarProps> = ({
             </div>
               <div className="client-item">
                 <i className="fa-solid fa-phone" />
-                <span>{formatPhoneNumber(selectedClient.phoneNumber)}</span>
+                <span><a href={`tel:${formatPhoneNumber(selectedClient.phoneNumber)}`}>{formatPhoneNumber(selectedClient.phoneNumber)}</a></span>
               </div>
               <div className="client-item">
                 <i className="fa-solid fa-envelope"></i>
                   {selectedClient.email ? (
-                    <span>{selectedClient.email}</span>
+                    <span><a href={`mailto:${selectedClient.email}`}>{selectedClient.email}</a></span>
                    ) : ( 
                     <span className="noEmail">No email provided</span>
                    )} 
@@ -120,7 +121,9 @@ const TopBar: React.FC<TopBarProps> = ({
             <div className="property">
               <div className="address service-item">
                 <i className="fa-solid fa-location-dot" />
+                <a href={toGoogleMapsLink(`${selectedJob.property.street}, ${selectedJob.property.city}, ${selectedJob.property.state} ${selectedJob.property.zipCode}`)} target="_blank" rel="noopener noreferrer">
                 {selectedJob.property.street}, {selectedJob.property.city}, {selectedJob.property.state} {selectedJob.property.zipCode}
+                </a>
               </div>
             </div>
             <div className="contact">
@@ -130,7 +133,7 @@ const TopBar: React.FC<TopBarProps> = ({
               </div>
               <div className="phone service-item">
                 <i className="fa-solid fa-phone" />
-                <span>{formatPhoneNumber(selectedJob.client.phoneNumber)}</span>
+                <span><a href={`tel:${formatPhoneNumber(selectedJob.client.phoneNumber)}`}>{formatPhoneNumber(selectedJob.client.phoneNumber)}</a></span>
               </div>
             </div>
             <div className="service-tags">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Job } from '../../types/interfaces';
 import PaymentModal from '../Payment/PaymentModal';
 import '../../styles/components/DailyListItem.css';
@@ -12,9 +12,8 @@ interface DailyListItemProps {
   onModalToggle?: (isOpen: boolean) => void;
 }
 
-const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, onComplete, onModalToggle }) => {
+const DailyListItemComponent: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, onComplete, onModalToggle }) => {
   const isComplete = job.status === 'complete';
-  const [isHovered, setIsHovered] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const handleItemClick = (e: React.MouseEvent) => {
@@ -58,9 +57,7 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
   return (
     <>
       <li
-        className={`list-item daily-item ${isFocused ? 'focused daily-focused' : ''} ${isComplete ? 'daily-complete' : ''} ${isHovered ? 'hovered' : ''}`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className={`list-item daily-item ${isFocused ? 'focused daily-focused' : ''} ${isComplete ? 'daily-complete' : ''}`}
         onClick={handleItemClick}
         data-job-id={job.id}
       >
@@ -105,5 +102,7 @@ const DailyListItem: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, 
     </>
   );
 };
+
+const DailyListItem = memo(DailyListItemComponent)
 
 export default DailyListItem;

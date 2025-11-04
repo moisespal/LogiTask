@@ -69,15 +69,19 @@ const Home: React.FC = () => {
   const [isDraggingDisabled, setIsDraggingDisabled] = useState(false);
   const [activeJobId, setActiveJobId] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const jobsRef = useRef<Job[]>(jobs);
+  useEffect(() => {
+    jobsRef.current = jobs;
+  }, [jobs]);
 
-  const handleClientUpdated = (updatedClient: ClientDataID) => {
+  const handleClientUpdated = useCallback((updatedClient: ClientDataID) => {
     updateClientInCaches(queryClient, updatedClient);
-};
+  }, [queryClient]);
 
   // Handle job completion toggle
   const handleJobComplete = useCallback(async (jobId: number) => {
     try {
-      const job = jobs.find(job => job.id === jobId);
+      const job = jobsRef.current.find(job => job.id === jobId);
       if (!job) return;
       const newStatus = job.status === 'complete' ? 'uncomplete' : 'complete';
       const dateTime = job.status === 'complete' ? null : getUTCISOString();
@@ -88,17 +92,19 @@ const Home: React.FC = () => {
           job.id === jobId ? { ...job, status: newStatus } : job
         );
       });
-
-      if (selectedJob?.id === jobId) {
-        setSelectedJob({ ...selectedJob, status: newStatus });
-      }
-      await api.patch(`/api/Update-Schedule/${jobId}/`, { 
-        status: newStatus, complete_date:dateTime 
+       setSelectedJob(prev => {
+        if (!prev || prev.id !== jobId) {
+          return prev;
+        }
+        return { ...prev, status: newStatus };
+      });
+      await api.patch(`/api/Update-Schedule/${jobId}/`, {
+        status: newStatus, complete_date:dateTime
       });
     } catch (error) {
       console.error('Error toggling job completion:', error);
     } 
-  }, [jobs, queryClient, selectedJob]);
+  }, [queryClient]);
 
   // Event Handlers
   const handleModeClick = useCallback(async () => {
@@ -120,12 +126,22 @@ const Home: React.FC = () => {
     setSearchTerm(e.target.value);
   }, []);
 
+  const noop = useCallback(() => {}, []);
+
   const handleSortChange = useCallback((option: string) => {
     setSortOption(option);
   }, []);
 
   const handleStatsToggle = useCallback(() => {
     setShowDailyStats(prev => !prev);
+  }, []);
+
+  const openAddClientModal = useCallback(() => {
+    setIsAddClientModalOpen(true);
+  }, []);
+
+  const closeAddClientModal = useCallback(() => {
+    setIsAddClientModalOpen(false);
   }, []);
 
   // Memoized filtering and sorting functions
@@ -274,11 +290,11 @@ const Home: React.FC = () => {
     sessionStorage.setItem('lastFocusedClientId', id.toString());
   }, []);
 
-  const handleJobClick = useCallback((id: number, job: Job) => {
+  const handleJobClick = useCallback((id: number) => {
     setFocusedItemId(id);
-    setSelectedJob(job);
+    setSelectedJob(jobs.find(job => job.id === id) || null);
     sessionStorage.setItem('lastFocusedJobId', id.toString());
-  }, []);
+  }, [jobs]);
 
   // Handle property modal state changes
   const handlePropertyModalStateChange = useCallback((isOpen: boolean) => {
@@ -425,6 +441,8 @@ const Home: React.FC = () => {
             value={searchTerm}
             onChange={handleChange}
             placeholder={modeType === 'Client' ? "Search clients..." : "Search jobs..."}
+            spellCheck={false}
+            inputMode='text'
           />
       </div>
     
@@ -444,17 +462,13 @@ const Home: React.FC = () => {
               <ClientListItem
                 client={client}
                 isFocused={focusedItemId === client.id}
-                onClick={() => handleClientClick(client.id)}
+                onClick={handleClientClick}
                 renderStars={renderStars}
                 onClientUpdated={handleClientUpdated}
               />
               
               <ClientProperties 
-                client={{
-                  ...client,
-                  phoneNumber: client.phoneNumber || '',
-                  properties: client.properties || []
-                }} 
+                client={client} 
                 visible={focusedItemId === client.id}
                 onPropertyModalStateChange={handlePropertyModalStateChange}
               />
@@ -496,9 +510,7 @@ const Home: React.FC = () => {
                           <SortableDailyList
                             job={job}
                             isFocused={focusedItemId === job.id}
-                            onClick={(id) => {
-                              handleJobClick(id, job);
-                            }}
+                            onClick={handleJobClick}
                             onComplete={handleJobComplete}
                             isDisabled={isDraggingDisabled}
                             onModalToggle={toggleDraggingEnabled}
@@ -516,7 +528,7 @@ const Home: React.FC = () => {
                         <SortableDailyList
                           job={activeJob}
                           isFocused={focusedItemId === activeJob.id}
-                          onClick={() => {}}
+                          onClick={noop}
                           onComplete={handleJobComplete}
                           isDisabled={false}
                           isDragging={true}
@@ -542,7 +554,7 @@ const Home: React.FC = () => {
       <BottomBar
         isModeRotated={isModeRotated}
         handleModeClick={handleModeClick}
-        openAddClientModal={() => setIsAddClientModalOpen(true)}
+        openAddClientModal={openAddClientModal}
         onTeamModalOpen={handleTeamModalOpen}
         onStatsToggle={handleStatsToggle}
         modeType={modeType}
@@ -551,7 +563,7 @@ const Home: React.FC = () => {
             
       <AddClientModal
         isOpen={isAddClientModalOpen}
-        onClose={() => setIsAddClientModalOpen(false)}
+        onClose={closeAddClientModal}
       />
       <TeamModal
         isOpen={isTeamModalOpen}

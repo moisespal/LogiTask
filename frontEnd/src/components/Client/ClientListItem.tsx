@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { ClientDataID } from '../../types/interfaces';
 import PaymentModal from '../Payment/PaymentModal';
 import { useNavigate } from "react-router-dom";
@@ -13,39 +13,47 @@ interface ClientListItemProps {
     onClientUpdated: (updatedClient: ClientDataID) => void;
 }
 
-const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onClick, renderStars, onClientUpdated }) => {
+const ClientListItemComponent: React.FC<ClientListItemProps> = ({ client, isFocused, onClick, renderStars, onClientUpdated }) => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
-    const [showEditModal, setShowEditModal] = useState(false); 
+    const [showEditModal, setShowEditModal] = useState(false);
 
-    const handlePayClick = (e: React.MouseEvent) => {
+    const handlePayClick = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         setShowPaymentModal(true);
-    };
+    }, []);
 
-    const handleEditClick = (e: React.MouseEvent) => {
+    const handleEditClick = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
         setShowEditModal(true);
-    };
+    }, []);
 
     const handlePaymentSubmit = (amount: string, method: string) => {
         console.log(`Payment recorded for ${client.firstName} ${client.lastName}: $${amount} via ${method}`);
         setShowPaymentModal(false);
     };
 
+    const handlePaymentModalClose = useCallback(() => {
+        setShowPaymentModal(false);
+    }, []);
+
+    const handleEditModalClose = useCallback(() => {
+        setShowEditModal(false);
+    }, []);
+
     const navigate = useNavigate();
-    const handleClientClick = () => {
+    const handleClientClick = useCallback(() => {
         if (!isFocused) return;
         navigate(`client-view/`, {
             state: {
                 client: client,
             }
         });
-    };
+    }, [isFocused, navigate, client]);
 
-    const handleListItemClick = () => {
+    const handleListItemClick = useCallback(() => {
         onClick(client.id);
         handleClientClick(); 
-    };
+    }, [client.id, onClick, handleClientClick]);
     
     return (
         <>
@@ -86,7 +94,7 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onCl
 
             <PaymentModal 
                 isOpen={showPaymentModal}
-                onClose={() => setShowPaymentModal(false)}
+                onClose={handlePaymentModalClose}
                 client={client}
                 onPaymentSubmit={handlePaymentSubmit}
             />
@@ -94,12 +102,14 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, isFocused, onCl
                 <EditClientModal 
                     isOpen={showEditModal}
                     client={client}
-                    onClose={() => setShowEditModal(false)}
+                    onClose={handleEditModalClose}
                     onClientUpdated={onClientUpdated}
                 />
             )}
         </>
     );
 };
+
+const ClientListItem = memo(ClientListItemComponent);
 
 export default ClientListItem;
