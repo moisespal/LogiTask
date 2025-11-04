@@ -159,7 +159,8 @@ class UploadExcelView(APIView):
                     frequency=row['frequency'],
                     nextDate=row['nextDate'],
                     service=row['service'],
-                    cost=row['cost']
+                    cost=row['cost'],
+                    monthly_pricing=row["monthly_pricing"]
                 )
 
 

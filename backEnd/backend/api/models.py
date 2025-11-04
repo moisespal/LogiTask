@@ -143,6 +143,8 @@ class Schedule(models.Model):
             ).order_by("order")
            
             for schedule in schedules:
+                if schedule.monthly_pricing:
+                    schedule.cost=0
                 Job.objects.create(
                     schedule=schedule,
                     cost=schedule.cost,
@@ -209,7 +211,7 @@ class Balance(models.Model):
 
     def recalculate_balance(self):
         with transaction.atomic():
-            unapplied_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete')
+            unapplied_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete', schedule__monthly_pricing = False)
             unapplied_payments = Payment.objects.filter(client=self.client, is_applied_to_balance=False)
             unapplied_adjustments = BalanceAdjustment.objects.filter(client=self.client, is_applied_to_balance=False)
             
@@ -225,6 +227,8 @@ class Balance(models.Model):
             
             delta = total_payments - total_jobs + total_adjustments 
 
+            unapplied_jobs = Job.objects.filter(client=self.client, is_applied_to_balance=False, status='complete', schedule__monthly_pricing = True)
+             
             self.current_balance += delta
 
             # Save current balance
