@@ -7,6 +7,7 @@
 
   /* Status Colors - Clear and intuitive */
   --color-pending: #90caf9; 
+  --color-loading: #1ec3ff;
   --color-focused: #ffca28;
   --color-complete: #4CAF50;
   --color-complete-focused: #0a8a0f;
@@ -94,6 +95,12 @@
 
 .daily-icon.status-complete i {
   color: var(--color-complete);
+}
+
+.daily-icon.status-loading i {
+  color: var(--color-loading);
+  animation: spin 2s linear infinite;
+  
 }
 
 /* Daily content styles */

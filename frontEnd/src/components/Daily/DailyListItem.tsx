@@ -14,6 +14,7 @@ interface DailyListItemProps {
 
 const DailyListItemComponent: React.FC<DailyListItemProps> = ({ job, isFocused, onClick, onComplete, onModalToggle }) => {
   const isComplete = job.status === 'complete';
+  const [isLoading, setIsLoading] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const handleItemClick = (e: React.MouseEvent) => {
@@ -24,14 +25,19 @@ const DailyListItemComponent: React.FC<DailyListItemProps> = ({ job, isFocused, 
     }
   };
 
-  const handleIconClick = (e: React.MouseEvent) => {
+  const handleIconClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (isLoading) return;
     
     if (isFocused && onComplete) {
-      // If already focused, complete it
-      onComplete(job.id);
+        setIsLoading(true);
+        try {
+          await onComplete(job.id);
+        } finally {
+          setIsLoading(false);
+        }
     } else {
-      // If not focused, focus it
       onClick(job.id);
     }
   };
@@ -63,10 +69,17 @@ const DailyListItemComponent: React.FC<DailyListItemProps> = ({ job, isFocused, 
       >
         <div className="list-item-header">
           <div 
-            className={`daily-icon ${isComplete ? 'status-complete' : isFocused ? 'status-focused' : 'status-pending'}`}
+            className={`daily-icon ${
+              isLoading ? 'status-loading' : 
+              isComplete ? 'status-complete' : 
+              isFocused ? 'status-focused' : 
+              'status-pending'
+            }`}
             onClick={handleIconClick}
           >
-            {isComplete ? (
+            {isLoading ? (
+              <i className="fa-solid fa-spinner"></i>
+            ) : isComplete ? (
               <i className="fa-solid fa-check-circle"></i>
             ) : isFocused ? (
               <i className="fa-regular fa-circle-dot"></i>

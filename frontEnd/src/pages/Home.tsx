@@ -82,28 +82,37 @@ const Home: React.FC = () => {
   const handleJobComplete = useCallback(async (jobId: number) => {
     try {
       const job = jobsRef.current.find(job => job.id === jobId);
-      if (!job) return;
-      const newStatus = job.status === 'complete' ? 'uncomplete' : 'complete';
-      const dateTime = job.status === 'complete' ? null : getUTCISOString();
 
-      queryClient.setQueryData(['todaysJobs'], (oldJobs: Job[] | undefined) => {
-        if (!oldJobs) return [];
-        return oldJobs.map(job => 
-          job.id === jobId ? { ...job, status: newStatus } : job
-        );
-      });
-       setSelectedJob(prev => {
-        if (!prev || prev.id !== jobId) {
-          return prev;
-        }
-        return { ...prev, status: newStatus };
-      });
-      await api.patch(`/api/Update-Schedule/${jobId}/`, {
+      if (!job) return;
+
+      const newStatus = job.status === 'complete' ? 'uncomplete' : 'complete';
+      const dateTime = newStatus === 'complete' ? getUTCISOString() : null;
+
+      const response = await api.patch(`/api/Update-Schedule/${jobId}/`, {
         status: newStatus, complete_date:dateTime
       });
+
+      // Only update job cache if the request was successful
+      if (response.status === 200) {
+        console.log('Job status updated successfully with dateTime:', dateTime, " for job ID:", jobId);
+        
+        queryClient.setQueryData(['todaysJobs'], (oldJobs: Job[] | undefined) => {
+          if (!oldJobs) return [];
+          return oldJobs.map(job => 
+            job.id === jobId ? { ...job, status: newStatus } : job
+          );
+        });
+        
+        setSelectedJob(prev => {
+          if (!prev || prev.id !== jobId) {
+            return prev;
+          }
+          return { ...prev, status: newStatus };
+        });
+      }
     } catch (error) {
       console.error('Error toggling job completion:', error);
-    } 
+    }
   }, [queryClient]);
 
   // Event Handlers
