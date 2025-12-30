@@ -10,6 +10,7 @@ interface PaymentModalProps {
   job?: Job;
   client?: ClientDataID;
   onPaymentSubmit: (amount: string, method: string) => void;
+  onPaymentSuccess?: () => void;
 }
 
 const PaymentModal: React.FC<PaymentModalProps> = ({ 
@@ -17,7 +18,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   onClose, 
   job, 
   client, 
-  onPaymentSubmit 
+  onPaymentSubmit,
+  onPaymentSuccess
 }) => {
   // If job is provided, use its set cost, otherwise default to empty string so inputs are more user-friendly
   const [paymentAmount, setPaymentAmount] = useState(job ? job.cost.toString() : '');
@@ -64,6 +66,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           'Content-Type': 'application/json'
       }});
       if (propertyResponse.status === 201) {
+        onPaymentSuccess?.()
         alert("Payment received")
       }
     }catch (err) {

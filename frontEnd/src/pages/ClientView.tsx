@@ -38,7 +38,7 @@ const ClientView: React.FC = () => {
 
     const navigate = useNavigate();
 
-    useEffect(() => {
+    const fetchClientData = async () => {
         const combinedJobs: (clientViewJob & { invoiced: boolean })[] = [];
         let combinedJobTotalCents = 0;
 
@@ -49,79 +49,69 @@ const ClientView: React.FC = () => {
         let combinedAdjustmentsTotalCents = 0;
 
         let combinedBalance = 0;
-
         let debitSum = 0;
         let creditSum = 0;
 
-        api.get(`/api/client/${client.id}/unapplied/`)
-            .then(response => {
-            combinedBalance += parseFloat(response.data.delta);
+        try {
+            const unappliedRes = await api.get(`/api/client/${client.id}/unapplied/`);
 
-            const unapplied = response.data.unapplied_jobs;
-            if (Array.isArray(unapplied)) {
-                for (const job of [...unapplied].reverse()) {
-                    combinedJobs.push({ ...job, invoiced: false });
-                    combinedJobTotalCents += parseFloat(job.cost) * 100;
-                }
+            combinedBalance += parseFloat(unappliedRes.data.delta);
+
+            for (const job of [...(unappliedRes.data.unapplied_jobs || [])].reverse()) {
+            combinedJobs.push({ ...job, invoiced: false });
+            combinedJobTotalCents += parseFloat(job.cost) * 100;
             }
 
-            const unappliedPayments = response.data.unapplied_payments;
-            if (Array.isArray(unappliedPayments)) {
-                for (const payment of [...unappliedPayments].reverse()) {
-                    combinedPayments.push({ ...payment, invoiced: false });
-                    combinedPaymentsTotalCents += parseFloat(payment.amount) * 100; 
-                }
+            for (const payment of [...(unappliedRes.data.unapplied_payments || [])].reverse()) {
+            combinedPayments.push({ ...payment, invoiced: false });
+            combinedPaymentsTotalCents += parseFloat(payment.amount) * 100;
             }
 
-            const unappliedAdjustments = response.data.unapplied_adjustments;
-            if (Array.isArray(unappliedAdjustments)) {
-                for (const adjustment of [...unappliedAdjustments].reverse()) {
-                    const amt = Math.abs(parseFloat(adjustment.amount));
-                    if (adjustment.adjustment_type === "debit") {
-                        debitSum += amt;
-                    } else {
-                        creditSum += amt;
-                    }
-                    combinedAdjustments.push({ ...adjustment, invoiced: false });
-                    combinedAdjustmentsTotalCents += parseFloat(adjustment.amount) * 100; 
-                }
+            for (const adjustment of [...(unappliedRes.data.unapplied_adjustments || [])].reverse()) {
+            const amt = Math.abs(parseFloat(adjustment.amount));
+            adjustment.adjustment_type === "debit" ? debitSum += amt : creditSum += amt;
+            combinedAdjustments.push({ ...adjustment, invoiced: false });
+            combinedAdjustmentsTotalCents += parseFloat(adjustment.amount) * 100;
             }
 
-            return api.get(`/api/balance-history/${client.id}/`);
-            })
-            .then(response => {
-                if (response.data && response.data.length > 0) {
-                    combinedBalance += parseFloat(response.data[response.data.length - 1].new_balance);
-                    
-                    for (const dataItem of response.data) {
-                        if (Array.isArray(dataItem.jobs)) {
-                            for (const job of [...dataItem.jobs].reverse()) {
-                                combinedJobs.push({ ...job, invoiced: true });
-                                combinedJobTotalCents += parseFloat(job.cost) * 100;
-                            }
-                        }
-                        
-                        if (Array.isArray(dataItem.payments)) {
-                            for (const payment of [...dataItem.payments].reverse()) {
-                                combinedPayments.push({ ...payment, invoiced: true });
-                                combinedPaymentsTotalCents += parseFloat(payment.amount) * 100; 
-                            }
-                        }
-                    }
+            const historyRes = await api.get(`/api/balance-history/${client.id}/`);
+
+            if (historyRes.data?.length) {
+            combinedBalance += parseFloat(
+                historyRes.data[historyRes.data.length - 1].new_balance
+            );
+
+            for (const item of historyRes.data) {
+                for (const job of [...(item.jobs || [])].reverse()) {
+                combinedJobs.push({ ...job, invoiced: true });
+                combinedJobTotalCents += parseFloat(job.cost) * 100;
                 }
-                setAllJobsCompleted(combinedJobs);
-                setAllJobsTotal(combinedJobTotalCents / 100);
-                setTotalPayments(combinedPayments);
-                setAllPaymentsTotal(combinedPaymentsTotalCents / 100);
-                setAllAdjustments(combinedAdjustments);
-                setAllAdjustmentsTotal(combinedAdjustmentsTotalCents / 100);
-                setAdjustmentDebits(debitSum);
-                setAdjustmentCredits(creditSum);
-                setNewBalance(combinedBalance);
-            })
-        .catch(error => {
-            console.error('Error fetching jobs:', error);
-        });
+
+                for (const payment of [...(item.payments || [])].reverse()) {
+                combinedPayments.push({ ...payment, invoiced: true });
+                combinedPaymentsTotalCents += parseFloat(payment.amount) * 100;
+                }
+            }
+            }
+
+            // 🔽 single state commit
+            setAllJobsCompleted(combinedJobs);
+            setAllJobsTotal(combinedJobTotalCents / 100);
+            setTotalPayments(combinedPayments);
+            setAllPaymentsTotal(combinedPaymentsTotalCents / 100);
+            setAllAdjustments(combinedAdjustments);
+            setAllAdjustmentsTotal(combinedAdjustmentsTotalCents / 100);
+            setAdjustmentDebits(debitSum);
+            setAdjustmentCredits(creditSum);
+            setNewBalance(combinedBalance);
+
+        } catch (err) {
+            console.error("Error fetching client data:", err);
+        }
+    };
+
+    useEffect(() => {
+        fetchClientData();
     }, [client.id]);
 
     const handleClientUpdated = (updatedClient: ClientDataID) => {
@@ -339,11 +329,18 @@ const ClientView: React.FC = () => {
                 onClose={() => setShowPaymentModal(false)}
                 client={client}
                 onPaymentSubmit={() => setShowPaymentModal(false)}
+                onPaymentSuccess={() => {
+                    queryClient.invalidateQueries({ queryKey: ['todaysPayments'] })
+                    fetchClientData();
+                }}
             />
             <AdjustmentModal
                 isOpen={showAdjustmentModal}
                 client={client}
                 onClose={() => setShowAdjustmentModal(false)}
+                onAdjustmentSuccess={() => {
+                    fetchClientData();
+                }}
             />
             <EditClientModal 
                 isOpen={showEditModal}

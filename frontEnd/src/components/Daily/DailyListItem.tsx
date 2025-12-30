@@ -3,6 +3,7 @@ import { Job } from '../../types/interfaces';
 import PaymentModal from '../Payment/PaymentModal';
 import '../../styles/components/DailyListItem.css';
 import '../../styles/components/listItem.css';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface DailyListItemProps {
   job: Job;
@@ -16,6 +17,7 @@ const DailyListItemComponent: React.FC<DailyListItemProps> = ({ job, isFocused, 
   const isComplete = job.status === 'complete';
   const [isLoading, setIsLoading] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleItemClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -111,6 +113,9 @@ const DailyListItemComponent: React.FC<DailyListItemProps> = ({ job, isFocused, 
         onClose={closePaymentModal}
         job={job}
         onPaymentSubmit={handlePaymentSubmit}
+        onPaymentSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ['todaysPayments'] })
+        }}
       />
     </>
   );

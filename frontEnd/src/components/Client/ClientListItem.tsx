@@ -4,6 +4,7 @@ import PaymentModal from '../Payment/PaymentModal';
 import { useNavigate } from "react-router-dom";
 import '../../styles/components/ClientListItem.css';
 import EditClientModal from './EditClientModal';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface ClientListItemProps {
     client: ClientDataID;
@@ -16,6 +17,7 @@ interface ClientListItemProps {
 const ClientListItemComponent: React.FC<ClientListItemProps> = ({ client, isFocused, onClick, renderStars, onClientUpdated }) => {
     const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+    const queryClient = useQueryClient();
 
     const handlePayClick = useCallback((e: React.MouseEvent) => {
         e.stopPropagation();
@@ -97,6 +99,9 @@ const ClientListItemComponent: React.FC<ClientListItemProps> = ({ client, isFocu
                 onClose={handlePaymentModalClose}
                 client={client}
                 onPaymentSubmit={handlePaymentSubmit}
+                onPaymentSuccess={() => {
+                    queryClient.invalidateQueries({ queryKey: ['todaysPayments'] })
+                }}
             />
             {showEditModal && (
                 <EditClientModal 
